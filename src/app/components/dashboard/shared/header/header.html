@@ -1,0 +1,43 @@
+<header class="w-full border-b border-gray-200">
+  <div class="flex items-center justify-between gap-x-2 w-full py-3 px-4 md:px-7 lg:px-10">
+
+    <!-- Logo -->
+    <a href="/dashboard" class="h-8 flex items-center gap-x-3 lg:hidden">
+      <img src="/logos/Epsel_logo.png" alt="Logo Epsel" class="h-full object-cover">
+      <p class="font-bold text-sm">EPSEL S.A.</p>
+    </a>
+
+    <!-- SearchBox -->
+    <div class="hidden lg:block w-full max-w-sm relative">
+      <input
+        type="text"
+        placeholder="Buscar..."
+        class="pl-10 pr-12 py-2 text-sm w-full max-w-xs rounded-lg border border-gray-200 focus:outline-blue-500 bg-white focus:border-blue-500 transition-colors focus:outline-0 focus:ring-blue-500">
+      <svg lucideSearch class="size-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+    </div>
+
+
+
+    <div class="flex items-center ml-auto gap-x-1">
+
+      <!-- Soporte -->
+      <button class="flex items-center justify-center gap-x-1 size-8 rounded-full hover:bg-gray-100">
+        <svg lucideCircleQuestionMark class="size-4.5 text-gray-800" />
+      </button>
+
+      <!-- Notificacions -->
+      <button class="flex items-center justify-center gap-x-1 size-8 rounded-full hover:bg-gray-100">
+        <svg lucideBell class="size-4.5 text-gray-800" />
+      </button>
+
+      <!-- Perfil -->
+      <div class="ml-2 pl-4 h-8 flex items-center border-l border-gray-200">
+        <a href="/perfil" class="h-10 w-10 bg-gray-300 rounded-full overflow-hidden">
+          <img src="https://avatars.githubusercontent.com/u/148911330?v=4" alt="User Avatar" class="h-full w-full object-cover" />
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</header>

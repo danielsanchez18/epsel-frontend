@@ -1,0 +1,31 @@
+<section class="lg:border border-gray-200 lg:rounded-xl lg:p-5 flex flex-col gap-10">
+
+  <div class="flex items-center justify-between gap-2">
+
+    <component-shared-search-box
+      class="w-full md:max-w-md"
+      placeholder="Buscar propiedades por código catastral"
+      [searchQuery]="searchQuery"
+      (searchQueryChange)="onSearchQuery($event)"
+    />
+
+    <div class="flex items-center gap-x-1">
+      <component-shared-import />
+      <component-shared-filters />
+    </div>
+
+  </div>
+
+  <component-dashboard-properties-table />
+
+  <!-- <component-dashboard-properties-empty /> -->
+
+  <component-shared-paginator
+    *ngIf="totalPages > 1"
+    [page]="currentPage"
+    [totalPages]="totalPages"
+    [totalElements]="totalElements"
+    (pageChange)="onPageChange($event)"
+  />
+
+</section>

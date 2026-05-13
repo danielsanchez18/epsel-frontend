@@ -1,0 +1,40 @@
+<div class="flex flex-col w-70 border-r pb-10 border-gray-200 h-full">
+
+  <div class="mb-1 py-5 pl-10 pr-5">
+    <a href="/dashboard" class="h-10 flex items-center gap-x-3">
+      <img src="/logos/Epsel_logo.png" alt="Logo Epsel" class="h-full object-cover">
+      <p class="font-bold">EPSEL S.A.</p>
+    </a>
+  </div>
+
+  <div class="flex flex-col pl-10 pr-5 gap-y-5 h-full overflow-y-auto">
+
+    <div class="flex flex-col w-full">
+      <p class="text-sm font-medium py-3">Dashboard</p>
+      <a routerLink="/dashboard"
+        routerLinkActive="border-blue-500! text-blue-600! font-medium"
+        [routerLinkActiveOptions]="{ exact:true }"
+        class="flex items-center gap-x-2 border-l-[3px] text-gray-600 hover:text-black border-gray-200 px-4 py-2.5 hover:bg-gray-100 text-sm">
+        <svg lucideLayoutDashboard class="size-4" />
+        General
+      </a>
+    </div>
+
+
+    @for (route of routes; track route) {
+      <div class="flex flex-col w-full">
+        <p class="text-sm font-medium py-3">{{ route.nameCategory }}</p>
+        @for (link of route.links; track link) {
+          <a [routerLink]="link.path"
+            routerLinkActive="border-blue-500! text-blue-600! font-medium"
+            class="flex items-center gap-x-2 border-l-[3px] text-gray-600 hover:text-black border-gray-200 px-4 py-2.5 hover:bg-gray-100 text-sm">
+            <svg [lucideIcon]="link.icon" class="size-4" />
+            {{ link.name }}
+          </a>
+        }
+      </div>
+    }
+
+  </div>
+
+</div>

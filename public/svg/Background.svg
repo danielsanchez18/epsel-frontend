@@ -1,0 +1,13 @@
+<svg class="w-full" preserveAspectRatio="none" width="1113" height="161" viewBox="0 0 1113 161" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g clip-path="url(#clip0_697_201879)">
+    <rect x="1" width="1112" height="348" fill="#B2E7FE"></rect>
+    <rect width="185.209" height="704.432" transform="matrix(0.50392 0.86375 -0.860909 0.508759 435.452 -177.87)" fill="#FF8F5D"></rect>
+    <rect width="184.653" height="378.667" transform="matrix(0.849839 -0.527043 0.522157 0.852849 -10.4556 -16.4521)" fill="#3ECEED"></rect>
+    <rect width="184.653" height="189.175" transform="matrix(0.849839 -0.527043 0.522157 0.852849 35.4456 58.5195)" fill="#4C48FF"></rect>
+  </g>
+  <defs>
+    <clipPath id="clip0_697_201879">
+      <rect x="0.5" width="1112" height="161" rx="12" fill="white"></rect>
+    </clipPath>
+  </defs>
+</svg>

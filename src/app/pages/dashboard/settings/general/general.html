@@ -1,0 +1,44 @@
+<main class="flex flex-col gap-y-5 px-4 md:px-7 lg:px-10">
+
+  <!-- Título y descripción -->
+  <div class="mb-5">
+    <h1 class="text-lg font-medium">Configuración</h1>
+    <p class="text-sm text-gray-700">Administra las configuraciones del sistema.</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex gap-x-1 border-b border-gray-200">
+    <a
+      routerLink="zonas-operativas"
+      routerLinkActive="font-semibold text-blue-600! border-blue-600!"
+      class="py-3 px-3 text-sm border-b-2 border-transparent text-gray-700 hover:text-black"
+    >
+      Zonas Operativas
+    </a>
+    <a
+      routerLink="reglas-financieras"
+      routerLinkActive="font-semibold text-blue-600! border-blue-600!"
+      class="py-3 px-3 text-sm border-b-2 border-transparent text-gray-700 hover:text-black"
+    >
+      Reglas Financieras
+    </a>
+    <a
+      routerLink="costos-servicio"
+      routerLinkActive="font-semibold text-blue-600! border-blue-600!"
+      class="py-3 px-3 text-sm border-b-2 border-transparent text-gray-700 hover:text-black"
+    >
+      Costos de Servicio
+    </a>
+    <a
+      routerLink="tarifas-agua"
+      routerLinkActive="font-semibold text-blue-600! border-blue-600!"
+      class="py-3 px-3 text-sm border-b-2 border-transparent text-gray-700 hover:text-black"
+    >
+      Tarifas de Agua
+    </a>
+  </div>
+
+  <router-outlet />
+
+
+</main>

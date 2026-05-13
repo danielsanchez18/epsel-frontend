@@ -1,0 +1,190 @@
+<section class="grid xl:grid-cols-[1.5fr_1fr] gap-5">
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="contents">
+
+    <!-- Información Personal -->
+    <div class="border border-gray-200 rounded-xl overflow-hidden">
+
+      <div class="px-5 py-3 text-sm font-medium border-b border-gray-200">
+        Información Personal
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-x-5 gap-y-5 p-5">
+
+        <!-- Foto -->
+        <div class="flex flex-col md:col-span-2 gap-y-2">
+          <label name="photo" class="text-sm font-medium">
+            Foto
+            <span class="text-red-500 ml-0.5">*</span>
+            <span class="text-gray-700 text-xs ml-0.5 font-normal">(La imagen debe pesar max. 1MB)</span>
+          </label>
+          <input id="image" name="image" type="file" accept="image/*"
+            (change)="onFileChange($event)"
+            class="text-sm w-full contain-content rounded-lg border file:border-r file:border-gray-200 border-gray-200 file:text-sm file:py-2 file:px-4 file:focus:outline-blue-500 file:mr-4 file:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:cursor-pointer hover:file:cursor-pointer">
+
+          @if (imagePreview) {
+            <img src="{{ imagePreview }}" alt="Preview" class="w-24 h-24 object-cover rounded-md mt-2" />
+          }
+        </div>
+
+        <!-- Nombre -->
+        <div class="flex flex-col gap-y-2">
+          <label name="names" class="text-sm font-medium">
+            Nombres
+            <span class="text-red-500 ml-0.5">*</span>
+          </label>
+          <input type="text" name="names"
+            formControlName="names"
+            class="border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Ingrese los nombres completos" required />
+
+          @if (form.controls.names.invalid && form.controls.names.touched) {
+            <div class="text-xs text-red-500">
+              @if (form.controls.names.errors?.['required']) { El nombre es obligatorio. }
+              @if (form.controls.names.errors?.['minlength']) { El nombre debe tener al menos 2 caracteres. }
+            </div>
+          }
+        </div>
+
+        <!-- Apellido -->
+        <div class="flex flex-col gap-y-2">
+          <label name="lastNames" class="text-sm font-medium">
+            Apellidos
+            <span class="text-red-500 ml-0.5">*</span>
+          </label>
+          <input type="text" name="lastNames"
+            formControlName="lastNames"
+            class="border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Ingrese los apellidos completos" required />
+          @if (form.controls.lastNames.invalid && form.controls.lastNames.touched) {
+            <div class="text-xs text-red-500">
+              @if (form.controls.lastNames.errors?.['required']) { El apellido es obligatorio. }
+              @if (form.controls.lastNames.errors?.['minlength']) { El apellido debe tener al menos 2 caracteres. }
+            </div>
+          }
+        </div>
+
+        <!-- DNI -->
+        <div class="flex flex-col gap-y-2">
+          <label name="dni" class="text-sm font-medium">
+            DNI
+            <span class="text-red-500 ml-0.5">*</span>
+          </label>
+          <input type="text"
+            name="dni"
+            inputmode="numeric"
+            maxlength="8"
+            pattern="[0-9]{8}"
+            formControlName="dni"
+            class="border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Ingrese el DNI" required />
+          @if (form.controls.dni.invalid && form.controls.dni.touched) {
+            <div class="text-xs text-red-500">
+              @if (form.controls.dni.errors?.['required']) { El DNI es obligatorio. }
+              @if (form.controls.dni.errors?.['pattern']) { El DNI debe tener exactamente 8 dígitos. }
+            </div>
+          }
+        </div>
+
+        <!-- Teléfono -->
+        <div class="flex flex-col gap-y-2">
+          <label name="phone" class="text-sm font-medium">
+            Teléfono
+            <span class="text-red-500 ml-0.5">*</span>
+          </label>
+          <input type="text" name="phone"
+            inputmode="numeric"
+            pattern="[0-9]{9}"
+            formControlName="phone"
+            maxlength="9" minlength="9"
+            class="border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Ejemplo: 987654321" />
+          @if (form.controls.phone.invalid && form.controls.phone.touched) {
+            <div class="text-xs text-red-500">
+              @if (form.controls.phone.errors?.['required']) { El teléfono es obligatorio. }
+              @if (form.controls.phone.errors?.['pattern']) { El teléfono debe tener exactamente 9 dígitos. }
+            </div>
+          }
+        </div>
+
+        <!-- Correo electrónico -->
+        <div class="flex flex-col gap-y-2">
+          <label name="email" class="text-sm font-medium">
+            Correo electrónico
+            <span class="text-red-500 ml-0.5">*</span>
+          </label>
+          <input type="email" name="email"
+            formControlName="email"
+            class="border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Ingrese el correo electrónico" required />
+        </div>
+
+        <!-- Contraseña -->
+        <div class="flex flex-col gap-y-2">
+          <label name="password" class="text-sm font-medium">
+            Contraseña
+            <span class="text-red-500 ml-0.5">*</span>
+          </label>
+          <input type="password" name="password"
+            formControlName="password"
+            class="border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Ingrese una contraseña segura" required />
+          @if (form.controls.password.invalid && form.controls.password.touched) {
+            <div class="text-xs text-red-500">
+              @if (form.controls.password.errors?.['required']) { La contraseña es obligatoria. }
+              @if (form.controls.password.errors?.['minlength']) { La contraseña debe tener al menos 8 caracteres. }
+              @if (form.controls.password.errors?.['pattern']) { La contraseña debe incluir mayúsculas, minúsculas, números y símbolos. }
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Asignación Operativa -->
+    <div class="border border-gray-200 rounded-xl overflow-hidden">
+
+      <div class="px-5 py-3 text-sm font-medium border-b border-gray-200">
+        Asignación Operativa
+      </div>
+
+      <div class="grid gap-5 p-5">
+
+        <!-- Rol -->
+        <div class="flex flex-col gap-y-2">
+          <label name="role" class="text-sm font-medium">
+            Rol
+            <span class="text-red-500 ml-0.5">*</span>
+          </label>
+          <select name="roleId" formControlName="roleId" required
+            class="border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="" disabled selected>Seleccione un rol</option>
+            @for (role of roles; track role) {
+              <option [value]="role.id">
+                {{ role.name === 'ADMIN' ? 'ADMINISTRADOR'
+                  : role.name === 'SUPERVISOR' ? 'SUPERVISOR'
+                  : role.name === 'TECHNICIAN' ? 'TÉCNICO'
+                  : role.name === 'VERIFIER' ? 'VERIFICADOR'
+                  : role.name === 'MANAGEMENT' ? 'GERENTE'
+                  : role.name }}
+              </option>
+            }
+          </select>
+        </div>
+
+
+
+        <!-- Boton de Guardar -->
+        <div class="flex justify-end">
+          <button type="submit"
+            [disabled]="form.invalid || isSubmitting"
+            class="text-sm w-full bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            {{ isSubmitting ? 'Registrando...' : 'Registrar Trabajador' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+</section>

@@ -1,0 +1,30 @@
+<section class="flex items-center justify-between gap-x-3">
+
+  <!-- Resultados -->
+  <p class="text-sm font-medium">
+    {{ totalElements }}
+    <span class="text-gray-700 font-normal">{{ totalElements === 1 ? 'resultado' : 'resultados' }}</span>
+  </p>
+
+  <!-- Paginación -->
+  <nav class="flex items-center gap-x-1 text-gray-500">
+    <button
+      type="button"
+      class="size-8 flex items-center justify-center rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+      [disabled]="!canGoPrevious"
+      (click)="onPrevious()">
+      <svg lucideChevronLeft class="size-5" />
+    </button>
+    <p class="size-8 flex items-center justify-center rounded-lg bg-gray-100 text-black font-medium text-sm">{{ safeCurrentPage }}</p>
+    <p class="text-sm mx-2">de</p>
+    <p class="text-sm h-8 flex items-center justify-center">{{ safeTotalPages }}</p>
+    <button
+      type="button"
+      class="size-8 flex items-center justify-center rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+      [disabled]="!canGoNext"
+      (click)="onNext()">
+      <svg lucideChevronRight class="size-5" />
+    </button>
+  </nav>
+
+</section>

@@ -1,0 +1,63 @@
+<section class="flex flex-col border border-gray-200 bg-white overflow-hidden rounded-xl px-5 divide-y divide-gray-200">
+
+  <!-- Meses para el corte automático -->
+  <div class="flex items-center justify-between gap-x-5 py-5">
+    <div class="space-y-1">
+      <h2 class="text-sm font-medium">Meses para el corte automático</h2>
+      <p class="text-sm text-gray-500">Configura el número de meses para el corte automático de las reglas financieras.</p>
+    </div>
+
+    <div class="flex items-center gap-x-2">
+      <input
+        type="number"
+        min="1" max="12"
+        value="2"
+        placeholder="00"
+        class="text-sm w-15 text-center rounded-lg px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+      <button class="flex items-center gap-x-1 font-medium text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 w-fit">
+        Guardar
+      </button>
+    </div>
+  </div>
+
+  <!-- Porcentaje de mora -->
+  <div class="flex items-center justify-between gap-x-5 py-5">
+    <div class="space-y-1">
+      <h2 class="text-sm font-medium">Porcentaje de mora</h2>
+      <p class="text-sm text-gray-500">Configura el porcentaje de mora para las reglas financieras.</p>
+    </div>
+
+    <div class="flex items-center gap-x-2">
+      <input
+        type="number"
+        min="0" max="100"
+        value="5"
+        placeholder="00"
+        class="text-sm w-15 text-center rounded-lg px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+      <button class="flex items-center gap-x-1 font-medium text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 w-fit">
+        Guardar
+      </button>
+    </div>
+  </div>
+
+  <!-- Días de gracia -->
+  <div class="flex items-center justify-between gap-x-5 py-5">
+    <div class="space-y-1">
+      <h2 class="text-sm font-medium">Días de gracia</h2>
+      <p class="text-sm text-gray-500">Configura el número de días de gracia para las reglas financieras.</p>
+    </div>
+
+    <div class="flex items-center gap-x-2">
+      <input
+        type="number"
+        min="0" max="30"
+        value="5"
+        placeholder="00"
+        class="text-sm w-15 text-center rounded-lg px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+      <button class="flex items-center gap-x-1 font-medium text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 w-fit">
+        Guardar
+      </button>
+    </div>
+  </div>
+
+</section>

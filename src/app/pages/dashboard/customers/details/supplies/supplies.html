@@ -1,0 +1,46 @@
+<section class="p-5 border border-gray-200 rounded-xl overflow-hidden bg-white grid gap-5">
+
+  <div class="flex items-center justify-between gap-x-3">
+    <component-shared-search-box
+      placeholder="Buscar suministros por código"
+      class="max-w-md w-full"
+    />
+
+    <component-shared-filters />
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left">
+      <thead>
+        <tr class="bg-gray-100 text-sm">
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Código</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Dirección</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Estado</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Fecha de instalación</th>
+        </tr>
+      </thead>
+
+      <tbody class="text-sm divide-y divide-gray-200">
+        <tr class="group cursor-pointer hover:bg-gray-50">
+          <td class="py-4 px-6 text-nowrap text-blue-600 font-medium group-hover:underline">SUM-2256224</td>
+          <td class="py-4 px-6 text-nowrap">
+            <div>
+              <p>Av. Mariscal Castilla 123, Piso B</p>
+              <p class="text-gray-700 text-xs">Monsefú, Chiclayo</p>
+            </div>
+          </td>
+          <td class="py-3 px-6">
+            <div class="flex items-center gap-x-1 font-medium text-[13px] text-green-600 bg-green-50 rounded-lg px-3 py-2 w-fit">
+              <svg lucideBadgeCheck class="size-4" />
+              Activo
+            </div>
+          </td>
+          <td class="py-3 px-6 text-nowrap text-gray-700">30 oct 2023 - 10:30 AM</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <component-shared-paginator />
+
+</section>

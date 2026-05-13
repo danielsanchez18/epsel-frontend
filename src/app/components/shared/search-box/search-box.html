@@ -1,0 +1,19 @@
+<div class="relative w-full group">
+  <input
+    type="text"
+    [(ngModel)]="searchQuery"
+    [placeholder]="placeholder"
+    class="pl-10 pr-12 py-2.5 text-sm w-full rounded-lg border border-gray-200 focus:outline-blue-500 bg-white focus:border-blue-500 transition-colors focus:outline-0 focus:ring-blue-500"
+    (input)="onSearchInput()"
+  >
+
+  <!-- Icono de Placeholder -->
+  <svg lucideSearch class="size-4 text-gray-500 absolute left-4 top-1/2 -translate-y-1/2" />
+
+  <button
+    *ngIf="searchQuery"
+    class="absolute top-1/2 text-xs right-3 -translate-y-1/2 size-6 bg-gray-100 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200 hover:text-gray-900 transition-colors"
+    (click)="clearSearch()">
+    <svg lucideX class="size-3.5 m-auto" />
+  </button>
+</div>

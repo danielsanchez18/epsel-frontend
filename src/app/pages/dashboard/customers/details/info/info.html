@@ -1,0 +1,103 @@
+<section class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1fr_2fr] gap-5 h-full relative">
+
+  <!-- KPIS -->
+  <div class="lg:col-span-2">
+    <component-dashboard-customers-details-kpis />
+  </div>
+
+
+  <!-- Información de registro -->
+  <article class="rounded-2xl border border-gray-200 bg-white overflow-hidden h-fit order-2 lg:order-1">
+    <div class="px-5 py-3 border-b border-gray-200">
+      <h2 class="text-sm font-medium">Información de registro</h2>
+    </div>
+
+    <div class="p-5 space-y-3">
+      <div class="flex items-center gap-x-2">
+        <svg lucideBadgeInfo class="size-4 text-gray-500" />
+        <span class="text-sm text-gray-700">ID:</span>
+        <button class="truncate text-sm hover:underline text-blue-600 hover:text-blue-600-dark font-semibold">
+          46546546544645646
+        </button>
+      </div>
+      <div class="flex items-center gap-x-2">
+        <svg lucideCalendar1 class="size-4 text-gray-500" />
+        <span class="text-sm text-gray-700">Fecha de registro:</span>
+        <span class="text-sm">16 de mayo de 2026</span>
+      </div>
+      <div class="flex items-center gap-x-2">
+        <svg lucideCalendarCheck class="size-4 text-gray-500" />
+        <span class="text-sm text-gray-700">Fecha de actualización:</span>
+        <span class="text-sm">16 de mayo de 2026</span>
+      </div>
+      <div class="flex items-center gap-x-2">
+        <svg lucideUserCheck class="size-4 text-gray-500" />
+        <span class="text-sm text-gray-700">Registrado por:</span>
+        <button class="truncate text-sm hover:underline text-blue-600 hover:text-blue-600-dark font-semibold">
+          Daniel Sánchez Pisfil
+        </button>
+      </div>
+    </div>
+  </article>
+
+  <!-- Información personal -->
+  <article class="rounded-2xl border border-gray-200 bg-white overflow-hidden order-1 lg:order-2">
+    <div class="px-5 py-3 border-b border-gray-200">
+      <h2 class="text-sm font-medium">Información Personal</h2>
+    </div>
+
+    <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div class="flex flex-col gap-y-2">
+        <label class="text-sm font-medium">Tipo de cliente</label>
+        <input
+          type="text"
+          placeholder="Ingrese el tipo de cliente"
+          value="Coorporativo"
+          disabled
+          class="text-sm bg-gray-100 border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600">
+      </div>
+
+      <div class="flex flex-col gap-y-2">
+        <label class="text-sm font-medium">Número de documento</label>
+        <input
+          type="text"
+          placeholder="Ingrese su número de documento"
+          value="46546546"
+          disabled
+          class="text-sm bg-gray-100 border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600">
+      </div>
+
+      <div class="flex flex-col gap-y-2 md:col-span-2">
+        <label class="text-sm font-medium">Nombres</label>
+        <input
+          type="text"
+          placeholder="Ingrese su nombre completo"
+          class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600">
+      </div>
+
+      <div class="flex flex-col gap-y-2">
+        <label class="text-sm font-medium">Correo</label>
+        <input
+          type="email"
+          placeholder="Ingrese su correo electrónico"
+          class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600">
+      </div>
+
+      <div class="flex flex-col gap-y-2">
+        <label class="text-sm font-medium">Teléfono</label>
+        <input
+          type="text"
+          placeholder="Ingrese su número de teléfono"
+          class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600">
+      </div>
+
+      <div class="md:col-span-2">
+        <button
+          type="button"
+          class="text-sm px-4 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:bg-black disabled:cursor-not-allowed">
+          Guardar cambios
+        </button>
+      </div>
+    </div>
+  </article>
+</section>

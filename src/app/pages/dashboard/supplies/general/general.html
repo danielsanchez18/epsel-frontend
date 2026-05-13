@@ -1,0 +1,22 @@
+<main class="flex flex-col gap-y-7 px-4 md:px-7 lg:px-10">
+
+  <div class="flex items-center gap-x-2">
+
+    <!-- Título y descripción -->
+    <div>
+      <h1 class="text-lg font-medium">Suministros</h1>
+      <p class="text-sm text-gray-700">Administra los suministros del sistema.</p>
+    </div>
+
+    <a routerLink="registrar"
+      class="ml-auto rounded-lg font-medium bg-blue-500 text-white text-sm hover:bg-blue-600 px-3 py-2 transition-colors duration-200"
+      aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-scale-animation-modal" data-hs-overlay="#hs-scale-animation-modal">
+      Registrar
+    </a>
+
+  </div>
+
+  <component-dashboard-supplies-kpis />
+  <component-dashboard-supplies-list />
+
+</main>

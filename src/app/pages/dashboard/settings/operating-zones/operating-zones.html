@@ -1,0 +1,74 @@
+<section class="flex flex-col gap-5 border border-gray-200 bg-white overflow-hidden rounded-xl p-5">
+
+  <div class="flex items-center gap-x-3">
+    <component-shared-search-box
+      placeholder="Buscar zona por nombre"
+      class="max-w-md w-full"
+    />
+
+    <component-shared-filters class="ml-auto" />
+
+    <button class="flex items-center gap-x-1 font-medium text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 w-fit">
+      Nueva Zona
+    </button>
+  </div>
+
+  <!-- Tabla de zonas operativas -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full">
+      <thead>
+        <tr class="bg-gray-100 text-sm">
+          <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Zona Operativa</th>
+          <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Descripción</th>
+          <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Estado</th>
+          <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="text-sm divide-y divide-gray-200">
+        <tr class="group cursor-pointer hover:bg-gray-50">
+          <td class="py-3 px-6 text-nowrap font-medium text-blue-600 group-hover:underline">Zona 1</td>
+          <td class="py-3 px-6 max-w-70 truncate">Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque totam, officiis magnam eligendi omnis rerum natus culpa perferendis accusantium voluptas dolor recusandae eos illo hic suscipit iure, maxime ex consequatur.</td>
+          <td class="py-3 px-6">
+            <div class="flex items-center gap-x-1 font-medium text-[13px] text-green-600 bg-green-50 rounded-lg px-3 py-2 w-fit">
+              <svg lucideBadgeCheck class="size-4" />
+              Activo
+            </div>
+          </td>
+          <td class="py-3 px-6 text-right">
+            <div class="flex items-center gap-x-1">
+              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
+                <svg lucidePenBox class="size-4" />
+              </button>
+              <button class="flex items-center gap-x-1 font-medium text-[13px] text-red-500 border border-red-100 bg-red-50 hover:bg-red-100 rounded-lg px-2 py-2 w-fit">
+                <svg lucideTrash2 class="size-4" />
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr class="group cursor-pointer hover:bg-gray-50">
+          <td class="py-3 px-6 text-nowrap font-medium text-blue-600 group-hover:underline">Zona 1</td>
+          <td class="py-3 px-6 max-w-70 truncate">Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque totam, officiis magnam eligendi omnis rerum natus culpa perferendis accusantium voluptas dolor recusandae eos illo hic suscipit iure, maxime ex consequatur.</td>
+          <td class="py-3 px-6">
+            <div class="flex items-center gap-x-1 font-medium text-[13px] text-green-600 bg-green-50 rounded-lg px-3 py-2 w-fit">
+              <svg lucideBadgeCheck class="size-4" />
+              Activo
+            </div>
+          </td>
+          <td class="py-3 px-6 text-right">
+            <div class="flex items-center gap-x-1">
+              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
+                <svg lucidePenBox class="size-4" />
+              </button>
+              <button class="flex items-center gap-x-1 font-medium text-[13px] text-red-500 border border-red-100 bg-red-50 hover:bg-red-100 rounded-lg px-2 py-2 w-fit">
+                <svg lucideTrash2 class="size-4" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <component-shared-paginator />
+
+</section>

@@ -1,0 +1,22 @@
+<main class="flex flex-col gap-y-7 px-4 md:px-7 lg:px-10">
+
+  <div class="flex items-center gap-x-2">
+
+    <!-- Título y descripción -->
+    <div>
+      <h1 class="text-lg font-medium">Personal</h1>
+      <p class="text-sm text-gray-700">Administra el personal del sistema.</p>
+    </div>
+
+    <a
+      routerLink="agregar"
+      class="ml-auto rounded-lg font-medium bg-blue-500 text-white text-sm hover:bg-blue-600 px-3 py-2 transition-colors duration-200">
+      Agregar
+    </a>
+
+  </div>
+
+  <component-dashboard-workers-kpis />
+  <component-dashboard-workers-list />
+
+</main>

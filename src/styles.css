@@ -1,1 +1,41 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+@import "../node_modules/preline/variants.css";
+
+@source "../node_modules/preline/dist/*.js";
+
+@plugin "@tailwindcss/forms";
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@custom-variant hover (&:hover);
+
+@theme {
+  --font-primary: "Inter", sans-serif;
+}
+
+:root {
+  @apply font-primary;
+}
+
+
+/* Ocultar flechas de los input de tipo number Para Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Ocultar flechas de los input de tipo number Para Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Ocultar el scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}
