@@ -69,7 +69,7 @@ export class AuthService {
   }
 
 
-  getUser(): UserResponse {
+  getUser(): any {
     const rawUser = localStorage.getItem(AuthService.USER_KEY);
 
     if (!rawUser) {

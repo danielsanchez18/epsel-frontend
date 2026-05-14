@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ComponentDashboardGeneralKpis } from "@components/dashboard/general/kpis/kpis";
+import { AuthService } from '@services/auth/auth.service';
 
 @Component({
   selector: 'page-dashboard-general',
@@ -8,4 +9,9 @@ import { ComponentDashboardGeneralKpis } from "@components/dashboard/general/kpi
   ],
   templateUrl: './general.html',
 })
-export class PageDashboardGeneral {}
+export class PageDashboardGeneral {
+
+  private auth = inject(AuthService);
+  usuario = this.auth.getUser();
+
+}

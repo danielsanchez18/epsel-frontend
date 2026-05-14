@@ -32,8 +32,9 @@
 
       <!-- Perfil -->
       <div class="ml-2 pl-4 h-8 flex items-center border-l border-gray-200">
-        <a href="/perfil" class="h-10 w-10 bg-gray-300 rounded-full overflow-hidden">
-          <img src="https://avatars.githubusercontent.com/u/148911330?v=4" alt="User Avatar" class="h-full w-full object-cover" />
+        <a href="/dashboard/perfil" class="h-10 w-10 bg-gray-300 rounded-full overflow-hidden flex items-center justify-center">
+          <img *ngIf="usuario?.photoUrl" [src]="usuario?.photoUrl | publicUrl" alt="User Avatar" class="h-full w-full object-cover" />
+          <svg *ngIf="!usuario?.photoUrl" lucideUserCircle class="size-8 text-gray-500"></svg>
         </a>
       </div>
 

@@ -129,9 +129,11 @@
         <input
           type="text"
           placeholder="Ingrese su número de teléfono"
+          ma
           class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600"
           [(ngModel)]="formData.phone"
           (ngModelChange)="checkChanges()"
+          (keypress)="allowOnlyNumbers($event)"
           (blur)="touch('phone')">
         @if (touched.phone && formData.phone && !validatePhone(formData.phone)) {
           <div class="text-xs text-red-500">El teléfono debe tener exactamente 9 dígitos numéricos.</div>

@@ -211,4 +211,17 @@ export class PageDashboardWorkersDetailsInfo implements DoCheck, OnInit {
     }
   }
 
+  allowOnlyNumbers(event: KeyboardEvent) {
+    const charCode = event.key.charCodeAt(0);
+    if (
+      event.key !== 'Backspace' &&
+      event.key !== 'Tab' &&
+      event.key !== 'ArrowLeft' &&
+      event.key !== 'ArrowRight' &&
+      (charCode < 48 || charCode > 57)
+    ) {
+      event.preventDefault();
+    }
+  }
+
 }

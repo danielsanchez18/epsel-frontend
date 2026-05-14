@@ -76,6 +76,7 @@
             maxlength="8"
             pattern="[0-9]{8}"
             formControlName="dni"
+            (keypress)="allowOnlyNumbers($event)"
             class="border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Ingrese el DNI" required />
           @if (form.controls.dni.invalid && form.controls.dni.touched) {
@@ -97,6 +98,7 @@
             pattern="[0-9]{9}"
             formControlName="phone"
             maxlength="9" minlength="9"
+            (keypress)="allowOnlyNumbers($event)"
             class="border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Ejemplo: 987654321" />
           @if (form.controls.phone.invalid && form.controls.phone.touched) {
