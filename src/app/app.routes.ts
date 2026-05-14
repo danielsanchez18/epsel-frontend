@@ -15,7 +15,7 @@ export const routes: Routes = [
     loadChildren: () => import('@routes/dashboard/dashboard.routes').then(m => m.DASHBOARD_ROUTES)
   },
   {
-    path: 'profile',
+    path: 'perfil',
     canMatch: [authGuard],
     loadChildren: () => import('@routes/profile/profile.routes').then(m => m.PROFILE_ROUTES)
   },
