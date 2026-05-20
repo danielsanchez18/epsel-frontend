@@ -7,16 +7,6 @@
         {{ customerName ? ('Mostrando los suministros de ' + customerName) : 'Mostrando los suministros asociados al cliente actual' }}
       </p>
     </div>
-
-    <div class="flex items-center gap-x-3 w-full lg:w-md">
-      <component-shared-search-box
-        class="max-w-md w-full"
-        placeholder="Buscar por suministro, medidor o referencia"
-        [searchQuery]="searchQuery"
-        (searchQueryChange)="onSearchQuery($event)"
-      />
-
-    </div>
   </div>
 
   <div *ngIf="isLoading" class="flex justify-center py-10">
@@ -36,8 +26,7 @@
       </thead>
 
       <tbody class="text-sm divide-y divide-gray-200">
-        <tr routerLink="/dashboard/suministros/{{item.id}}"
-          *ngFor="let item of supplies" class="group hover:bg-gray-50 cursor-pointer">
+        <tr *ngFor="let item of supplies" [routerLink]="['/dashboard/suministros', item.id]" class="group hover:bg-gray-50 cursor-pointer">
           <td class="py-4 px-6 text-nowrap text-blue-600 font-medium group-hover:underline">
             {{ item.supplyNumber }}
           </td>

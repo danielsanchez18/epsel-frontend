@@ -1,20 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ComponentSharedSearchBox } from "@components/shared/search-box/search-box";
-import { ComponentSharedFilters } from "@components/shared/filters/filters";
 import { ComponentSharedPaginator } from "@components/shared/paginator/paginator";
 import { ComponentDashboardSuppliesEmpty } from '@components/dashboard/supplies/empty/empty';
 import { SupplyService } from '@core/services/supplies/supply.service';
-import { SupplyResponseDTO } from '@core/interfaces/supplies/supply.interface';
+import { SupplyDetailsDTO } from '@core/interfaces/supplies/supply.interface';
 import { PageDashboardCustomersDetailsGeneral } from '../general/general';
-import { LucideBadgeCheck, LucideBuilding2, LucideHouse, LucideStore, LucideSearch } from "@lucide/angular";
+import { LucideBadgeCheck, LucideBuilding2, LucideHouse, LucideStore } from "@lucide/angular";
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'page-dashboard-customers-details-supplies',
   imports: [
     CommonModule,
-    ComponentSharedSearchBox,
     ComponentSharedPaginator,
     ComponentDashboardSuppliesEmpty,
     RouterLink,
@@ -25,31 +23,35 @@ import { LucideBadgeCheck, LucideBuilding2, LucideHouse, LucideStore, LucideSear
   ],
   templateUrl: './supplies.html',
 })
-export class PageDashboardCustomerDetailsSupplies implements OnInit {
+export class PageDashboardCustomerDetailsSupplies implements OnInit, OnDestroy {
   private supplyService = inject(SupplyService);
   private route = inject(ActivatedRoute);
   private parent = inject(PageDashboardCustomersDetailsGeneral);
 
-  supplies: SupplyResponseDTO[] = [];
+  supplies: SupplyDetailsDTO[] = [];
   customerId: string | null = null;
   customerName = '';
-  searchQuery = '';
   currentPage = 0;
   totalPages = 0;
   totalElements = 0;
   pageSize = 10;
   isLoading = false;
+  private customerSub?: Subscription;
 
   ngOnInit(): void {
     this.customerId = this.parent.customerId || this.route.parent?.snapshot.paramMap.get('id') || null;
 
-    this.parent.customer$.subscribe(customer => {
+    this.customerSub = this.parent.customer$.subscribe(customer => {
       this.customerName = customer?.fullName || '';
     });
 
     if (this.customerId) {
       this.loadSupplies();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.customerSub?.unsubscribe();
   }
 
   loadSupplies(page: number = 0): void {
@@ -62,14 +64,7 @@ export class PageDashboardCustomerDetailsSupplies implements OnInit {
 
     this.isLoading = true;
 
-    this.supplyService.findAll(
-      page,
-      this.pageSize,
-      this.searchQuery.trim() || undefined,
-      undefined,
-      undefined,
-      this.customerId
-    ).subscribe({
+    this.supplyService.getByCustomerId(this.customerId, page, this.pageSize).subscribe({
       next: (res) => {
         if (res.success && res.data) {
           this.supplies = res.data.content ?? [];
@@ -94,11 +89,6 @@ export class PageDashboardCustomerDetailsSupplies implements OnInit {
 
   onPageChange(page: number): void {
     this.loadSupplies(page);
-  }
-
-  onSearchQuery(query: string): void {
-    this.searchQuery = query;
-    this.loadSupplies(0);
   }
 
   getTypeLabel(type?: string): string {
