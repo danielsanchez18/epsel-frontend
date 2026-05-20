@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'component-dashboard-properties-empty',
+  selector: 'component-dashboard-supplies-empty',
   imports: [],
   templateUrl: './empty.html',
 })

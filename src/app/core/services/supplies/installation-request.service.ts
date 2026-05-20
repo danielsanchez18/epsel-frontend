@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { API_URL } from '@core/utils/api';
 import { ApiResponse } from '@core/interfaces/shared/api-response.interface';
 import { PaginatedResponse } from '@core/interfaces/shared/paginated-response.interface';
-import { CreateInstallationRequest, InstallationRequestResponse, InstallationRequestStatus } from '@interfaces/supplies/installation-request.interface';
+import { CreateInstallationRequest, InstallSupplyDTO, InstallationRequestResponse, InstallationRequestStatus } from '@interfaces/supplies/installation-request.interface';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -27,8 +27,8 @@ export class InstallationRequestService {
     return this.http.patch<ApiResponse<InstallationRequestResponse>>(`${this.baseUrl}/${id}/reject`, {}, { params });
   }
 
-  install(id: string): Observable<ApiResponse<InstallationRequestResponse>> {
-    return this.http.patch<ApiResponse<InstallationRequestResponse>>(`${this.baseUrl}/${id}/install`, {});
+  install(id: string, dto: InstallSupplyDTO): Observable<ApiResponse<InstallationRequestResponse>> {
+    return this.http.patch<ApiResponse<InstallationRequestResponse>>(`${this.baseUrl}/${id}/install`, dto);
   }
 
   findAll(

@@ -3,8 +3,13 @@ export type InstallationRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'I
 export interface CreateInstallationRequest {
   customerId: string;
   propertyId: string;
+  internalReference?: string;
   requestedDate?: string;
   observations?: string;
+}
+
+export interface InstallSupplyDTO {
+  meterNumber: string;
 }
 
 export interface InstallationRequestResponse {
@@ -13,6 +18,7 @@ export interface InstallationRequestResponse {
   customerName: string;
   zoneName: string;
   propertyId: string;
+  internalReference?: string;
   propertyAddress: string;
   installationCost: number;
   status: InstallationRequestStatus;

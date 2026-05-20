@@ -59,6 +59,33 @@ export class ComponentDashboardCustomersAdd implements OnInit {
     }
   }
 
+  allowOnlyLetters(event: KeyboardEvent) {
+    const key = event.key;
+    // Allow control/navigation keys
+    const allowedControls = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+    if (allowedControls.includes(key)) return;
+    // Prevent digits
+    if (/\d/.test(key)) {
+      event.preventDefault();
+    }
+  }
+
+  handleNamePaste(event: ClipboardEvent) {
+    const paste = event.clipboardData?.getData('text') || '';
+    if (/\d/.test(paste)) {
+      // Filter out digits and insert cleaned text
+      event.preventDefault();
+      const filtered = paste.replace(/\d/g, '');
+      const input = event.target as HTMLInputElement;
+      const start = input.selectionStart || 0;
+      const end = input.selectionEnd || 0;
+      const value = input.value || '';
+      const newValue = value.slice(0, start) + filtered + value.slice(end);
+      input.value = newValue;
+      input.dispatchEvent(new Event('input'));
+    }
+  }
+
   onSubmit() {
     if (this.addForm.invalid) return;
 

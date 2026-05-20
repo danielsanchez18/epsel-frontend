@@ -46,6 +46,7 @@ export class ComponentDashboardApplicationsAdd implements OnInit {
 
     this.requestForm = this.fb.group({
       customerId: ['', [Validators.required]],
+      internalReference: ['', [Validators.required, Validators.maxLength(100)]],
       propertyId: ['', [Validators.required]],
       requestedDate: ['', [Validators.required, this.minDateValidator()]],
       observations: ['', [Validators.maxLength(500)]]
@@ -138,6 +139,7 @@ export class ComponentDashboardApplicationsAdd implements OnInit {
     this.isLoading = true;
     const payload: CreateInstallationRequest = {
       customerId: this.requestForm.value.customerId,
+      internalReference: this.requestForm.value.internalReference,
       propertyId: this.requestForm.value.propertyId,
       requestedDate: this.requestForm.value.requestedDate,
       observations: this.requestForm.value.observations

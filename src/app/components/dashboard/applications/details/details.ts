@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { Subscription } from 'rxjs';
 
@@ -20,6 +20,7 @@ import { InstallationRequestResponse } from '@interfaces/supplies/installation-r
 export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy {
 
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private requestService = inject(InstallationRequestService);
   private customerService = inject(CustomerService);
   private propertyService = inject(PropertyService);
@@ -196,14 +197,30 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
     Swal.fire({
       icon: 'question',
       title: 'Registrar instalación',
-      text: '¿Deseas marcar esta solicitud como instalada?',
+      input: 'text',
+      inputLabel: 'Número de medidor',
+      inputPlaceholder: 'Ingresa el número de medidor',
+      inputAttributes: {
+        maxlength: '50'
+      },
       showCancelButton: true,
       confirmButtonText: 'Sí, instalar',
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#16a34a'
+      ,
+      preConfirm: (value) => {
+        if (!value || !value.trim()) {
+          Swal.showValidationMessage('El número de medidor es requerido.');
+          return;
+        }
+        return value.trim();
+      }
     }).then(result => {
-      if (!result.isConfirmed) return;
-      this.executeAction(() => this.requestService.install(this.request!.id), 'Solicitud marcada como instalada.');
+      if (!result.isConfirmed || !result.value) return;
+      this.executeAction(
+        () => this.requestService.install(this.request!.id, { meterNumber: result.value }),
+        'Solicitud marcada como instalada.'
+      );
     });
   }
 
@@ -253,6 +270,10 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
 
   canViewSupply(): boolean {
     return this.request?.status === 'INSTALLED';
+  }
+
+  goToSupplies(): void {
+    this.router.navigate(['/dashboard/suministros']);
   }
 
   getTimeline(): Array<{ label: string; date?: string | null; active: boolean; done: boolean }> {

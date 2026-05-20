@@ -16,9 +16,16 @@
 
   </div>
 
-  <component-dashboard-supplies-table />
+  <div *ngIf="isLoading" class="flex justify-center py-10">
+    <div class="animate-spin inline-block size-6 border-2 border-current border-t-transparent text-blue-600 rounded-full" role="status" aria-label="loading"></div>
+  </div>
 
-  <!-- <component-dashboard-supplies-empty /> -->
+  <component-dashboard-supplies-table
+    *ngIf="!isLoading && supplies.length > 0"
+    [items]="supplies"
+  />
+
+  <component-dashboard-supplies-empty *ngIf="!isLoading && supplies.length === 0" />
 
   <component-shared-paginator
     *ngIf="totalPages > 1"
