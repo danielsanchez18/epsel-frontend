@@ -106,6 +106,17 @@ export class PageDashboardCustomersDetailsInfo implements OnInit, OnDestroy {
     }
   }
 
+  allowOnlyLetters(event: KeyboardEvent) {
+    const key = event.key;
+    // Allow control/navigation keys
+    const allowedControls = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+    if (allowedControls.includes(key)) return;
+    // Prevent digits
+    if (/\d/.test(key)) {
+      event.preventDefault();
+    }
+  }
+
   copyToClipboard(text: string | null | undefined): void {
       if (text) {
         navigator.clipboard.writeText(text);

@@ -73,6 +73,7 @@
         <input
           type="text"
           formControlName="fullName"
+          (keypress)="allowOnlyLetters($event)"
           placeholder="Ingrese nombre completo"
           class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600 focus:border-transparent">
         <span *ngIf="editForm.get('fullName')?.invalid && editForm.get('fullName')?.touched" class="text-xs text-red-500">
