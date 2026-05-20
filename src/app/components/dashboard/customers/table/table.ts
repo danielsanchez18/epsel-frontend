@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LucideUserCog, LucideBadgeCheck, LucideShieldCheck, LucideUserPen, LucideUserStar, LucideUserSearch, LucideTrash2, LucideCircleX } from '@lucide/angular';
-import { UserResponse } from '@interfaces/users/user.interface';
+import { CustomerResponse } from '@interfaces/customers/customer.interface';
 import { PublicUrlPipe } from '@core/pipes/public-url.pipe';
 
 @Component({
@@ -19,7 +19,7 @@ import { PublicUrlPipe } from '@core/pipes/public-url.pipe';
 })
 export class ComponentDashboardCustomersTable {
 
-  @Input() users: UserResponse[] = [];
+  @Input() customers: CustomerResponse[] = [];
   @Input() isLoading = false;
 
 }

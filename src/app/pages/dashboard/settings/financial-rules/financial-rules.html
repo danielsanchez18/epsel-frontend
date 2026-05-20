@@ -1,63 +1,101 @@
-<section class="flex flex-col border border-gray-200 bg-white overflow-hidden rounded-xl px-5 divide-y divide-gray-200">
+<section *ngIf="!isLoading; else loader" class="flex flex-col border border-gray-200 bg-white overflow-hidden rounded-xl px-5 py-2">
+  <form [formGroup]="configForm" (ngSubmit)="onSubmit()" class="divide-y divide-gray-200">
 
-  <!-- Meses para el corte automático -->
-  <div class="flex items-center justify-between gap-x-5 py-5">
-    <div class="space-y-1">
-      <h2 class="text-sm font-medium">Meses para el corte automático</h2>
-      <p class="text-sm text-gray-500">Configura el número de meses para el corte automático de las reglas financieras.</p>
+    <!-- Acciones / Header -->
+    <div class="flex items-center justify-between py-4">
+      <div>
+        <h2 class="font-medium text-sm">Reglas Financieras</h2>
+        <p class="text-sm text-gray-500">Configura los parámetros automáticos de cobranza.</p>
+      </div>
+
+      <div class="flex items-center gap-x-2">
+        <!-- Modo Lectura -->
+        <button *ngIf="!isEditing" type="button" (click)="enableEdit()"
+          class="flex items-center gap-x-1 font-medium text-[13px] bg-black text-white hover:bg-black/70 rounded-lg px-3 py-2">
+          Cambiar
+        </button>
+
+        <!-- Modo Edición -->
+        <ng-container *ngIf="isEditing">
+          <button type="button" (click)="cancelEdit()" [disabled]="isSaving"
+            class="flex items-center gap-x-1 font-medium text-[13px] bg-white border border-gray-200 hover:bg-gray-100 rounded-lg px-3 py-2 disabled:opacity-50">
+            Cancelar
+          </button>
+          <button type="submit" [disabled]="configForm.invalid || isSaving || !hasChanges"
+            class="flex items-center gap-x-1 font-medium text-[13px] border border-transparent bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 disabled:opacity-50">
+            <span *ngIf="isSaving" class="animate-spin inline-block size-4 border-2 border-current border-t-transparent text-white rounded-full"></span>
+            {{ isSaving ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+        </ng-container>
+      </div>
     </div>
 
-    <div class="flex items-center gap-x-2">
-      <input
-        type="number"
-        min="1" max="12"
-        value="2"
-        placeholder="00"
-        class="text-sm w-15 text-center rounded-lg px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-      <button class="flex items-center gap-x-1 font-medium text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 w-fit">
-        Guardar
-      </button>
-    </div>
-  </div>
+    <!-- Meses para el corte automático -->
+    <div class="flex items-center justify-between gap-x-5 py-5">
+      <div class="space-y-1">
+        <h2 class="text-sm font-medium">Meses para el corte automático</h2>
+        <p class="text-sm text-gray-500">Configura el número de meses para el corte automático de las reglas financieras.</p>
+        <span *ngIf="isEditing && configForm.get('monthsBeforeCut')?.invalid" class="text-xs text-red-500">
+          * El valor debe ser mayor o igual a 1.
+        </span>
+      </div>
 
-  <!-- Porcentaje de mora -->
-  <div class="flex items-center justify-between gap-x-5 py-5">
-    <div class="space-y-1">
-      <h2 class="text-sm font-medium">Porcentaje de mora</h2>
-      <p class="text-sm text-gray-500">Configura el porcentaje de mora para las reglas financieras.</p>
-    </div>
-
-    <div class="flex items-center gap-x-2">
-      <input
-        type="number"
-        min="0" max="100"
-        value="5"
-        placeholder="00"
-        class="text-sm w-15 text-center rounded-lg px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-      <button class="flex items-center gap-x-1 font-medium text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 w-fit">
-        Guardar
-      </button>
-    </div>
-  </div>
-
-  <!-- Días de gracia -->
-  <div class="flex items-center justify-between gap-x-5 py-5">
-    <div class="space-y-1">
-      <h2 class="text-sm font-medium">Días de gracia</h2>
-      <p class="text-sm text-gray-500">Configura el número de días de gracia para las reglas financieras.</p>
+      <div class="flex items-center gap-x-2">
+        <input
+          type="number"
+          formControlName="monthsBeforeCut"
+          placeholder="00"
+          [class.bg-gray-100]="!isEditing"
+          class="text-sm w-20 text-center rounded-lg px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-75 disabled:pointer-events-none" />
+      </div>
     </div>
 
-    <div class="flex items-center gap-x-2">
-      <input
-        type="number"
-        min="0" max="30"
-        value="5"
-        placeholder="00"
-        class="text-sm w-15 text-center rounded-lg px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-      <button class="flex items-center gap-x-1 font-medium text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 w-fit">
-        Guardar
-      </button>
-    </div>
-  </div>
+    <!-- Porcentaje de mora -->
+    <div class="flex items-center justify-between gap-x-5 py-5">
+      <div class="space-y-1">
+        <h2 class="text-sm font-medium">Porcentaje de mora (%)</h2>
+        <p class="text-sm text-gray-500">Configura el porcentaje de mora para las reglas financieras.</p>
+        <span *ngIf="isEditing && configForm.get('lateInterestPercentage')?.invalid" class="text-xs text-red-500">
+          * El porcentaje debe estar entre 0 y 100.
+        </span>
+      </div>
 
+      <div class="flex items-center gap-x-2">
+        <input
+          type="number"
+          formControlName="lateInterestPercentage"
+          step="0.01"
+          placeholder="0.0"
+          [class.bg-gray-100]="!isEditing"
+          class="text-sm w-20 text-center rounded-lg px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-75 disabled:pointer-events-none" />
+      </div>
+    </div>
+
+    <!-- Días de gracia -->
+    <div class="flex items-center justify-between gap-x-5 py-5">
+      <div class="space-y-1">
+        <h2 class="text-sm font-medium">Días de gracia</h2>
+        <p class="text-sm text-gray-500">Configura el número de días de gracia para las reglas financieras.</p>
+        <span *ngIf="isEditing && configForm.get('graceDays')?.invalid" class="text-xs text-red-500">
+          * El valor no puede ser negativo.
+        </span>
+      </div>
+
+      <div class="flex items-center gap-x-2">
+        <input
+          type="number"
+          formControlName="graceDays"
+          placeholder="00"
+          [class.bg-gray-100]="!isEditing"
+          class="text-sm w-20 text-center rounded-lg px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-75 disabled:pointer-events-none" />
+      </div>
+    </div>
+  </form>
 </section>
+
+<!-- Loader -->
+<ng-template #loader>
+  <div class="flex justify-center py-20 border border-gray-200 bg-white rounded-xl">
+    <span class="animate-spin inline-block size-8 border-2 border-current border-t-transparent text-blue-600 rounded-full" role="status" aria-label="loading"></span>
+  </div>
+</ng-template>

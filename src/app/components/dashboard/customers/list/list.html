@@ -17,13 +17,13 @@
   </div>
 
   <component-dashboard-customers-table
-    *ngIf="users.length > 0"
-    [users]="users"
+    *ngIf="customers.length > 0"
+    [customers]="customers"
     [isLoading]="isLoading"
   />
 
   <component-dashboard-customers-empty
-    *ngIf="users.length === 0"
+    *ngIf="customers.length === 0 && !isLoading"
     [title]="searchQuery ? 'No se encontraron resultados' : 'No tienes clientes registrados'"
     [message]="searchQuery ? 'Intenta ajustando los términos de búsqueda' : 'Registra un nuevo cliente para empezar a gestionar tu sistema'"
   />

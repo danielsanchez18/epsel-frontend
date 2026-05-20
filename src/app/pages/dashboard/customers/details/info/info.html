@@ -6,37 +6,40 @@
   </div>
 
 
-  <!-- Información de registro -->
+<!-- Información de registro -->
   <article class="rounded-2xl border border-gray-200 bg-white overflow-hidden h-fit order-2 lg:order-1">
     <div class="px-5 py-3 border-b border-gray-200">
       <h2 class="text-sm font-medium">Información de registro</h2>
     </div>
 
-    <div class="p-5 space-y-3">
+    <div class="p-5 space-y-3" *ngIf="customer">
       <div class="flex items-center gap-x-2">
         <svg lucideBadgeInfo class="size-4 text-gray-500" />
         <span class="text-sm text-gray-700">ID:</span>
-        <button class="truncate text-sm hover:underline text-blue-600 hover:text-blue-600-dark font-semibold">
-          46546546544645646
+        <button  class="truncate text-sm hover:underline text-blue-600 hover:text-blue-600-dark font-semibold" (click)="copyToClipboard(customer.id)">
+          {{ customer.id }}
         </button>
       </div>
       <div class="flex items-center gap-x-2">
         <svg lucideCalendar1 class="size-4 text-gray-500" />
         <span class="text-sm text-gray-700">Fecha de registro:</span>
-        <span class="text-sm">16 de mayo de 2026</span>
+        <span class="text-sm">{{ customer.createdAt | date:'longDate':'':'es' }}</span>
       </div>
       <div class="flex items-center gap-x-2">
         <svg lucideCalendarCheck class="size-4 text-gray-500" />
         <span class="text-sm text-gray-700">Fecha de actualización:</span>
-        <span class="text-sm">16 de mayo de 2026</span>
+        <span class="text-sm">{{ customer.updatedAt | date:'longDate':'':'es' }}</span>
       </div>
+      <!-- Asumiendo que registeredBy se requiere, pero no está en la base DTO original. Dejar estático o removerlo según necesites -->
       <div class="flex items-center gap-x-2">
         <svg lucideUserCheck class="size-4 text-gray-500" />
-        <span class="text-sm text-gray-700">Registrado por:</span>
-        <button class="truncate text-sm hover:underline text-blue-600 hover:text-blue-600-dark font-semibold">
-          Daniel Sánchez Pisfil
-        </button>
+        <span class="text-sm text-gray-700">Modificado por:</span>
+        <span class="text-sm text-gray-800">Sistema</span>
       </div>
+    </div>
+
+    <div class="p-5 flex justify-center" *ngIf="isLoading">
+      <div class="animate-spin inline-block size-6 border-[3px] border-current border-t-transparent text-blue-600 rounded-full" role="status" aria-label="loading"></div>
     </div>
   </article>
 
@@ -46,58 +49,73 @@
       <h2 class="text-sm font-medium">Información Personal</h2>
     </div>
 
-    <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+    <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
       <div class="flex flex-col gap-y-2">
         <label class="text-sm font-medium">Tipo de cliente</label>
         <input
           type="text"
-          placeholder="Ingrese el tipo de cliente"
-          value="Coorporativo"
+          [value]="customer?.type === 'PERSON' ? 'Persona Natural' : (customer?.type === 'COMPANY' ? 'Empresa / Corporación' : (customer?.type || ''))"
           disabled
-          class="text-sm bg-gray-100 border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600">
+          class="text-sm bg-gray-100 border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] cursor-not-allowed">
       </div>
 
       <div class="flex flex-col gap-y-2">
         <label class="text-sm font-medium">Número de documento</label>
         <input
           type="text"
-          placeholder="Ingrese su número de documento"
-          value="46546546"
+          [value]="customer?.documentNumber || ''"
           disabled
-          class="text-sm bg-gray-100 border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600">
+          class="text-sm bg-gray-100 border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] cursor-not-allowed">
       </div>
 
       <div class="flex flex-col gap-y-2 md:col-span-2">
         <label class="text-sm font-medium">Nombres</label>
         <input
           type="text"
-          placeholder="Ingrese su nombre completo"
-          class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600">
+          formControlName="fullName"
+          placeholder="Ingrese nombre completo"
+          class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600 focus:border-transparent">
+        <span *ngIf="editForm.get('fullName')?.invalid && editForm.get('fullName')?.touched" class="text-xs text-red-500">
+          * El nombre es obligatorio y debe tener al menos 3 caracteres.
+        </span>
       </div>
 
       <div class="flex flex-col gap-y-2">
         <label class="text-sm font-medium">Correo</label>
         <input
           type="email"
-          placeholder="Ingrese su correo electrónico"
-          class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600">
+          formControlName="email"
+          placeholder="Ingrese correo electrónico"
+          class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600 focus:border-transparent">
+        <span *ngIf="editForm.get('email')?.invalid && editForm.get('email')?.touched" class="text-xs text-red-500">
+          * Ingrese un correo electrónico válido.
+        </span>
       </div>
 
       <div class="flex flex-col gap-y-2">
         <label class="text-sm font-medium">Teléfono</label>
         <input
           type="text"
-          placeholder="Ingrese su número de teléfono"
-          class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600">
+          formControlName="phone"
+          (keypress)="allowOnlyNumbers($event)"
+          maxlength="9"
+          placeholder="Ingrese número de teléfono"
+          class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600 focus:border-transparent">
+        <!-- Error messages for phone -->
+        <span *ngIf="editForm.get('phone')?.invalid && editForm.get('phone')?.touched" class="text-xs text-red-500">
+          * El teléfono debe contener exactamente 9 dígitos.
+        </span>
       </div>
 
       <div class="md:col-span-2">
         <button
-          type="button"
-          class="text-sm px-4 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:bg-black disabled:cursor-not-allowed">
-          Guardar cambios
+          type="submit"
+          [disabled]="editForm.invalid || !hasChanges || isSaving || isLoading"
+          class="text-sm px-4 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed inline-flex items-center gap-x-2 transition-colors">
+          <span *ngIf="isSaving" class="animate-spin inline-block size-4 border-2 border-current border-t-transparent text-white rounded-full" role="status" aria-label="loading"></span>
+          {{ isSaving ? 'Guardando...' : 'Guardar cambios' }}
         </button>
       </div>
-    </div>
+    </form>
   </article>
 </section>

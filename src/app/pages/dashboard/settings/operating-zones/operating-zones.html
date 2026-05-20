@@ -4,63 +4,55 @@
     <component-shared-search-box
       placeholder="Buscar zona por nombre"
       class="max-w-md w-full"
+      (searchQueryChange)="onSearch($event)"
     />
 
-    <component-shared-filters class="ml-auto" />
-
-    <button class="flex items-center gap-x-1 font-medium text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 w-fit">
-      Nueva Zona
+    <button class="ml-auto flex items-center gap-x-1 font-medium text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 w-fit"
+      aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-scale-animation-modal" data-hs-overlay="#hs-scale-animation-modal">
+      Agregar Zona
     </button>
   </div>
 
   <!-- Tabla de zonas operativas -->
-  <div class="overflow-x-auto">
+  <div class="overflow-x-auto" *ngIf="zones.length > 0; else emptyState">
     <table class="min-w-full">
       <thead>
         <tr class="bg-gray-100 text-sm">
           <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Zona Operativa</th>
           <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Descripción</th>
           <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Estado</th>
-          <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Acciones</th>
+          <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-right">Acciones</th>
         </tr>
       </thead>
       <tbody class="text-sm divide-y divide-gray-200">
-        <tr class="group cursor-pointer hover:bg-gray-50">
-          <td class="py-3 px-6 text-nowrap font-medium text-blue-600 group-hover:underline">Zona 1</td>
-          <td class="py-3 px-6 max-w-70 truncate">Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque totam, officiis magnam eligendi omnis rerum natus culpa perferendis accusantium voluptas dolor recusandae eos illo hic suscipit iure, maxime ex consequatur.</td>
+        <tr class="group hover:bg-gray-50" *ngFor="let zone of zones">
+          <td class="py-3 px-6 text-nowrap font-medium text-blue-600">{{ zone.name }}</td>
+          <td class="py-3 px-6 max-w-70 truncate" [title]="zone.description">{{ zone.description }}</td>
           <td class="py-3 px-6">
-            <div class="flex items-center gap-x-1 font-medium text-[13px] text-green-600 bg-green-50 rounded-lg px-3 py-2 w-fit">
-              <svg lucideBadgeCheck class="size-4" />
-              Activo
+            <div class="flex items-center gap-x-1 font-medium text-[13px] px-3 py-2 w-fit rounded-lg"
+              [ngClass]="zone.active ? 'text-green-600 bg-green-50' : 'text-red-500 bg-red-50'">
+              <svg [class]="zone.active ? 'size-4' : 'hidden'" lucideBadgeCheck></svg>
+              <svg [class]="!zone.active ? 'size-4' : 'hidden'" lucideBadgeX></svg>
+              {{ zone.active ? 'Activo' : 'Inactivo' }}
             </div>
           </td>
-          <td class="py-3 px-6 text-right">
-            <div class="flex items-center gap-x-1">
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucidePenBox class="size-4" />
-              </button>
-              <button class="flex items-center gap-x-1 font-medium text-[13px] text-red-500 border border-red-100 bg-red-50 hover:bg-red-100 rounded-lg px-2 py-2 w-fit">
-                <svg lucideTrash2 class="size-4" />
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr class="group cursor-pointer hover:bg-gray-50">
-          <td class="py-3 px-6 text-nowrap font-medium text-blue-600 group-hover:underline">Zona 1</td>
-          <td class="py-3 px-6 max-w-70 truncate">Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque totam, officiis magnam eligendi omnis rerum natus culpa perferendis accusantium voluptas dolor recusandae eos illo hic suscipit iure, maxime ex consequatur.</td>
           <td class="py-3 px-6">
-            <div class="flex items-center gap-x-1 font-medium text-[13px] text-green-600 bg-green-50 rounded-lg px-3 py-2 w-fit">
-              <svg lucideBadgeCheck class="size-4" />
-              Activo
-            </div>
-          </td>
-          <td class="py-3 px-6 text-right">
-            <div class="flex items-center gap-x-1">
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucidePenBox class="size-4" />
+            <div class="flex items-center justify-end gap-x-1">
+              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit"
+                (click)="openEdit(zone)"
+                aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-edit-modal" data-hs-overlay="#hs-edit-modal"
+                title="Editar zona">
+                <svg lucideSquarePen class="size-4" />
               </button>
-              <button class="flex items-center gap-x-1 font-medium text-[13px] text-red-500 border border-red-100 bg-red-50 hover:bg-red-100 rounded-lg px-2 py-2 w-fit">
-                <svg lucideTrash2 class="size-4" />
+              <button *ngIf="zone.active" class="flex items-center gap-x-1 font-medium text-[13px] text-red-500 border border-red-100 bg-red-50 hover:bg-red-100 rounded-lg px-2 py-2 w-fit"
+                (click)="changeStatus(zone, false)"
+                title="Deshabilitar zona">
+                <svg lucideBadgeX class="size-4" />
+              </button>
+              <button *ngIf="!zone.active" class="flex items-center gap-x-1 font-medium text-[13px] text-green-500 border border-green-100 bg-green-50 hover:bg-green-100 rounded-lg px-2 py-2 w-fit"
+                (click)="changeStatus(zone, true)"
+                title="Habilitar zona">
+                <svg lucideBadgeCheck class="size-4" />
               </button>
             </div>
           </td>
@@ -69,6 +61,36 @@
     </table>
   </div>
 
-  <component-shared-paginator />
+  <ng-template #emptyState>
+    <div *ngIf="!isLoading" class="flex flex-col items-center justify-center py-10">
+      <img src="/images/empty.png" alt="No hay resultados" class="w-40 h-40 object-contain drop-shadow-sm">
+      <p class="text-gray-700 -mt-5">No se encontraron zonas operativas.</p>
+    </div>
+    <div *ngIf="isLoading" class="flex justify-center py-10">
+      <span class="animate-spin inline-block size-6 border-2 border-current border-t-transparent text-blue-600 rounded-full" role="status" aria-label="loading"></span>
+    </div>
+  </ng-template>
+
+  <component-shared-paginator
+    *ngIf="zones.length > 0"
+    [page]="page"
+    [totalPages]="totalPages"
+    [totalElements]="totalElements"
+    (pageChange)="onPageChange($event)"
+  />
 
 </section>
+
+<!-- Modal de agregar zona -->
+<div id="hs-scale-animation-modal"
+  class="hs-overlay hidden size-full fixed top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none"
+  role="dialog" tabindex="-1" aria-labelledby="hs-scale-animation-modal-label">
+  <component-dashboard-settings-operating-zones-add />
+</div>
+
+<!-- Modal de editar zona -->
+<div id="hs-edit-modal"
+  class="hs-overlay hidden size-full fixed top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none"
+  role="dialog" tabindex="-1" aria-labelledby="hs-edit-modal-label">
+  <component-dashboard-settings-operating-zones-edit />
+</div>

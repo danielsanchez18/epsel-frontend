@@ -7,70 +7,47 @@
         <thead>
           <tr class="bg-gray-100 text-sm">
             <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Cliente</th>
-            <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">DNI</th>
-            <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Teléfono</th>
-            <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Rol</th>
-            <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Estado</th>
+            <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Documento</th>
+            <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Tipo</th>
+            <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Contacto</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
 
-          @for (user of users; track $index) {
+          @for (customer of customers; track $index) {
 
-            <tr routerLink={{user.id}}
+            <tr routerLink={{customer.id}}
               class="group hover:bg-gray-50 hover:cursor-pointer max-xl:w-full">
 
-              <!-- Nombre del trabajador -->
+              <!-- Nombre del cliente -->
               <td class="px-6 py-3 whitespace-nowrap">
                 <div class="flex items-center gap-x-3">
-                  @if (user.photoUrl) {
-                    <div class="size-10 rounded-full overflow-hidden">
-                      <img src="{{ user.photoUrl | publicUrl }}" alt="User Avatar" class="h-full w-full object-cover" />
-                    </div>
-                  } @else {
-                    <div class="size-10 rounded-full bg-blue-600 flex items-center justify-center overflow-hidden">
-                      <span class="text-white text-sm font-medium">
-                        {{ user.names.charAt(0) }}{{ user.lastNames.charAt(0) }}
-                      </span>
-                    </div>
-                  }
+                  <div class="size-8 rounded-full bg-blue-600 flex items-center justify-center overflow-hidden">
+                    <span class="text-white text-sm font-medium">
+                      {{ customer.fullName.charAt(0) | uppercase }}
+                    </span>
+                  </div>
                   <div>
-                    <p class="text-sm capitalize font-medium group-hover:text-blue-600 group-hover:underline">{{ user.names }} {{ user.lastNames }}</p>
-                    <p class="text-xs text-gray-700">{{ user.email }}</p>
+                    <p class="text-sm capitalize font-medium group-hover:text-blue-600 group-hover:underline">{{ customer.fullName }}</p>
                   </div>
                 </div>
               </td>
 
-              <td class="px-6 py-3 whitespace-nowrap text-sm">{{ user.dni }}</td>
-              <td class="px-6 py-3 whitespace-nowrap text-sm">{{ user.phone }}</td>
+              <td class="px-6 py-3 whitespace-nowrap text-sm">{{ customer.documentNumber }}</td>
 
-              <td class="px-6 py-3 whitespace-nowrap text-start">
-                <div class="flex items-center gap-x-1 text-black font-medium text-[13px] bg-gray-100 rounded-lg px-3 py-2 w-fit">
-                  @if (user.role === 'ADMIN') { <svg lucideShieldCheck class="size-4" /> Administrador }
-                  @if (user.role === 'VERIFIER') { <svg lucideUserPen class="size-4" /> Verificador }
-                  @if (user.role === 'TECHNICIAN') { <svg lucideUserCog class="size-4" /> Técnico }
-                  @if (user.role === 'SUPERVISOR') { <svg lucideUserSearch class="size-4" /> Supervisor }
-                  @if (user.role === 'MANAGEMENT') { <svg lucideUserStar class="size-4" /> Gerente }
-                </div>
-              </td>
-
-              <td class="px-6 py-3 whitespace-nowrap text-start">
-                @if (user.status === 'ACTIVE') {
-                  <div class="flex items-center gap-x-1 text-blue-600 font-medium text-[13px] bg-blue-50 rounded-lg px-3 py-2 w-fit">
-                    <svg lucideBadgeCheck class="size-4" />
-                    Activo
-                  </div>
-                } @else if (user.status === 'INACTIVE') {
-                  <div class="flex items-center gap-x-1 font-medium text-black text-[13px] bg-gray-100 rounded-lg px-3 py-2 w-fit">
-                    <svg lucideXCircle class="size-4" />
-                    Inactivo
-                  </div>
-                } @else if (user.status === 'SUSPENDED') {
-                  <div class="flex items-center gap-x-1 font-medium text-red-500 text-[13px] bg-red-50 rounded-lg px-3 py-2 w-fit">
-                    <svg lucideTrash2 class="size-4" />
-                    Eliminado
-                  </div>
+              <td class="px-6 py-3 whitespace-nowrap text-sm font-medium">
+                @if (customer.type === 'PERSON') {
+                  <span class="text-gray-900 bg-gray-100 px-2 py-2 rounded-md text-[13px]">Persona Natural</span>
+                } @else if (customer.type === 'COMPANY') {
+                  <span class="text-blue-700 bg-blue-100 px-2 py-2 rounded-md text-[13px]">Empresa / Corporación</span>
+                } @else {
+                  <span class="text-gray-900 bg-gray-100 px-2 py-2 rounded-md text-[13px]">{{ customer.type }}</span>
                 }
+              </td>
+
+              <td class="px-6 py-3 whitespace-nowrap text-sm">
+                <p>{{ customer.phone || 'Sin teléfono' }}</p>
+                <p class="text-xs text-gray-500">{{ customer.email || 'Sin correo' }}</p>
               </td>
 
             </tr>

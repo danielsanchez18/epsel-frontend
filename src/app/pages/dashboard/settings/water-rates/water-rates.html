@@ -1,63 +1,77 @@
-<section class="flex flex-col gap-5 border border-gray-200 bg-white overflow-hidden rounded-xl p-5">
+<section class="flex flex-col gap-5 border border-gray-200 bg-white overflow-hidden rounded-xl p-5 min-h-125">
 
   <div class="flex items-center gap-x-3">
     <component-shared-search-box
-      placeholder="Buscar zona por nombre"
+      placeholder="Buscar tarifa por zona"
       class="max-w-md w-full"
-    />
+      (searchQueryChange)="onSearch($event)"
+    ></component-shared-search-box>
 
-    <component-shared-filters class="ml-auto" />
 
-    <button class="flex items-center gap-x-1 font-medium text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 w-fit">
+    <button class="ml-auto flex items-center gap-x-1 font-medium text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 w-fit"
+      aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-scale-animation-modal" data-hs-overlay="#hs-scale-animation-modal">
       Agregar Tarifa
     </button>
   </div>
 
   <!-- Tabla de zonas operativas -->
-  <div class="overflow-x-auto">
+  <div class="overflow-x-auto relative flex-1">
+
+    <div *ngIf="isLoading" class="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
+      <div class="animate-spin inline-block size-6 border-[3px] border-current border-t-transparent text-blue-600 rounded-full" role="status" aria-label="loading"></div>
+    </div>
+
     <table class="min-w-full">
       <thead>
         <tr class="bg-gray-100 text-sm">
           <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Zona</th>
           <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Precio por m<sup>3</sup></th>
           <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Cargo Fijo</th>
-          <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">IGV/Impuestos</th>
+          <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Igv/Impuestos</th>
           <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Fecha de vigencia</th>
           <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Estado</th>
-          <th class="py-3 px-6 font-semibold text-nowrap text-xs uppercase text-start">Acciones</th>
         </tr>
       </thead>
       <tbody class="text-sm divide-y divide-gray-200">
-        <tr class="group cursor-pointer hover:bg-gray-50">
-          <td class="py-3 px-6 text-nowrap text-blue-600 font-medium group-hover:underline">Zona 1</td>
-          <td class="py-3 px-6 text-nowrap">S/. 3.00</td>
-          <td class="py-3 px-6 text-nowrap">S/. 3.00</td>
-          <td class="py-3 px-6 text-nowrap">S/. 0.60</td>
-          <td class="py-3 px-6 text-nowrap">01 Enero 2023</td>
-          <td class="py-3 px-6">
-            <div class="flex items-center gap-x-1 font-medium text-[13px] text-green-600 bg-green-50 rounded-lg px-3 py-2 w-fit">
-              <svg lucideBadgeCheck class="size-4" />
+        <tr *ngFor="let tariff of tariffs" class="group hover:bg-gray-50">
+          <td class="py-3 px-6 text-nowrap text-blue-600 font-medium group-hover:underline">{{ tariff.zoneName }}</td>
+          <td class="py-3 px-6 text-nowrap">S/ {{ tariff.pricePerM3 | number:'1.2-2' }}</td>
+          <td class="py-3 px-6 text-nowrap">S/ {{ tariff.fixedCharge | number:'1.2-2' }}</td>
+          <td class="py-3 px-6 text-nowrap">{{ tariff.taxPercentage }}%</td>
+          <td class="py-3 px-6 text-nowrap">{{ tariff.effectiveDate | date:'dd MMM yyyy' }}</td>
+          <td class="py-3 px-6 text-nowrap">
+            <div *ngIf="tariff.active" class="flex items-center gap-x-1 font-medium text-[13px] text-green-600 bg-green-50 rounded-lg px-3 py-2 w-fit">
+              <svg lucideBadgeCheck class="size-4"></svg>
               Activo
             </div>
-          </td>
-          <td class="py-3 px-6 text-right">
-            <div class="flex items-center gap-x-1">
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucidePenBox class="size-4" />
-              </button>
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucideBadgeX class="size-4" />
-              </button>
-              <button class="flex items-center gap-x-1 font-medium text-[13px] text-red-500 border border-red-100 bg-red-50 hover:bg-red-100 rounded-lg px-2 py-2 w-fit">
-                <svg lucideTrash2 class="size-4" />
-              </button>
+             <div *ngIf="!tariff.active" class="flex items-center gap-x-1 font-medium text-[13px] text-red-600 bg-red-50 rounded-lg px-3 py-2 w-fit">
+              <svg lucideBadgeX class="size-4"></svg>
+              Inactivo
             </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="!isLoading && tariffs.length === 0">
+          <td colspan="7" class="py-8 text-center text-gray-500">
+            No se encontraron tarifas de agua.
           </td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <component-shared-paginator />
+  <component-shared-paginator
+    class="mt-auto"
+    [page]="page"
+    [totalPages]="totalPages"
+    (pageChange)="onPageChange($event)"
+  ></component-shared-paginator>
 
 </section>
+
+<!-- Modal de agregar tarifa -->
+<div id="hs-scale-animation-modal"
+  class="hs-overlay hidden size-full fixed top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none"
+  role="dialog" tabindex="-1" aria-labelledby="hs-scale-animation-modal-label">
+  <component-dashboard-settings-water-tariffs-add />
+</div>
