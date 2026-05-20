@@ -4,7 +4,7 @@
 
     <component-shared-search-box
       class="w-full md:max-w-md"
-      placeholder="Buscar propiedades por código catastral"
+      placeholder="Buscar solicitudes por zona o cliente"
       [searchQuery]="searchQuery"
       (searchQueryChange)="onSearchQuery($event)"
     />
@@ -16,20 +16,18 @@
 
   </div>
 
-  <component-dashboard-properties-table
-    *ngIf="properties.length > 0"
-    [properties]="properties"
-    [isLoading]="isLoading"
+  <component-dashboard-applications-table
+    [items]="requests"
+    *ngIf="requests.length > 0"
   />
 
-  <component-dashboard-properties-empty
-    *ngIf="properties.length === 0 && !isLoading"
-    [title]="searchQuery ? 'No se encontraron resultados' : 'No tienes propiedades registradas'"
-    [message]="searchQuery ? 'Intenta ajustando los términos de búsqueda' : 'Registra una nueva propiedad para empezar a gestionar tu sistema'"
+  <component-dashboard-applications-empty
+    *ngIf="requests.length === 0 && !isLoading"
+    [title]="searchQuery ? 'No se encontraron resultados' : 'No tienes solicitudes registradas'"
+    [message]="searchQuery ? 'Intenta ajustando los términos de búsqueda' : 'Registra una nueva solicitud para empezar a gestionar tu sistema'"
   />
 
   <component-shared-paginator
-    *ngIf="totalPages > 1"
     [page]="currentPage"
     [totalPages]="totalPages"
     [totalElements]="totalElements"

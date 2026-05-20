@@ -1,0 +1,97 @@
+<div class="hs-overlay-animation-target hs-overlay-open:scale-100 hs-overlay-open:opacity-100 scale-95 opacity-0 ease-in-out transition-all duration-200 sm:max-w-4xl sm:w-full m-3 sm:mx-auto min-h-[calc(100%-56px)] flex items-center">
+  <form [formGroup]="requestForm" (ngSubmit)="onSubmit()" class="w-full flex flex-col bg-white border border-gray-300 shadow-2xs rounded-xl pointer-events-auto">
+
+    <!-- Header del modal -->
+    <div class="flex justify-between items-center py-3 px-5 border-b border-gray-200">
+      <h3 id="hs-scale-animation-modal-label" class="font-medium">Registrar solicitud de instalación</h3>
+      <button type="button" #closeButton
+        class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-300 disabled:opacity-50 disabled:pointer-events-none"
+        aria-label="Close" data-hs-overlay="#hs-scale-animation-modal">
+        <span class="sr-only">Close</span>
+        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6 6 18"></path>
+          <path d="m6 6 12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Contenido del modal -->
+    <div class="overflow-y-auto grid sm:grid-cols-2 gap-5">
+
+      <!-- Buscar cliente -->
+      <div class="flex flex-col gap-y-4 h-full border-r border-gray-200 p-5">
+        <div [formGroup]="searchCustomerForm" class="">
+          <label class="text-sm font-medium">Buscar cliente por DNI/RUC o nombre</label>
+          <div class="relative mt-2">
+            <input type="text" formControlName="documentNumber" class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Escribe para buscar..." />
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+              <svg lucideLoader *ngIf="isSearching" class="animate-spin size-4 text-gray-400"></svg>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedCustomer" class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-x-3">
+          <div class="size-10 bg-blue-500 rounded-full overflow-hidden flex items-center justify-center text-white font-medium">
+            <p class="text-white text-lg font-medium">{{ selectedCustomer.fullName.charAt(0) }}</p>
+          </div>
+          <div>
+            <div class="text-sm font-medium">{{ selectedCustomer.fullName }}</div>
+            <div class="text-xs text-gray-600">{{ selectedCustomer.documentNumber }}</div>
+          </div>
+          <button type="button" (click)="resetCustomerSelection()" class="ml-auto size-7 flex justify-center items-center rounded-full bg-red-100 text-red-600 hover:bg-red-200">
+            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+        <div *ngIf="selectedCustomer && propertiesLoaded && properties.length === 0" class="text-sm text-yellow-700 mt-2">Este cliente no tiene predios asociados.</div>
+
+        <div *ngIf="!selectedCustomer" class="divide-y divide-gray-200">
+          <div *ngFor="let customer of customers" class="py-3 w-full text-start flex items-center gap-x-3">
+            <div class="w-10 h-10 min-w-10 bg-blue-500 rounded-full overflow-hidden flex items-center justify-center text-white font-medium">
+              <p class="text-white text-lg font-medium">{{ customer.fullName.charAt(0) }}</p>
+            </div>
+            <div class="w-full">
+              <div class="text-sm font-medium">{{ customer.fullName }}</div>
+              <div class="text-xs text-gray-600">{{ customer.documentNumber }}</div>
+            </div>
+            <button type="button" (click)="selectCustomer(customer)" class="ml-auto py-1.5 px-2 inline-flex items-center gap-x-2 text-[13px] font-medium rounded-lg bg-blue-600 border border-blue-600 text-white hover:bg-blue-700">Asignar</button>
+          </div>
+          <div *ngIf="customers.length === 0 && !isSearching && searchCustomerForm.get('documentNumber')?.value" class="text-center py-4 text-sm text-gray-500">No se encontraron clientes.</div>
+        </div>
+      </div>
+
+      <!-- Formulario de solicitud -->
+      <div class="h-full p-5 flex flex-col gap-4">
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium">Predio <span class="text-red-500">*</span></label>
+          <select formControlName="propertyId" class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="" disabled selected>Selecciona un predio</option>
+            <option *ngFor="let prop of properties" [value]="prop.id">{{ prop.address }} {{ prop.cadastralCode ? ('- ' + prop.cadastralCode) : '' }}</option>
+          </select>
+          <span *ngIf="requestForm.get('propertyId')?.invalid && requestForm.get('propertyId')?.touched" class="text-xs text-red-500">Predio es requerido.</span>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium">Fecha solicitada <span class="text-red-500">*</span></label>
+          <input type="date" formControlName="requestedDate" [attr.min]="todayString" class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <span *ngIf="requestForm.get('requestedDate')?.hasError('required') && requestForm.get('requestedDate')?.touched" class="text-xs text-red-500">La fecha es requerida.</span>
+          <span *ngIf="requestForm.get('requestedDate')?.hasError('minDate') && requestForm.get('requestedDate')?.touched" class="text-xs text-red-500">La fecha no puede ser anterior a hoy.</span>
+        </div>
+
+        <div class="flex flex-col gap-2 flex-1">
+          <label class="text-sm font-medium">Observaciones</label>
+          <textarea formControlName="observations" rows="4" maxlength="500" class="w-full border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Escribe alguna observación (máx. 500 caracteres)"></textarea>
+          <span *ngIf="requestForm.get('observations')?.hasError('maxlength') && requestForm.get('observations')?.touched" class="text-xs text-red-500">Máximo 500 caracteres.</span>
+        </div>
+
+        <div class="flex justify-end items-center gap-x-2 mt-auto">
+          <button type="reset" (click)="resetCustomerSelection()" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg bg-white border border-gray-200 hover:bg-gray-100" data-hs-overlay="#hs-scale-animation-modal">Cancelar</button>
+          <button type="submit" [disabled]="requestForm.invalid || isLoading" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg bg-blue-600 border border-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+            <span *ngIf="isLoading" class="animate-spin inline-block size-4 border-2 border-current border-t-transparent text-white rounded-full" role="status" aria-label="loading"></span>
+            {{ isLoading ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>

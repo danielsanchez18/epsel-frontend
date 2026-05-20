@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { PropertyService } from '../../../../../core/services/properties/property.service';
+import { PropertyResponse } from '@interfaces/properties/properties.interface';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'page-dashboard-properties-details-general',
@@ -21,7 +24,40 @@ export class PageDashboardPropertiesDetailsGeneral {
     { name: 'Órdenes de Trabajo', path: 'ordenes-de-trabajo' },
     { name: 'Documentos', path: 'documentos' },
     { name: 'Historial', path: 'historial' },
-
   ]
+
+  private propertyService = inject(PropertyService);
+  private route = inject(ActivatedRoute);
+
+  private propertySubject = new BehaviorSubject<PropertyResponse | null>(null);
+  public property$ = this.propertySubject.asObservable();
+
+  propertyId: string | null = null;
+  isLoading = true;
+
+  ngOnInit() {
+    this.propertyId = this.route.snapshot.paramMap.get('id') || null;
+    if (this.propertyId) {
+      this.loadProperty();
+    }
+  }
+
+  private loadProperty() {
+    this.isLoading = true;
+    this.propertyService.getById(this.propertyId!).subscribe({
+      next: (res) => {
+        this.propertySubject.next(res.data);
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading property:', error);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  updatePropertyData(data: PropertyResponse) {
+    this.propertySubject.next(data);
+  }
 
 }

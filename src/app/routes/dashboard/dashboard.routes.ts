@@ -22,6 +22,10 @@ export const DASHBOARD_ROUTES: Routes = [
         loadChildren: () => import('@routes/dashboard/properties.routes').then(m => m.PROPERTIES_ROUTES)
       },
       {
+        path: 'solicitudes',
+        loadChildren: () => import('@routes/dashboard/applications.routes').then(m => m.APPLICATIONS_ROUTES)
+      },
+      {
         path: 'suministros',
         loadChildren: () => import('@routes/dashboard/supplies.routes').then(m => m.SUPPLIES_ROUTES)
       },

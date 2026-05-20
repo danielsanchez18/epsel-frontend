@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { PropertyResponse } from '@interfaces/properties/properties.interface';
 import { LucideHouse, LucideStore, LucideBuilding2 } from "@lucide/angular";
 
 @Component({
@@ -12,4 +13,9 @@ import { LucideHouse, LucideStore, LucideBuilding2 } from "@lucide/angular";
 ],
   templateUrl: './table.html',
 })
-export class ComponentDashboardPropertiesTable {}
+export class ComponentDashboardPropertiesTable {
+
+  @Input() properties: PropertyResponse[] = [];
+  @Input() isLoading = false;
+
+}

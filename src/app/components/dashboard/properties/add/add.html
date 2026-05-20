@@ -1,11 +1,11 @@
 <div
   class="hs-overlay-animation-target hs-overlay-open:scale-100 hs-overlay-open:opacity-100 scale-95 opacity-0 ease-in-out transition-all duration-200 sm:max-w-4xl sm:w-full m-3 sm:mx-auto min-h-[calc(100%-56px)] flex items-center">
-  <div class="w-full flex flex-col bg-white border border-gray-300 shadow-2xs rounded-xl pointer-events-auto">
+  <form [formGroup]="propertyForm" (ngSubmit)="onSubmit()" class="w-full flex flex-col bg-white border border-gray-300 shadow-2xs rounded-xl pointer-events-auto">
 
     <!-- Header del modal -->
     <div class="flex justify-between items-center py-3 px-5 border-b border-gray-200">
       <h3 id="hs-scale-animation-modal-label" class="font-medium text-sm">Registrar Nuevo Predio</h3>
-      <button type="button"
+      <button type="button" #closeButton
         class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-300 disabled:opacity-50 disabled:pointer-events-none"
         aria-label="Close" data-hs-overlay="#hs-scale-animation-modal">
         <span class="sr-only">Close</span>
@@ -18,133 +18,119 @@
     </div>
 
     <!-- Contenido del modal -->
-    <div class="overflow-y-auto grid grid-cols-2">
+    <div class="overflow-y-auto grid sm:grid-cols-2">
 
       <!-- Buscar cliente -->
       <div class="flex flex-col gap-y-5 h-full border-r border-gray-200 p-5">
-        <div class="flex flex-col gap-2">
-          <label name="names" class="text-sm font-medium">
-            Número de Documento del cliente
+        <div [formGroup]="searchCustomerForm" class="relative">
+          <label for="documentNumber" class="text-sm font-medium">
+            Buscar cliente por DNI/RUC
             <span class="text-red-500 ml-0.5">*</span>
           </label>
-          <input type="text" name="documentNumber"
-            formControlName="documentNumber"
-            class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Ej: 123456789" required
-          />
-        </div>
-
-        <div class="divide-y divide-gray-200 ">
-          <div class="py-3 w-full text-start flex items-center gap-x-3">
-            <img src="https://avatars.githubusercontent.com/u/148911330?v=4" alt="Avatar" class="size-10 rounded-full object-cover">
-            <div class="w-full">
-              <span class="text-sm font-medium">Juan Pérez</span>
-              <p class="text-xs text-gray-700">DNI: 123456789</p>
+          <div class="relative mt-2">
+            <input type="text" id="documentNumber" formControlName="documentNumber"
+              class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Escribe para buscar..." [readonly]="selectedCustomer" />
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+              <svg lucideLoader *ngIf="isSearching" class="animate-spin size-4 text-gray-400" />
             </div>
-            <button type="button"
-              class="ml-auto py-1.5 px-2 inline-flex items-center gap-x-2 text-[13px] font-medium rounded-lg bg-blue-600 border border-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-              Asignar
-            </button>
-          </div>
-          <div class="py-3 w-full text-start flex items-center gap-x-3">
-            <img src="https://avatars.githubusercontent.com/u/148911330?v=4" alt="Avatar" class="size-10 rounded-full object-cover">
-            <div class="w-full">
-              <span class="text-sm font-medium">Juan Pérez</span>
-              <p class="text-xs text-gray-700">DNI: 123456789</p>
-            </div>
-            <button type="button"
-              class="ml-auto py-1.5 px-2 inline-flex items-center gap-x-2 text-[13px] font-medium rounded-lg bg-blue-600 border border-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-              Asignar
-            </button>
-          </div>
-          <div class="py-3 w-full text-start flex items-center gap-x-3">
-            <img src="https://avatars.githubusercontent.com/u/148911330?v=4" alt="Avatar" class="size-10 rounded-full object-cover">
-            <div class="w-full">
-              <span class="text-sm font-medium">Juan Pérez</span>
-              <p class="text-xs text-gray-700">DNI: 123456789</p>
-            </div>
-            <button type="button"
-              class="ml-auto py-1.5 px-2 inline-flex items-center gap-x-2 text-[13px] font-medium rounded-lg bg-blue-600 border border-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-              Asignar
-            </button>
           </div>
         </div>
 
+        <div *ngIf="selectedCustomer" class="border-2 border-blue-500 rounded-lg px-4 py-2.5 flex items-center gap-x-3">
+          <div>
+            <span class="text-sm font-medium">{{ selectedCustomer.fullName }}</span>
+            <p class="text-xs text-gray-700">Documento: {{ selectedCustomer.documentNumber }}</p>
+          </div>
+          <button type="button" (click)="resetCustomerSelection()"
+            class="ml-auto size-7 flex justify-center items-center rounded-full bg-gray-100  hover:bg-gray-200">
+            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+
+        <div *ngIf="!selectedCustomer" class="divide-y divide-gray-200">
+          <div *ngFor="let customer of customers" class="py-3 w-full text-start flex items-center gap-x-3">
+            <div class="w-full">
+              <span class="text-sm font-medium">{{ customer.fullName }}</span>
+              <p class="text-xs text-gray-700">Documento: {{ customer.documentNumber }}</p>
+            </div>
+            <button type="button" (click)="selectCustomer(customer)"
+              class="ml-auto py-1.5 px-2 inline-flex items-center gap-x-2 text-[13px] font-medium rounded-lg bg-blue-600 border border-blue-600 text-white hover:bg-blue-700">
+              Asignar
+            </button>
+          </div>
+           <div *ngIf="customers.length === 0 && !isSearching && searchCustomerForm.get('documentNumber')?.value" class="text-center py-4 text-sm text-gray-500">
+            No se encontraron clientes.
+          </div>
+        </div>
       </div>
 
+      <!-- Formulario de predio -->
       <div class="h-full p-5 flex flex-col gap-5">
+        <div class="grid grid-cols-2 gap-5">
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium">Tipo de Propiedad <span class="text-red-500">*</span></label>
+            <select formControlName="type" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="" disabled>Selecciona un tipo</option>
+              <option value="HOUSE">Casa</option>
+              <option value="BUSINESS">Comercial</option>
+              <option value="INDUSTRIAL">Industrial</option>
+            </select>
+            <span *ngIf="propertyForm.get('type')?.invalid && propertyForm.get('type')?.touched" class="text-xs text-red-500">Tipo es requerido.</span>
+          </div>
 
-        <div class="flex flex-col gap-2">
-          <label name="names" class="text-sm font-medium">
-            Tipo de Propiedad
-            <span class="text-red-500 ml-0.5">*</span>
-          </label>
-          <select type="text" name="documentNumber"
-            formControlName="documentNumber"
-            class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Ej: 123456789" required
-          >
-            <option value="">Selecciona un tipo de propiedad</option>
-            <option value="casa">Casa</option>
-            <option value="local">Local Comercial</option>
-            <option value="industrial">Industrial</option>
-          </select>
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium">Zona <span class="text-red-500">*</span></label>
+            <select formControlName="zoneId" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="" disabled>Selecciona una zona</option>
+              <option *ngFor="let zone of zones" [value]="zone.id">{{ zone.name }}</option>
+            </select>
+            <span *ngIf="propertyForm.get('zoneId')?.invalid && propertyForm.get('zoneId')?.touched" class="text-xs text-red-500">Zona es requerida.</span>
+          </div>
         </div>
 
         <div class="flex flex-col gap-2">
-          <label name="names" class="text-sm font-medium">
-            Zona
-            <span class="text-red-500 ml-0.5">*</span>
-          </label>
-          <select type="text" name="documentNumber"
-            formControlName="documentNumber"
-            class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Ej: 123456789" required
-          >
-            <option value="">Selecciona una zona</option>
-            <option value="norte">Norte</option>
-            <option value="sur">Sur</option>
-            <option value="este">Este</option>
-            <option value="oeste">Oeste</option>
-          </select>
+          <label class="text-sm font-medium">Dirección <span class="text-red-500">*</span></label>
+          <input type="text" formControlName="address" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm" placeholder="Ej: Av. Principal 123, Lima" />
+          <span *ngIf="propertyForm.get('address')?.invalid && propertyForm.get('address')?.touched" class="text-xs text-red-500">Dirección es requerida.</span>
         </div>
 
         <div class="flex flex-col gap-2">
-          <label name="names" class="text-sm font-medium">
-            Dirección
-            <span class="text-red-500 ml-0.5">*</span>
-          </label>
-          <input type="text" name="documentNumber"
-            formControlName="documentNumber"
-            class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Ej: Av. Principal 123, Lima" required
-          />
+          <label class="text-sm font-medium">Código Catastral <span class="text-red-500">*</span></label>
+          <input type="text" formControlName="cadastralCode" maxlength="50" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm" placeholder="Ej: P0123456" />
+          <span *ngIf="propertyForm.get('cadastralCode')?.hasError('required') && propertyForm.get('cadastralCode')?.touched" class="text-xs text-red-500">Código es requerido.</span>
+          <span *ngIf="propertyForm.get('cadastralCode')?.hasError('maxlength') && propertyForm.get('cadastralCode')?.touched" class="text-xs text-red-500">Máximo 50 caracteres.</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-5">
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium">Latitud</label>
+            <input type="number" formControlName="latitude" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm" placeholder="Ej: -12.046374" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium">Longitud</label>
+            <input type="number" formControlName="longitude" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm" placeholder="Ej: -77.042793" />
+          </div>
         </div>
 
         <div class="flex flex-col gap-2">
-          <label name="names" class="text-sm font-medium">
-            Referencia
-            <span class="text-red-500 ml-0.5">*</span>
-          </label>
-          <input type="text" name="documentNumber"
-            formControlName="documentNumber"
-            class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Ej: Cerca al parque, frente a la iglesia, etc." required
-          />
+          <label class="text-sm font-medium">Referencia</label>
+          <textarea formControlName="reference" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm" placeholder="Ej: Cerca al parque, frente a la iglesia, etc." rows="2"></textarea>
         </div>
 
-        <div class="flex justify-end items-center gap-x-2">
+        <div class="flex justify-end items-center gap-x-2 mt-auto">
           <button type="reset"
-            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg bg-white border border-gray-200 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none"
+            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg bg-white border border-gray-200 hover:bg-gray-100"
             data-hs-overlay="#hs-scale-animation-modal">
             Cancelar
           </button>
-          <button type="button"
-            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg bg-blue-600 border border-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-            Guardar
+          <button type="submit" [disabled]="propertyForm.invalid || isLoading"
+            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg bg-blue-600 border border-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">
+            <svg lucideLoader *ngIf="isLoading" class="animate-spin size-4" />
+            {{ isLoading ? 'Guardando...' : 'Guardar' }}
           </button>
         </div>
       </div>
     </div>
-  </div>
+  </form>
 </div>

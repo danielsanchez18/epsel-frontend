@@ -1,0 +1,52 @@
+<section class="overflow-x-hidden hover:overflow-x-auto">
+  <div class="min-w-full inline-block align-middle">
+    <div class="overflow-hidden">
+    <!-- Table content -->
+    <table class="min-w-full">
+        <thead>
+          <tr class="bg-gray-100 text-sm">
+            <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Cliente</th>
+            <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Predio</th>
+            <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Costo de Instalación</th>
+            <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Estado</th>
+            <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Fecha de solicitud</th>
+            <th scope="col" class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Fecha de instalación</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <tr routerLink="{{ item.id }}" *ngFor="let item of items" class="group hover:bg-gray-50 cursor-pointer max-xl:w-full">
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+              <div>
+                <p class="text-sm font-medium">{{ item.customerName }}</p>
+              </div>
+            </td>
+            <td class="px-6 py-3 whitespace-nowrap text-sm">
+              <div>
+                <p class="text-sm">{{ item.propertyAddress }}</p>
+                <p class="text-xs text-gray-700">{{ item.zoneName }}</p>
+              </div>
+            </td>
+            <td class="px-6 py-3 whitespace-nowrap text-sm">S/. {{ item.installationCost | number:'1.2-2' }}</td>
+            <td class="px-6 py-3 whitespace-nowrap text-sm">
+              @if (item.status === 'APPROVED' || item.status === 'INSTALLED') {
+                <p class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-sm font-medium bg-green-100 text-green-600">
+                  {{ item.status === 'APPROVED' ? 'Aprobada' : 'Instalada' }}
+                </p>
+              } @else if (item.status === 'PENDING') {
+                <p class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-sm font-medium bg-yellow-100 text-yellow-600">
+                  Pendiente
+                </p>
+              } @else if (item.status === 'REJECTED') {
+                <p class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-sm font-medium bg-red-100 text-red-600">
+                  Rechazada
+                </p>
+              }
+            </td>
+            <td class="px-6 py-3 whitespace-nowrap text-sm">{{ item.requestedDate | date:'longDate':'':'es' }}</td>
+            <td class="px-6 py-3 whitespace-nowrap text-sm">{{ item.installationDate ? (item.installationDate | date:'longDate':'':'es') : 'Sin instalación' }}</td>
+          </tr>
+        </tbody>
+    </table>
+  </div>
+</div>
+</section>

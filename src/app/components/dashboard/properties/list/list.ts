@@ -7,6 +7,8 @@ import { ComponentSharedImport } from "@components/shared/import/import";
 import { UserService } from '@services/users/user.service';
 import { ComponentDashboardPropertiesTable } from '../table/table';
 import { ComponentDashboardPropertiesEmpty } from '../empty/empty';
+import { PropertyService } from '@services/properties/property.service';
+import { PropertyResponse } from '@interfaces/properties/properties.interface';
 
 @Component({
   selector: 'component-dashboard-properties-list',
@@ -23,8 +25,9 @@ import { ComponentDashboardPropertiesEmpty } from '../empty/empty';
 })
 export class ComponentDashboardPropertiesList {
 
-  private userService = inject(UserService);
+  private propertyService = inject(PropertyService);
 
+  properties: PropertyResponse[] = [];
   currentPage = 0;
   totalPages = 0;
   totalElements = 0;
@@ -34,46 +37,39 @@ export class ComponentDashboardPropertiesList {
 
 
   ngOnInit(): void {
-    this.loadUsers();
+    this.loadProperties();
   }
 
 
-  loadUsers(page: number = 0): void {
+  loadProperties(page: number = 0): void {
 
     this.isLoading = true;
 
-    if (this.searchQuery.trim()) {
-      this.userService.getAll(
-        { search: this.searchQuery },
-        this.currentPage,
-        this.pageSize,
-        "names,asc"
-      ).subscribe({
-        next: (res: any) => {
-          this.totalPages = res.data.totalPages;
-          this.totalElements = res.data.totalElements;
-          this.isLoading = false;
-        },
-        error: (err) => {
-          this.isLoading = false;
-        }
-      });
-    } else {
+    this.propertyService.getAll(page, this.pageSize, this.searchQuery,).subscribe({
+      next: (res: any) => {
+        this.properties = res.data.content;
+        this.totalPages = res.data.totalPages;
+        this.totalElements = res.data.totalElements;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('[ComponentPropertiesList] Error loading properties', err.message);
+        this.isLoading = false;
+      }
+    });
 
-    }
   }
-
 
   onPageChange(page: number): void {
     this.currentPage = page;
-    this.loadUsers(page);
+    this.loadProperties(page);
   }
 
 
   onSearchQuery(query: string): void {
     this.searchQuery = query;
     this.currentPage = 0;
-    this.loadUsers(0);
+    this.loadProperties(0);
   }
 
 }

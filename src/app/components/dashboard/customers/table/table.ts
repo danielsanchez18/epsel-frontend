@@ -10,10 +10,6 @@ import { PublicUrlPipe } from '@core/pipes/public-url.pipe';
   imports: [
     CommonModule,
     RouterLink,
-    LucideUserCog, LucideBadgeCheck, LucideShieldCheck, LucideUserPen, LucideUserStar, LucideUserSearch,
-    PublicUrlPipe,
-    LucideTrash2,
-    LucideCircleX
 ],
   templateUrl: './table.html',
 })
