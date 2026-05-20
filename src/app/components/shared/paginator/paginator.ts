@@ -3,6 +3,7 @@ import { LucideChevronLeft, LucideChevronRight } from '@lucide/angular';
 
 @Component({
   selector: 'component-shared-paginator',
+  standalone: true,
   imports: [
     LucideChevronLeft,
     LucideChevronRight,

@@ -12,4 +12,7 @@ import { ComponentDashboardPropertiesList } from "@components/dashboard/properti
 ],
   templateUrl: './general.html',
 })
-export class PageDashboardPropertiesGeneral {}
+export class PageDashboardPropertiesGeneral {
+
+
+}

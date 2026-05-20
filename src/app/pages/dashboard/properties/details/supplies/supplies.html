@@ -1,1 +1,78 @@
-<p>supplies works!</p>,
+<section class="p-5 border border-gray-200 rounded-xl overflow-hidden bg-white grid gap-10">
+
+  <div class="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <h2 class="text-base font-medium">Suministros del predio</h2>
+      <p class="text-sm text-gray-600">
+        {{ propertyName ? ('Mostrando los suministros de ' + propertyName) : 'Mostrando los suministros asociados al predio actual' }}
+      </p>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="flex justify-center py-10">
+    <div class="animate-spin inline-block size-6 border-2 border-current border-t-transparent text-blue-600 rounded-full" role="status" aria-label="loading"></div>
+  </div>
+
+  <div *ngIf="!isLoading && supplies.length > 0" class="overflow-x-auto">
+    <table class="w-full text-left">
+      <thead>
+        <tr class="bg-gray-100 text-sm">
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Suministro</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Medidor</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Estado</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Tipo</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Instalación</th>
+        </tr>
+      </thead>
+
+      <tbody class="text-sm divide-y divide-gray-200">
+        <tr *ngFor="let item of supplies" [routerLink]="['/dashboard/suministros', item.id]" class="group hover:bg-gray-50 cursor-pointer">
+          <td class="py-4 px-6 text-nowrap text-blue-600 font-medium group-hover:underline">
+            {{ item.supplyNumber }}
+          </td>
+          <td class="py-4 px-6 text-nowrap text-gray-700">
+            {{ item.meterNumber }}
+          </td>
+          <td class="py-3 px-6 text-nowrap">
+            <span class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-[13px] font-medium" [ngClass]="getStatusClass(item.status)">
+              <svg lucideBadgeCheck class="size-4 mr-1" />
+              {{ getStatusLabel(item.status) }}
+            </span>
+          </td>
+          <td class="py-3 px-6 text-nowrap">
+            <div class="flex items-center gap-x-2 font-medium text-[13px] bg-gray-100 rounded-lg px-3 py-2 w-fit">
+              <svg *ngIf="getTypeIcon(item.supplyType) === 'house'" lucideHouse class="size-4"></svg>
+              <svg *ngIf="getTypeIcon(item.supplyType) === 'store'" lucideStore class="size-4"></svg>
+              <svg *ngIf="getTypeIcon(item.supplyType) === 'building'" lucideBuilding2 class="size-4"></svg>
+              {{ getTypeLabel(item.supplyType) }}
+            </div>
+          </td>
+          <td class="py-4 px-6 text-nowrap text-gray-700">
+            {{ item.installationDate ? (item.installationDate | date:'dd MMM yyyy':'':'es') : '-' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!isLoading && supplies.length === 0" class="rounded-2xl px-5 py-15 h-full flex items-center justify-center">
+    <div class="space-y-7">
+      <img src="/images/empty.png" alt="Sin Suministros" class="h-20 w-auto mx-auto">
+      <div class="space-y-5">
+        <div>
+          <h2 class="font-medium text-center">Este predio no tiene suministros</h2>
+          <p class="text-xs text-gray-600 text-center">Cuando se instalen suministros para este predio, aparecerán aquí.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <component-shared-paginator
+    *ngIf="totalPages > 1"
+    [page]="currentPage"
+    [totalPages]="totalPages"
+    [totalElements]="totalElements"
+    (pageChange)="onPageChange($event)"
+  />
+
+</section>

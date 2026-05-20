@@ -6,11 +6,13 @@ import { Subscription } from 'rxjs';
 
 import { CustomerService } from '@services/customers/customer.service';
 import { PropertyService } from '@services/properties/property.service';
+import { SupplyService } from '@services/supplies/supply.service';
 import { InstallationRequestService } from '@services/supplies/installation-request.service';
 
 import { CustomerResponse } from '@interfaces/customers/customer.interface';
 import { PropertyResponse } from '@interfaces/properties/properties.interface';
 import { InstallationRequestResponse } from '@interfaces/supplies/installation-request.interface';
+import { SupplyDetailsDTO } from '@interfaces/supplies/supply.interface';
 
 @Component({
   selector: 'component-dashboard-applications-details',
@@ -24,10 +26,12 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
   private requestService = inject(InstallationRequestService);
   private customerService = inject(CustomerService);
   private propertyService = inject(PropertyService);
+  private supplyService = inject(SupplyService);
 
   request: InstallationRequestResponse | null = null;
   customer: CustomerResponse | null = null;
   property: PropertyResponse | null = null;
+  supply: SupplyDetailsDTO | null = null;
 
   isLoading = true;
   isActionLoading = false;
@@ -273,7 +277,35 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
   }
 
   goToSupplies(): void {
-    this.router.navigate(['/dashboard/suministros']);
+    if (!this.request) return;
+
+    this.isActionLoading = true;
+    this.supplyService.getByInstallationRequestId(this.request.id).subscribe({
+      next: (res) => {
+        this.isActionLoading = false;
+        if (res.success && res.data) {
+          this.supply = res.data;
+          this.router.navigate(['/dashboard/suministros', res.data.id]);
+          return;
+        }
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: res.message || 'No se pudo encontrar el suministro asociado a la solicitud.',
+          confirmButtonColor: '#d33'
+        });
+      },
+      error: (err: any) => {
+        this.isActionLoading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: err.error?.message || 'Error de conexión con el servidor.',
+          confirmButtonColor: '#d33'
+        });
+      }
+    });
   }
 
   getTimeline(): Array<{ label: string; date?: string | null; active: boolean; done: boolean }> {

@@ -47,6 +47,22 @@ export class SupplyService {
     return this.http.get<ApiResponse<PaginatedResponse<SupplyDetailsDTO>['data']>>(`${this.baseUrl}/customer/${customerId}`, { params });
   }
 
+  getByPropertyId(
+    propertyId: string,
+    page: number = 0,
+    size: number = 10
+  ): Observable<ApiResponse<PaginatedResponse<SupplyDetailsDTO>['data']>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<ApiResponse<PaginatedResponse<SupplyDetailsDTO>['data']>>(`${this.baseUrl}/property/${propertyId}`, { params });
+  }
+
+  getByInstallationRequestId(installationRequestId: string): Observable<ApiResponse<SupplyDetailsDTO>> {
+    return this.http.get<ApiResponse<SupplyDetailsDTO>>(`${this.baseUrl}/installation-request/${installationRequestId}`);
+  }
+
   getById(id: string): Observable<ApiResponse<SupplyDetailsDTO>> {
     return this.http.get<ApiResponse<SupplyDetailsDTO>>(`${this.baseUrl}/${id}`);
   }

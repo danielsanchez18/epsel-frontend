@@ -11,11 +11,15 @@ import { ServiceZoneService } from '@services/settings/service-zone.service';
 
 import { CustomerResponse } from '@interfaces/customers/customer.interface';
 import { ServiceZoneResponse } from '@interfaces/settings/settings.interface';
-import { LucideCheck, LucideLoader, LucideSearch } from '@lucide/angular';
+import { LucideLoader } from '@lucide/angular';
 
 @Component({
   selector: 'component-dashboard-properties-add',
-  imports: [CommonModule, ReactiveFormsModule, LucideLoader],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    LucideLoader
+  ],
   templateUrl: './add.html',
 })
 export class ComponentDashboardPropertiesAdd implements OnInit {

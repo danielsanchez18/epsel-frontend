@@ -7,7 +7,11 @@ import { SupplyResponseDTO } from '@core/interfaces/supplies/supply.interface';
 
 @Component({
   selector: 'component-dashboard-supplies-table',
-  imports: [CommonModule, LucideHouse, LucideStore, LucideBuilding2, RouterLink],
+  imports: [
+    CommonModule,
+    LucideHouse, LucideStore, LucideBuilding2,
+    RouterLink
+  ],
   templateUrl: './table.html',
 })
 export class ComponentDashboardSuppliesTable {

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { PropertyService } from '../../../../../core/services/properties/property.service';
+import { PropertyService } from '@core/services/properties/property.service';
 import { PropertyResponse } from '@interfaces/properties/properties.interface';
 import { BehaviorSubject } from 'rxjs';
 
@@ -31,6 +31,7 @@ export class PageDashboardPropertiesDetailsGeneral {
 
   private propertySubject = new BehaviorSubject<PropertyResponse | null>(null);
   public property$ = this.propertySubject.asObservable();
+  public property: PropertyResponse | null = null;
 
   propertyId: string | null = null;
   isLoading = true;
@@ -46,6 +47,7 @@ export class PageDashboardPropertiesDetailsGeneral {
     this.isLoading = true;
     this.propertyService.getById(this.propertyId!).subscribe({
       next: (res) => {
+        this.property = res.data;
         this.propertySubject.next(res.data);
         this.isLoading = false;
       },
@@ -57,6 +59,7 @@ export class PageDashboardPropertiesDetailsGeneral {
   }
 
   updatePropertyData(data: PropertyResponse) {
+    this.property = data;
     this.propertySubject.next(data);
   }
 
