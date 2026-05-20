@@ -20,7 +20,8 @@ export class SupplyService {
     size: number = 10,
     search?: string,
     status?: SupplyStatus,
-    zoneId?: string
+    zoneId?: string,
+    customerId?: string
   ): Observable<ApiResponse<PaginatedResponse<SupplyResponseDTO>['data']>> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -29,6 +30,7 @@ export class SupplyService {
     if (search) params = params.set('search', search);
     if (status) params = params.set('status', status);
     if (zoneId) params = params.set('zoneId', zoneId);
+    if (customerId) params = params.set('customerId', customerId);
 
     return this.http.get<ApiResponse<PaginatedResponse<SupplyResponseDTO>['data']>>(this.baseUrl, { params });
   }

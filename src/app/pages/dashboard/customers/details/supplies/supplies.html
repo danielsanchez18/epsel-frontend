@@ -1,46 +1,86 @@
-<section class="p-5 border border-gray-200 rounded-xl overflow-hidden bg-white grid gap-5">
+<section class="p-5 border border-gray-200 rounded-xl overflow-hidden bg-white grid gap-10">
 
-  <div class="flex items-center justify-between gap-x-3">
-    <component-shared-search-box
-      placeholder="Buscar suministros por código"
-      class="max-w-md w-full"
-    />
+  <div class="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <h2 class="text-base font-medium">Suministros del cliente</h2>
+      <p class="text-sm text-gray-600">
+        {{ customerName ? ('Mostrando los suministros de ' + customerName) : 'Mostrando los suministros asociados al cliente actual' }}
+      </p>
+    </div>
 
-    <component-shared-filters />
+    <div class="flex items-center gap-x-3 w-full lg:w-md">
+      <component-shared-search-box
+        class="max-w-md w-full"
+        placeholder="Buscar por suministro, medidor o referencia"
+        [searchQuery]="searchQuery"
+        (searchQueryChange)="onSearchQuery($event)"
+      />
+
+    </div>
   </div>
 
-  <div class="overflow-x-auto">
+  <div *ngIf="isLoading" class="flex justify-center py-10">
+    <div class="animate-spin inline-block size-6 border-2 border-current border-t-transparent text-blue-600 rounded-full" role="status" aria-label="loading"></div>
+  </div>
+
+  <div *ngIf="!isLoading && supplies.length > 0" class="overflow-x-auto">
     <table class="w-full text-left">
       <thead>
         <tr class="bg-gray-100 text-sm">
-          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Código</th>
-          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Dirección</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Suministro</th>
           <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Estado</th>
-          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Fecha de instalación</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Tipo</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Instalación</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Ubicación</th>
         </tr>
       </thead>
 
       <tbody class="text-sm divide-y divide-gray-200">
-        <tr class="group cursor-pointer hover:bg-gray-50">
-          <td class="py-4 px-6 text-nowrap text-blue-600 font-medium group-hover:underline">SUM-2256224</td>
-          <td class="py-4 px-6 text-nowrap">
+        <tr routerLink="/dashboard/suministros/{{item.id}}"
+          *ngFor="let item of supplies" class="group hover:bg-gray-50 cursor-pointer">
+          <td class="py-4 px-6 text-nowrap text-blue-600 font-medium group-hover:underline">
+            {{ item.supplyNumber }}
+          </td>
+          <td class="py-3 px-6 text-nowrap">
+            <span class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-[13px] font-medium" [ngClass]="getStatusClass(item.status)">
+              <svg lucideBadgeCheck class="size-4 mr-1" />
+              {{ getStatusLabel(item.status) }}
+            </span>
+          </td>
+          <td class="py-3 px-6 text-nowrap">
+            <div class="flex items-center gap-x-2 font-medium text-[13px] bg-gray-100 rounded-lg px-3 py-2 w-fit">
+              <svg *ngIf="getTypeIcon(item.supplyType) === 'house'" lucideHouse class="size-4"></svg>
+              <svg *ngIf="getTypeIcon(item.supplyType) === 'store'" lucideStore class="size-4"></svg>
+              <svg *ngIf="getTypeIcon(item.supplyType) === 'building'" lucideBuilding2 class="size-4"></svg>
+              {{ getTypeLabel(item.supplyType) }}
+            </div>
+          </td>
+          <td class="py-4 px-6 text-nowrap text-gray-700">
+            {{ item.installationDate ? (item.installationDate | date:'dd MMM yyyy':'':'es') : '-' }}
+          </td>
+          <td class="py-4 px-6">
             <div>
-              <p>Av. Mariscal Castilla 123, Piso B</p>
-              <p class="text-gray-700 text-xs">Monsefú, Chiclayo</p>
+              <p class="truncate">{{ item.propertyAddress }}</p>
+              <p class="text-gray-700 text-xs truncate">{{ item.zoneName }}</p>
             </div>
           </td>
-          <td class="py-3 px-6">
-            <div class="flex items-center gap-x-1 font-medium text-[13px] text-green-600 bg-green-50 rounded-lg px-3 py-2 w-fit">
-              <svg lucideBadgeCheck class="size-4" />
-              Activo
-            </div>
-          </td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">30 oct 2023 - 10:30 AM</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <component-shared-paginator />
+  <component-dashboard-supplies-empty
+    *ngIf="!isLoading && supplies.length === 0"
+    title="Este cliente no tiene suministros"
+    message="Cuando se aprueben e instalen solicitudes, los suministros aparecerán aquí."
+  />
+
+  <component-shared-paginator
+    *ngIf="totalPages > 1"
+    [page]="currentPage"
+    [totalPages]="totalPages"
+    [totalElements]="totalElements"
+    (pageChange)="onPageChange($event)"
+  />
 
 </section>

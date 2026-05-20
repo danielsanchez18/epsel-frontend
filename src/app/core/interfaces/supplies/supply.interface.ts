@@ -1,4 +1,4 @@
-export type SupplyStatus = 'ACTIVE' | 'SUSPENDED' | 'CUT_OFF' | 'RECONNECTED' | string;
+export type SupplyStatus = 'PENDING_INSTALLATION' | 'ACTIVE' | 'SUSPENDED' | 'CUT_OFF' | 'RECONNECTED' | 'INACTIVE' | string;
 
 export type SupplyType = 'HOUSE' | 'BUSINESS' | 'INDUSTRIAL' | string;
 
