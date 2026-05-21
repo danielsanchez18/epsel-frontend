@@ -66,7 +66,7 @@
           </div>
           <div class="space-y-2">
             <input #fileInput type="file" accept="image/*" (change)="onFileChange($event)" hidden />
-            <button type="button" (click)="fileInput.click()" class="text-[13px] px-2.5 py-1.5 font-medium text-white bg-blue-600 hover:bg-blue-600-dark rounded-lg">Cambiar foto</button>
+            <button type="button" (click)="isEditable && fileInput.click()" [disabled]="!isEditable" class="text-[13px] px-2.5 py-1.5 font-medium text-white bg-blue-600 hover:bg-blue-600-dark rounded-lg disabled:bg-gray-200 disabled:text-gray-500">Cambiar foto</button>
             <p class="text-xs text-gray-700">La imagen debe ser cuadrada y no mayor a 1MB</p>
           </div>
         </div>
@@ -80,7 +80,8 @@
           class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600"
           [(ngModel)]="formData.names"
           (ngModelChange)="checkChanges()"
-          (blur)="touch('names')">
+          (blur)="touch('names')"
+          [disabled]="!isEditable">
         @if (touched.names && !validateNames(formData.names)) {
           <div class="text-xs text-red-500">El nombre es obligatorio y debe tener al menos 2 caracteres.</div>
         }
@@ -94,7 +95,8 @@
           class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600"
           [(ngModel)]="formData.lastNames"
           (ngModelChange)="checkChanges()"
-          (blur)="touch('lastNames')">
+          (blur)="touch('lastNames')"
+          [disabled]="!isEditable">
         @if (touched.lastNames && !validateLastNames(formData.lastNames)) {
           <div class="text-xs text-red-500">El apellido es obligatorio y debe tener al menos 2 caracteres.</div>
         }
@@ -118,7 +120,8 @@
           class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600"
           [(ngModel)]="formData.email"
           (ngModelChange)="checkChanges()"
-          (blur)="touch('email')">
+          (blur)="touch('email')"
+          [disabled]="!isEditable">
         @if (touched.email && !validateEmail(formData.email)) {
           <div class="text-xs text-red-500">Ingresa un correo válido.</div>
         }
@@ -134,7 +137,8 @@
           [(ngModel)]="formData.phone"
           (ngModelChange)="checkChanges()"
           (keypress)="allowOnlyNumbers($event)"
-          (blur)="touch('phone')">
+          (blur)="touch('phone')"
+          [disabled]="!isEditable">
         @if (touched.phone && formData.phone && !validatePhone(formData.phone)) {
           <div class="text-xs text-red-500">El teléfono debe tener exactamente 9 dígitos numéricos.</div>
         }
@@ -144,7 +148,7 @@
         <button
           type="button"
           class="text-sm px-4 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:bg-black disabled:cursor-not-allowed"
-          [disabled]="!hasChanges || !isFormValid"
+          [disabled]="!hasChanges || !isFormValid || !isEditable"
           (click)="saveChanges()">
           Guardar cambios
         </button>

@@ -31,11 +31,35 @@
       </button>
 
       <!-- Perfil -->
-      <div class="ml-2 pl-4 h-8 flex items-center border-l border-gray-200">
-        <a href="/dashboard/perfil" class="h-10 w-10 bg-gray-300 rounded-full overflow-hidden flex items-center justify-center">
-          <img *ngIf="usuario?.photoUrl" [src]="usuario?.photoUrl | publicUrl" alt="User Avatar" class="h-full w-full object-cover" />
-          <svg *ngIf="!usuario?.photoUrl" lucideUserCircle class="size-8 text-gray-500"></svg>
-        </a>
+      <div class="hs-dropdown [--auto-close:inside] [--placement:bottom-right] relative inline-flex">
+
+        <button id="hs-dropdown-default" type="button"
+          class="hs-dropdown-toggle ml-2 pl-4 h-8 flex items-center border-l border-gray-200" aria-haspopup="menu"
+          aria-expanded="false" aria-label="Dropdown">
+          <div class="h-10 w-10 bg-gray-300 rounded-full overflow-hidden flex items-center justify-center">
+            <img *ngIf="usuario?.photoUrl" [src]="usuario?.photoUrl | publicUrl" alt="User Avatar" class="h-full w-full object-cover" />
+            <svg *ngIf="!usuario?.photoUrl" lucideUserCircle class="size-8 text-gray-500"></svg>
+          </div>
+        </button>
+
+        <!-- Contenido del dropdown -->
+        <div
+          class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-50 bg-white border border-gray-300 shadow-md rounded-lg mt-2 after:h-4 after:absolute after:-bottom-4 after:inset-0 after:w-full before:h-4 before:absolute before:-top-4 before:inset-s-0 before:w-full z-50"
+          role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-default">
+          <div class="p-1 space-y-0.5">
+            <!-- <a routerLink="/perfil"
+              class="flex items-center gap-x-2.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-hidden focus:bg-gray-200">
+              <svg lucideUser class="size-4" />
+              Mi perfil
+            </a> -->
+            <button type="button"
+              (click)="onLogout()"
+              class="w-full flex items-center gap-x-2.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-hidden focus:bg-gray-200">
+              <svg lucideLogOut class="size-4" />
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
       </div>
 
     </div>

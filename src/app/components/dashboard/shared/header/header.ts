@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideBell, LucideSearch, LucideCircleQuestionMark, LucideUserCircle } from '@lucide/angular';
+import { LucideBell, LucideSearch, LucideCircleQuestionMark, LucideUserCircle, LucideLogOut } from '@lucide/angular';
 import { AuthService } from '@services/auth/auth.service';
 import { UserService } from '@core/services/users/user.service';
 import { UserResponse } from '@core/interfaces/users/user.interface';
@@ -14,7 +14,8 @@ import { PublicUrlPipe } from '@core/pipes/public-url.pipe';
     LucideCircleQuestionMark,
     LucideSearch,
     LucideUserCircle,
-    PublicUrlPipe
+    PublicUrlPipe,
+    LucideLogOut
 ],
   templateUrl: './header.html',
 })
@@ -34,6 +35,10 @@ export class ComponentDashboardSharedHeader implements OnInit {
         }
       });
     }
+  }
+
+  onLogout() {
+    this.auth.logout();
   }
 
 }

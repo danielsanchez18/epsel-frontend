@@ -35,6 +35,8 @@
           </label>
           <input type="text" name="names"
             formControlName="names"
+            (keydown)="allowOnlyLetters($event)"
+            maxlength="50"
             class="border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Ingrese los nombres completos" required />
 
@@ -54,6 +56,8 @@
           </label>
           <input type="text" name="lastNames"
             formControlName="lastNames"
+            (keydown)="allowOnlyLetters($event)"
+            maxlength="50"
             class="border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Ingrese los apellidos completos" required />
           @if (form.controls.lastNames.invalid && form.controls.lastNames.touched) {
@@ -119,6 +123,12 @@
             formControlName="email"
             class="border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Ingrese el correo electrónico" required />
+          @if (form.controls.email.invalid && form.controls.email.touched) {
+            <div class="text-xs text-red-500">
+              @if (form.controls.email.errors?.['required']) { El correo electrónico es obligatorio. }
+              @if (form.controls.email.errors?.['email']) { Ingrese un correo electrónico válido. }
+            </div>
+          }
         </div>
 
         <!-- Contraseña -->

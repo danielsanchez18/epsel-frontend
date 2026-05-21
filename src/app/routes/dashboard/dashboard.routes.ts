@@ -1,4 +1,5 @@
 import { Routes } from "@angular/router";
+import { roleGuard } from "@core/guards/role.guard";
 
 export const DASHBOARD_ROUTES: Routes = [
   {
@@ -11,26 +12,38 @@ export const DASHBOARD_ROUTES: Routes = [
       },
       {
         path: 'personal',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MANAGEMENT'] },
         loadChildren: () => import('@routes/dashboard/workers.routes').then(m => m.WORKERS_ROUTES)
       },
       {
         path: 'clientes',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MANAGEMENT', 'SUPERVISOR'] },
         loadChildren: () => import('@routes/dashboard/customers.routes').then(m => m.CUSTOMERS_ROUTES)
       },
       {
         path: 'predios',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MANAGEMENT', 'SUPERVISOR'] },
         loadChildren: () => import('@routes/dashboard/properties.routes').then(m => m.PROPERTIES_ROUTES)
       },
       {
         path: 'solicitudes',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'TECHNICIAN', 'SUPERVISOR'] },
         loadChildren: () => import('@routes/dashboard/applications.routes').then(m => m.APPLICATIONS_ROUTES)
       },
       {
         path: 'suministros',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'TECHNICIAN', 'SUPERVISOR'] },
         loadChildren: () => import('@routes/dashboard/supplies.routes').then(m => m.SUPPLIES_ROUTES)
       },
       {
         path: 'configuracion',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MANAGEMENT'] },
         loadChildren: () => import('@routes/dashboard/settings.routes').then(m => m.SETTINGS_ROUTES)
       }
     ]

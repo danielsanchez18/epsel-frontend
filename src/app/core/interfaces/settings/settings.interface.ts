@@ -52,6 +52,8 @@ export interface UpdateServiceFeeConfigurationRequest {
   active?: boolean;
 }
 
+export type TariffStatus = 'ACTIVE' | 'UPCOMING' | 'HISTORICAL' | 'DISABLED' |string;
+
 export interface WaterTariffConfigurationResponse {
   id: string;
   zoneId: string;
@@ -61,6 +63,7 @@ export interface WaterTariffConfigurationResponse {
   taxPercentage: number;
   effectiveDate: string;
   active: boolean;
+  status: TariffStatus;
 }
 
 export interface CreateWaterTariffConfigurationRequest {

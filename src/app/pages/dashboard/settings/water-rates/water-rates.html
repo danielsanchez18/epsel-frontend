@@ -38,15 +38,19 @@
           <td class="py-3 px-6 text-nowrap">S/ {{ tariff.pricePerM3 | number:'1.2-2' }}</td>
           <td class="py-3 px-6 text-nowrap">S/ {{ tariff.fixedCharge | number:'1.2-2' }}</td>
           <td class="py-3 px-6 text-nowrap">{{ tariff.taxPercentage }}%</td>
-          <td class="py-3 px-6 text-nowrap">{{ tariff.effectiveDate | date:'dd MMM yyyy' }}</td>
+          <td class="py-3 px-6 text-nowrap">{{ tariff.effectiveDate | date:'dd MMM yyyy HH:mm':'':'es' }}</td>
           <td class="py-3 px-6 text-nowrap">
-            <div *ngIf="tariff.active" class="flex items-center gap-x-1 font-medium text-[13px] text-green-600 bg-green-50 rounded-lg px-3 py-2 w-fit">
+            <div *ngIf="tariff.status === 'ACTIVE'" class="flex items-center gap-x-1 font-medium text-[13px] text-green-600 bg-green-50 rounded-lg px-3 py-2 w-fit">
               <svg lucideBadgeCheck class="size-4"></svg>
-              Activo
+              Tarifa Actual
             </div>
-             <div *ngIf="!tariff.active" class="flex items-center gap-x-1 font-medium text-[13px] text-red-600 bg-red-50 rounded-lg px-3 py-2 w-fit">
+            <div *ngIf="tariff.status === 'UPCOMING'" class="flex items-center gap-x-1 font-medium text-[13px] text-blue-600 bg-blue-50 rounded-lg px-3 py-2 w-fit">
+              <svg lucideClock class="size-4"></svg>
+              Próxima Tarifa
+            </div>
+            <div *ngIf="tariff.status === 'HISTORICAL'" class="flex items-center gap-x-1 font-medium text-[13px] text-red-600 bg-red-50 rounded-lg px-3 py-2 w-fit">
               <svg lucideBadgeX class="size-4"></svg>
-              Inactivo
+              Tarifa Antigua
             </div>
           </td>
         </tr>

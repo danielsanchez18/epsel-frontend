@@ -58,7 +58,15 @@ export class PageDashboardWorkersDetailsSecurity implements OnInit, DoCheck {
     return this.parent.user?.status === 'ACTIVE';
   }
 
+  get isEditable(): boolean {
+    return this.parent.user?.status === 'ACTIVE';
+  }
+
   async saveRole(): Promise<void> {
+    if (!this.isEditable) {
+      void Swal.fire('No editable', 'No se pueden editar datos de un trabajador inactivo o eliminado.', 'info');
+      return;
+    }
     if (!this.showSaveRoleBtn) return;
 
     const result = await Swal.fire({
@@ -117,6 +125,10 @@ export class PageDashboardWorkersDetailsSecurity implements OnInit, DoCheck {
   }
 
   async deleteAccount(): Promise<void> {
+    if (!this.isEditable) {
+      void Swal.fire('No editable', 'No se pueden editar datos de un trabajador inactivo o eliminado.', 'info');
+      return;
+    }
     const result = await Swal.fire({
       title: '¿Eliminar cuenta?',
       text: 'Esta acción deshabilitará la cuenta de forma irreversible.',

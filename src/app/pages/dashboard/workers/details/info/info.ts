@@ -161,7 +161,30 @@ export class PageDashboardWorkersDetailsInfo implements DoCheck, OnInit {
     }
   }
 
+  
+
+  allowOnlyNumbers(event: KeyboardEvent) {
+    const charCode = event.key.charCodeAt(0);
+    if (
+      event.key !== 'Backspace' &&
+      event.key !== 'Tab' &&
+      event.key !== 'ArrowLeft' &&
+      event.key !== 'ArrowRight' &&
+      (charCode < 48 || charCode > 57)
+    ) {
+      event.preventDefault();
+    }
+  }
+
+  get isEditable(): boolean {
+    return this.parent.user?.status === 'ACTIVE';
+  }
+
   async saveChanges(): Promise<void> {
+    if (!this.isEditable) {
+      void Swal.fire('No editable', 'No se pueden editar datos de un trabajador inactivo o eliminado.', 'info');
+      return;
+    }
     const result = await Swal.fire({
       title: '¿Estás seguro?',
       text: 'Se actualizarán los datos de este usuario en el sistema.',
@@ -181,7 +204,6 @@ export class PageDashboardWorkersDetailsInfo implements DoCheck, OnInit {
         email: this.formData.email,
       };
 
-      // Ensure we send back the identical roleId to not wipe out or change the role
       if (this.parent.user?.role) {
         const found = this.roles.find(r => r.name === this.parent.user!.role);
         if (found) {
@@ -208,19 +230,6 @@ export class PageDashboardWorkersDetailsInfo implements DoCheck, OnInit {
           void Swal.fire('Ocurrió un error', err.error?.message || 'No se pudo actualizar', 'error');
         }
       });
-    }
-  }
-
-  allowOnlyNumbers(event: KeyboardEvent) {
-    const charCode = event.key.charCodeAt(0);
-    if (
-      event.key !== 'Backspace' &&
-      event.key !== 'Tab' &&
-      event.key !== 'ArrowLeft' &&
-      event.key !== 'ArrowRight' &&
-      (charCode < 48 || charCode > 57)
-    ) {
-      event.preventDefault();
     }
   }
 

@@ -1,9 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ComponentSharedSearchBox } from "@components/shared/search-box/search-box";
-import { ComponentSharedFilters } from "@components/shared/filters/filters";
 import { ComponentSharedPaginator } from "@components/shared/paginator/paginator";
-import { LucideBadgeX, LucideSquarePen, LucideBadgeCheck } from "@lucide/angular";
+import { LucideBadgeX, LucideBadgeCheck, LucideClock } from "@lucide/angular";
 import { ComponentDashboardSettingsWaterTariffsAdd } from "@components/dashboard/settings/water-rates/add/add";
 import { WaterTariffService } from '@services/settings/water-tariff.service';
 import { WaterTariffConfigurationResponse } from '@core/interfaces/settings/settings.interface';
@@ -17,7 +16,8 @@ import Swal from 'sweetalert2';
     LucideBadgeX,
     LucideBadgeCheck,
     ComponentDashboardSettingsWaterTariffsAdd,
-  ],
+    LucideClock
+],
   templateUrl: './water-rates.html',
 })
 export class PageDashboardSettingsWaterRates implements OnInit {
