@@ -69,6 +69,15 @@ export const DASHBOARD_ROUTES: Routes = [
           ),
       },
       {
+        path: 'facturacion',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MANAGEMENT'] },
+        loadChildren: () =>
+          import('@routes/dashboard/billing.routes').then(
+            (m) => m.BILLING_ROUTES,
+          ),
+      },
+      {
         path: 'configuracion',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN', 'MANAGEMENT'] },

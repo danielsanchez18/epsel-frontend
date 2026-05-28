@@ -1,0 +1,60 @@
+<section class="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+
+  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
+    <div class="flex text-sm text-gray-600 items-center justify-between">
+      <h3>Facturas Pendientes</h3>
+      <svg lucideClock class="size-5 stroke-[1.5]" />
+    </div>
+
+    <div class="space-y-1">
+      <p class="font-medium text-xl">{{ pendingCount }}<span class="text-sm"> fac. pendientes</span></p>
+    </div>
+  </article>
+
+  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
+    <div class="flex text-sm text-gray-600 items-center justify-between">
+      <h3>Facturas Vencidas</h3>
+      <svg lucideBadgeAlert class="size-5 stroke-[1.5]" />
+    </div>
+
+    <div class="space-y-1">
+      <p class="font-medium text-xl">{{ overdueCount }}<span class="text-sm"> fac. vencidas</span></p>
+    </div>
+  </article>
+
+  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
+    <div class="flex text-sm text-gray-600 items-center justify-between">
+      <h3>Facturas Pagadas</h3>
+      <svg lucideBadgeCheck class="size-5 stroke-[1.5]" />
+    </div>
+
+    <div class="space-y-1">
+      <p class="font-medium text-xl">{{ paidCount }}<span class="text-sm"> fac. pagadas</span></p>
+      <!-- <p class="text-xs text-blue-600 font-medium">+45 este mes</p> -->
+    </div>
+  </article>
+
+  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
+    <div class="flex text-sm text-gray-600 items-center justify-between">
+      <h3>Total Recaudado</h3>
+      <svg lucideBadgeDollarSign class="size-5 stroke-[1.5]" />
+    </div>
+
+    <div class="space-y-1">
+      <p class="font-medium text-xl">S/. {{ totalCollected }}</p>
+    </div>
+  </article>
+
+  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
+    <div class="flex text-sm text-gray-600 items-center justify-between">
+      <h3>Total Pendiente</h3>
+      <svg lucideBadgeDollarSign class="size-5 stroke-[1.5]" />
+    </div>
+
+    <div class="space-y-1">
+      <p class="font-medium text-xl">S/. {{ totalPending }}</p>
+    </div>
+  </article>
+
+
+</section>

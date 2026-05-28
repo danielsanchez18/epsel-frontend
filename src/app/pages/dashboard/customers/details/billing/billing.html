@@ -1,155 +1,73 @@
 <section class="p-5 border border-gray-200 rounded-xl overflow-hidden bg-white grid gap-5">
 
   <div class="flex items-center justify-between gap-x-3">
-    <component-shared-search-box
-      placeholder="Buscar factura por código"
-      class="max-w-md w-full"
-    />
+    <component-shared-search-box placeholder="Buscar factura por código o suministro..." class="max-w-md w-full"
+      [searchQuery]="searchQuery" (searchQueryChange)="onSearchQuery($event)" />
 
     <component-shared-filters />
   </div>
 
-  <div class="overflow-x-auto">
+  <div *ngIf="isLoading" class="flex justify-center py-10">
+    <div
+      class="animate-spin inline-block size-6 border-2 border-current border-t-transparent text-blue-600 rounded-full"
+      role="status" aria-label="loading"></div>
+  </div>
+
+  <div *ngIf="!isLoading && filteredBillings.length === 0"
+    class="flex flex-col items-center justify-center py-12 text-gray-500">
+    <svg lucideFileText class="size-12 stroke-[1.2] mb-3 text-gray-400"></svg>
+    <p class="font-medium text-gray-700">No se encontraron facturas</p>
+    <p class="text-xs text-gray-400 mt-1">Este cliente no registra facturas emitidas hasta el momento.</p>
+  </div>
+
+  <div *ngIf="!isLoading && filteredBillings.length > 0" class="overflow-x-auto">
     <table class="w-full text-left">
       <thead>
         <tr class="bg-gray-100 text-sm">
-          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Código</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">N° Factura</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Suministro</th>
           <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Monto</th>
-          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Fecha de emisión</th>
-          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Fecha de vencimiento</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Fecha Emisión</th>
+          <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Fecha Vencimiento</th>
           <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start">Estado</th>
           <th class="py-3 px-6 text-nowrap font-semibold text-xs uppercase text-start"></th>
         </tr>
       </thead>
 
-      <tbody class="text-sm divide-y divide-gray-200">
-        <tr class="group cursor-pointer hover:bg-gray-50">
-          <td class="py-3 px-6 text-nowrap font-medium group-hover:underline text-blue-600">COD-522546</td>
-          <td class="py-3 px-6 text-nowrap">$1,200.00</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">15 de octubre de 2023</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">30 de octubre de 2023</td>
-          <td class="py-3 px-6">
-            <div class="flex items-center gap-x-1 text-red-600 font-medium text-[13px] bg-red-50 rounded-lg px-3 py-2 w-fit">
-              <svg lucideBadgeAlert class="size-4" />
-              Vencido
-            </div>
+      <tbody class="text-sm divide-y divide-gray-100">
+        <tr routerLink="{{ bill.id }}" *ngFor="let bill of filteredBillings"
+          class="group hover:bg-gray-50 transition-colors cursor-pointer max-xl:w-full">
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 group-hover:underline">
+            {{ bill.billingNumber }}
           </td>
-          <td class="py-3 px-4 text-right">
-            <div class="flex items-center gap-x-1">
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucideDownload class="size-4" />
-              </button>
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucidePrinter class="size-4" />
-              </button>
-            </div>
+          <td class="py-4 px-6 text-nowrap">
+            {{ bill.supplyNumber }}
           </td>
-        </tr>
-        <tr class="group cursor-pointer hover:bg-gray-50">
-          <td class="py-3 px-6 text-nowrap font-medium group-hover:underline text-blue-600">COD-522546</td>
-          <td class="py-3 px-6 text-nowrap">$1,200.00</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">15 de octubre de 2023</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">30 de octubre de 2023</td>
-          <td class="py-3 px-6">
-            <div class="flex items-center gap-x-1 text-yellow-700 font-medium text-[13px] bg-yellow-50 rounded-lg px-3 py-2 w-fit">
-              <svg lucideBadgeAlert class="size-4" />
-              Pendiente
-            </div>
+          <td class="py-4 px-6 text-nowrap font-medium text-sm">
+            S/. {{ bill.totalAmount.toFixed(2) }}
           </td>
-          <td class="py-3 px-4 text-right">
-            <div class="flex items-center gap-x-1">
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucideDownload class="size-4" />
-              </button>
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucidePrinter class="size-4" />
-              </button>
-            </div>
+          <td class="py-4 px-6 text-nowrap">
+            {{ bill.billingDate | date: 'dd/MM/yyyy' }}
           </td>
-        </tr>
-        <tr class="group cursor-pointer hover:bg-gray-50">
-          <td class="py-3 px-6 text-nowrap font-medium group-hover:underline text-blue-600">COD-522546</td>
-          <td class="py-3 px-6 text-nowrap">$1,200.00</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">15 de octubre de 2023</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">30 de octubre de 2023</td>
-          <td class="py-3 px-6">
-            <div class="flex items-center gap-x-1 text-green-600 font-medium text-[13px] bg-green-50 rounded-lg px-3 py-2 w-fit">
-              <svg lucideBadgeCheck class="size-4" />
-              Pagada
-            </div>
+          <td class="py-4 px-6 text-nowrap">
+            {{ bill.dueDate | date: 'dd/MM/yyyy' }}
           </td>
-          <td class="py-3 px-4 text-right">
-            <div class="flex items-center gap-x-1">
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucideDownload class="size-4" />
-              </button>
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucidePrinter class="size-4" />
-              </button>
-            </div>
+          <td class="py-4 px-6">
+            <span class="inline-flex items-center gap-x-1.5 px-2.5 py-1.5 rounded-md text-[13px] font-medium"
+              [ngClass]="getStatusClass(bill.status)">
+              <svg *ngIf="bill.status === 'PAID'" lucideBadgeCheck class="size-3.5"></svg>
+              <svg *ngIf="bill.status !== 'PAID'" lucideBadgeAlert class="size-3.5"></svg>
+              {{ getStatusLabel(bill.status) }}
+            </span>
           </td>
-        </tr>
-        <tr class="group cursor-pointer hover:bg-gray-50">
-          <td class="py-3 px-6 text-nowrap font-medium group-hover:underline text-blue-600">COD-522546</td>
-          <td class="py-3 px-6 text-nowrap">$1,200.00</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">15 de octubre de 2023</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">30 de octubre de 2023</td>
-          <td class="py-3 px-6">
-            <div class="flex items-center gap-x-1 text-green-600 font-medium text-[13px] bg-green-50 rounded-lg px-3 py-2 w-fit">
-              <svg lucideBadgeCheck class="size-4" />
-              Pagada
-            </div>
-          </td>
-          <td class="py-3 px-4 text-right">
-            <div class="flex items-center gap-x-1">
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucideDownload class="size-4" />
+          <td class="py-4 px-6 text-right">
+            <div class="flex items-center justify-end gap-x-1.5">
+              <button (click)="viewInvoice(bill)" title="Ver detalle"
+                class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
+                <svg lucideInfo class="size-4" />
               </button>
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucidePrinter class="size-4" />
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr class="group cursor-pointer hover:bg-gray-50">
-          <td class="py-3 px-6 text-nowrap font-medium group-hover:underline text-blue-600">COD-522546</td>
-          <td class="py-3 px-6 text-nowrap">$1,200.00</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">15 de octubre de 2023</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">30 de octubre de 2023</td>
-          <td class="py-3 px-6">
-            <div class="flex items-center gap-x-1 text-green-600 font-medium text-[13px] bg-green-50 rounded-lg px-3 py-2 w-fit">
-              <svg lucideBadgeCheck class="size-4" />
-              Pagada
-            </div>
-          </td>
-          <td class="py-3 px-4 text-right">
-            <div class="flex items-center gap-x-1">
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucideDownload class="size-4" />
-              </button>
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucidePrinter class="size-4" />
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr class="group cursor-pointer hover:bg-gray-50">
-          <td class="py-3 px-6 text-nowrap font-medium group-hover:underline text-blue-600">COD-522546</td>
-          <td class="py-3 px-6 text-nowrap">$1,200.00</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">15 de octubre de 2023</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">30 de octubre de 2023</td>
-          <td class="py-3 px-6">
-            <div class="flex items-center gap-x-1 text-green-600 font-medium text-[13px] bg-green-50 rounded-lg px-3 py-2 w-fit">
-              <svg lucideBadgeCheck class="size-4" />
-              Pagada
-            </div>
-          </td>
-          <td class="py-3 px-4 text-right">
-            <div class="flex items-center gap-x-1">
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucideDownload class="size-4" />
-              </button>
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
+              <button title="Imprimir/PDF"
+                class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
                 <svg lucidePrinter class="size-4" />
               </button>
             </div>
@@ -159,6 +77,7 @@
     </table>
   </div>
 
-  <component-shared-paginator />
+  <component-shared-paginator *ngIf="!isLoading && totalPages > 1" [page]="currentPage" [totalPages]="totalPages"
+    [totalElements]="totalElements" (pageChange)="onPageChange($event)" />
 
 </section>

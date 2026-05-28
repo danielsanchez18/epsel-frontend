@@ -100,7 +100,7 @@
         <div *ngIf="reading.status === 'BILLED'" class="grid sm:grid-cols-2 gap-x-6 gap-y-4">
           <div class="flex flex-col">
             <span class="text-xs text-gray-500 font-medium">Factura generada</span>
-            <span class="font-bold text-gray-900">FAC-2026-{{ reading.supplyNumber.slice(-4) }}</span>
+            <span class="font-bold text-gray-900">{{ billing?.billingNumber ?? 'Cargando...' }}</span>
           </div>
           <div class="flex flex-col">
             <span class="text-xs text-gray-500 font-medium">Monto</span>
@@ -113,8 +113,9 @@
           <div class="flex flex-col">
             <span class="text-xs text-gray-500 font-medium">Estado pago</span>
             <span
-              class="inline-flex items-center w-fit px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
-              Pendiente
+              class="inline-flex items-center w-fit px-2.5 py-0.5 rounded-full text-xs font-medium border"
+              [ngClass]="getBillingStatusClass(billing?.status)">
+              {{ getBillingStatusLabel(billing?.status) }}
             </span>
           </div>
         </div>

@@ -1,0 +1,81 @@
+<div class="overflow-x-auto">
+  <table class="w-full text-left">
+    <thead>
+      <tr class="bg-gray-100 text-sm">
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">N° Factura</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Cliente</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Suministro</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Dirección</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Periodo</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Consumo</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Total</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Vencimiento</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Estado</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start"></th>
+      </tr>
+    </thead>
+    <tbody class="text-sm divide-y divide-gray-200">
+      <tr routerLink="{{ bill.id }}" *ngFor="let bill of billings"
+        class="group hover:bg-gray-50 transition-colors cursor-pointer max-xl:w-full">
+        <!-- N° Factura -->
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 group-hover:underline">
+          {{ bill.billingNumber }}
+        </td>
+        <!-- Cliente -->
+        <td class="py-4 px-6 text-nowrap">
+          {{ bill.customerName }}
+        </td>
+        <!-- Suministro -->
+        <td class="py-4 px-6 text-nowrap">
+          {{ bill.supplyNumber }}
+        </td>
+        <!-- Dirección -->
+        <td class="py-4 px-6 text-nowrap truncate max-w-56" [title]="bill.propertyAddress">
+          {{ bill.propertyAddress }}
+        </td>
+        <!-- Periodo -->
+        <td class="py-4 px-6 text-nowrap">
+          {{ getPeriodLabel(bill.billingMonth, bill.billingYear) }}
+        </td>
+        <!-- Consumo -->
+        <td class="py-4 px-6 text-nowrap font-medium text-blue-700">
+          {{ bill.consumption }} m³
+        </td>
+        <!-- Total -->
+        <td class="py-4 px-6 text-nowrap font-medium">
+          S/. {{ bill.totalAmount.toFixed(2) }}
+        </td>
+        <!-- Vencimiento -->
+        <td class="py-4 px-6 text-nowrap">
+          {{ bill.dueDate | date: 'dd/MM/yyyy' }}
+        </td>
+        <!-- Estado -->
+        <td class="py-4 px-6">
+          <span class="inline-flex items-center gap-x-1.5 px-2.5 py-1.5 rounded-md text-[13px] font-medium"
+            [ngClass]="getStatusClass(bill.status)">
+            <svg *ngIf="bill.status === 'PAID'" lucideBadgeCheck class="size-3.5"></svg>
+            <svg *ngIf="bill.status !== 'PAID'" lucideBadgeAlert class="size-3.5"></svg>
+            {{ getStatusLabel(bill.status) }}
+          </span>
+        </td>
+        <!-- Acciones -->
+        <td class="py-4 px-6 text-right">
+          <div class="flex items-center justify-end gap-x-1.5">
+            <a [routerLink]="['/dashboard/facturacion', bill.id]" title="Ver detalle"
+              class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
+              <svg lucideEye class="size-4"></svg>
+            </a>
+            <button (click)="onDownloadPdf(bill)" title="Generar PDF"
+              class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
+              <svg lucideFileDown class="size-4"></svg>
+            </button>
+            <button (click)="onPay(bill)" title="Registrar pago"
+              class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
+              <svg lucideCreditCard class="size-4"></svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

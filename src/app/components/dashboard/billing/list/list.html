@@ -1,0 +1,34 @@
+<section class="lg:border border-gray-200 lg:rounded-xl lg:p-5 flex flex-col gap-10">
+
+  <div class="flex items-center justify-between gap-2">
+    <component-shared-search-box class="w-full md:max-w-md"
+      placeholder="Buscar factura por N°, suministro, cliente o dirección..." [searchQuery]="searchQuery"
+      (searchQueryChange)="onSearchQuery($event)" />
+
+    <div class="flex items-center gap-x-2.5">
+      <select [value]="selectedStatus" (change)="onStatusFilter($any($event.target).value)"
+        class="w-45 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 cursor-pointer outline-hidden focus:border-blue-500">
+        <option value="">Todos los estados</option>
+        <option value="PAID">Pagadas</option>
+        <option value="PENDING">Pendientes</option>
+        <option value="OVERDUE">Vencidas</option>
+        <option value="CANCELLED">Canceladas</option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="flex justify-center py-10">
+    <div
+      class="animate-spin inline-block size-6 border-2 border-current border-t-transparent text-blue-600 rounded-full"
+      role="status" aria-label="loading"></div>
+  </div>
+
+  <component-dashboard-billing-table *ngIf="!isLoading && billings.length > 0" [billings]="billings"
+    [isLoading]="isLoading" (downloadPdf)="generatePDF($event)" (pay)="registerPayment($event)" />
+
+  <component-dashboard-billing-empty *ngIf="!isLoading && billings.length === 0" />
+
+  <component-shared-paginator *ngIf="!isLoading && totalPages > 1" [page]="currentPage" [totalPages]="totalPages"
+    [totalElements]="totalElements" (pageChange)="onPageChange($event)" />
+
+</section>
