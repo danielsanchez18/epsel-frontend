@@ -1,0 +1,38 @@
+<section class="lg:border border-gray-200 lg:rounded-xl lg:p-5 flex flex-col gap-10">
+
+  <div class="flex items-center justify-between gap-2">
+
+    <component-shared-search-box
+      class="w-full md:max-w-md"
+      placeholder="Buscar lecturas por código de suministro..."
+      [searchQuery]="searchQuery"
+      (searchQueryChange)="onSearchQuery($event)"
+    />
+
+    <div class="flex items-center gap-x-1">
+      <component-shared-import />
+      <component-shared-filters />
+    </div>
+
+  </div>
+
+  <div *ngIf="isLoading" class="flex justify-center py-10">
+    <div class="animate-spin inline-block size-6 border-2 border-current border-t-transparent text-blue-600 rounded-full" role="status" aria-label="loading"></div>
+  </div>
+
+  <component-dashboard-readings-table
+    *ngIf="!isLoading && readings.length > 0"
+    [items]="readings"
+  />
+
+  <component-dashboard-readings-empty *ngIf="!isLoading && readings.length === 0" />
+
+  <component-shared-paginator
+    *ngIf="totalPages > 1"
+    [page]="currentPage"
+    [totalPages]="totalPages"
+    [totalElements]="totalElements"
+    (pageChange)="onPageChange($event)"
+  />
+
+</section>

@@ -1,0 +1,19 @@
+<main class="flex flex-col gap-y-7 px-4 md:px-7 lg:px-10">
+
+  <div class="flex items-center gap-x-2">
+    <a
+      routerLink="/dashboard/lecturas"
+      class="inline-flex items-center justify-center p-2 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
+      <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m15 18-6-6 6-6"></path>
+      </svg>
+    </a>
+    <div>
+      <h1 class="text-lg font-medium">Detalle de Lectura</h1>
+      <p class="text-sm text-gray-700">Ver información detallada de la lectura de medidor.</p>
+    </div>
+  </div>
+
+  <component-dashboard-readings-details />
+
+</main>

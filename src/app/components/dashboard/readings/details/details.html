@@ -1,0 +1,229 @@
+<div *ngIf="isLoading" class="flex justify-center py-20">
+  <div class="animate-spin inline-block size-8 border-4 border-current border-t-transparent text-blue-600 rounded-full"
+    role="status" aria-label="loading"></div>
+</div>
+
+<div *ngIf="!isLoading && reading === null" class="bg-red-50 border border-red-200 rounded-xl p-5 text-center">
+  <p class="text-red-700 font-medium">No se pudo encontrar la lectura seleccionada o no existe.</p>
+</div>
+
+<div *ngIf="!isLoading && reading !== null" class="grid lg:grid-cols-[1.5fr_1.1fr] gap-6">
+
+  <!-- Left Side: General Info, Reading details, and Billing -->
+  <div class="space-y-6">
+
+    <!-- Card 1: Información General -->
+    <section class="border border-gray-200 rounded-xl bg-white overflow-hidden shadow-xs">
+      <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center">
+        <h2 class="font-semibold text-gray-800 text-sm uppercase tracking-wide">Información General</h2>
+      </div>
+      <div class="p-5 grid sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+        <div class="flex flex-col">
+          <span class="text-xs text-gray-500 font-medium">Cliente</span>
+          <span class="font-semibold text-gray-900">{{ supply?.customerName ?? '-' }}</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs text-gray-500 font-medium">Suministro</span>
+          <span class="font-semibold text-blue-600">{{ reading.supplyNumber }}</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs text-gray-500 font-medium">Predio</span>
+          <span class="font-medium text-gray-800">{{ supply?.cadastralCode ?? 'P-10024' }}</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs text-gray-500 font-medium">Medidor</span>
+          <span class="font-medium text-gray-800">{{ supply?.meterNumber ?? '-' }}</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs text-gray-500 font-medium">Zona</span>
+          <span class="font-medium text-gray-800">{{ supply?.zoneName ?? '-' }}</span>
+        </div>
+        <div class="flex flex-col sm:col-span-2">
+          <span class="text-xs text-gray-500 font-medium">Dirección</span>
+          <span class="font-medium text-gray-800">{{ supply?.propertyAddress ?? '-' }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Card 2: Detalles de la Lectura -->
+    <section class="border border-gray-200 rounded-xl bg-white overflow-hidden shadow-xs">
+      <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center">
+        <h2 class="font-semibold text-gray-800 text-sm uppercase tracking-wide">Lectura</h2>
+        <span class="px-2.5 py-1 rounded-lg text-xs font-semibold border" [ngClass]="getStatusClass(reading.status)">
+          {{ getStatusLabel(reading.status) }}
+        </span>
+      </div>
+      <div class="p-5 grid sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+        <div class="flex flex-col">
+          <span class="text-xs text-gray-500 font-medium">Lectura Anterior</span>
+          <span class="font-medium text-gray-600">{{ reading.previousReading }} m³</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs text-gray-500 font-medium">Lectura Actual</span>
+          <span class="font-semibold text-gray-900">{{ reading.currentReading }} m³</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs text-gray-500 font-medium">Consumo</span>
+          <span class="font-bold text-blue-700 text-lg">{{ reading.consumption }} m³</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs text-gray-500 font-medium">Fecha</span>
+          <span class="font-medium text-gray-800">{{ reading.readingDate | date: 'dd/MM/yyyy' }}</span>
+        </div>
+        <div *ngIf="reading.observations"
+          class="flex flex-col sm:col-span-2 bg-amber-50/50 border border-amber-100 p-3 rounded-lg">
+          <span class="text-xs text-amber-800 font-semibold flex items-center gap-x-1 mb-1">
+            <svg lucideAlertTriangle class="size-3.5"></svg> Observaciones
+          </span>
+          <span class="text-xs text-amber-700">{{ reading.observations }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Card 3: Facturación -->
+    <section class="border border-gray-200 rounded-xl bg-white overflow-hidden shadow-xs">
+      <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50">
+        <h2 class="font-semibold text-gray-800 text-sm uppercase tracking-wide">Facturación</h2>
+      </div>
+      <div class="p-5 text-sm">
+        <div *ngIf="reading.status !== 'BILLED'"
+          class="flex items-center gap-x-3 text-gray-500 bg-gray-50 border rounded-lg p-4 justify-between">
+          <div class="flex items-center gap-x-3">
+            <svg lucideFileText class="size-6 text-gray-400"></svg>
+            <div>
+              <p class="font-medium text-gray-700">Factura no generada</p>
+              <p class="text-xs">La factura será generada una vez que la lectura sea validada.</p>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="reading.status === 'BILLED'" class="grid sm:grid-cols-2 gap-x-6 gap-y-4">
+          <div class="flex flex-col">
+            <span class="text-xs text-gray-500 font-medium">Factura generada</span>
+            <span class="font-bold text-gray-900">FAC-2026-{{ reading.supplyNumber.slice(-4) }}</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xs text-gray-500 font-medium">Monto</span>
+            <span class="font-bold text-green-700">S/. {{ getInvoiceAmount() }}</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xs text-gray-500 font-medium">Vencimiento</span>
+            <span class="font-semibold text-red-600">{{ getInvoiceDueDate() }}</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xs text-gray-500 font-medium">Estado pago</span>
+            <span
+              class="inline-flex items-center w-fit px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
+              Pendiente
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Right Side: Evidence, History and Actions -->
+  <div class="space-y-6">
+
+    <!-- Card 4: Acciones Contextuales -->
+    <section class="border border-gray-200 rounded-xl bg-white overflow-hidden shadow-xs">
+      <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50">
+        <h2 class="font-semibold text-gray-800 text-sm uppercase tracking-wide">Acciones</h2>
+      </div>
+      <div class="p-5 flex flex-col gap-3">
+        <!-- Status RECORDED -->
+        <ng-container *ngIf="reading.status === 'RECORDED'">
+          <button (click)="validateReading()"
+            class="w-full py-2.5 px-4 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-x-2 text-sm cursor-pointer">
+            <svg lucideCheck class="size-4"></svg> Validar
+          </button>
+          <button (click)="cancelReading()"
+            class="w-full py-2.5 px-4 rounded-lg bg-red-50 text-red-600 border border-red-200 font-medium hover:bg-red-100 transition-colors flex items-center justify-center gap-x-2 text-sm cursor-pointer">
+            <svg lucideX class="size-4"></svg> Cancelar
+          </button>
+        </ng-container>
+
+        <!-- Status VALIDATED -->
+        <ng-container *ngIf="reading.status === 'VALIDATED'">
+          <button (click)="generateInvoice()"
+            class="w-full py-2.5 px-4 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-x-2 text-sm cursor-pointer">
+            <svg lucideFileText class="size-4"></svg> Generar factura
+          </button>
+        </ng-container>
+
+        <!-- Status BILLED -->
+        <ng-container *ngIf="reading.status === 'BILLED'">
+          <button (click)="viewInvoice()"
+            class="w-full py-2.5 px-4 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-x-2 text-sm cursor-pointer">
+            <svg lucideFileText class="size-4"></svg> Ver factura
+          </button>
+        </ng-container>
+
+        <p class="text-xs text-gray-500 text-center">Acciones permitidas según el estado actual de la lectura</p>
+      </div>
+    </section>
+
+    <!-- Card 5: Evidencia -->
+    <section class="border border-gray-200 rounded-xl bg-white overflow-hidden shadow-xs">
+      <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50">
+        <h2 class="font-semibold text-gray-800 text-sm uppercase tracking-wide">Evidencia</h2>
+      </div>
+      <div class="p-5 flex flex-col items-center gap-4">
+        <!-- Foto -->
+        <div
+          class="w-full aspect-video max-h-52 bg-gray-100 border border-gray-200 rounded-lg overflow-hidden flex items-center justify-center relative">
+          <img *ngIf="reading.meterPhotoUrl" src="{{ reading.meterPhotoUrl | publicUrl }}" alt="Foto Medidor"
+            class="w-full h-full object-cover" />
+          <div *ngIf="!reading.meterPhotoUrl" class="flex flex-col items-center justify-center text-gray-400 p-4">
+            <svg lucideImage class="size-8 stroke-[1.5] mb-2"></svg>
+            <span class="text-xs">Sin foto de evidencia</span>
+          </div>
+        </div>
+
+        <!-- OCR -->
+        <div
+          class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3.5 flex items-center justify-between text-sm">
+          <span class="font-medium text-gray-500">OCR Detectado:</span>
+          <span
+            class="font-mono font-bold bg-blue-50 text-blue-700 px-2 py-0.5 border border-blue-100 rounded text-base">
+            {{ reading.ocrValue ?? '00000' }}
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Card 6: Historial -->
+    <section class="border border-gray-200 rounded-xl bg-white overflow-hidden shadow-xs">
+      <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50">
+        <h2 class="font-semibold text-gray-800 text-sm uppercase tracking-wide">Historial</h2>
+      </div>
+      <div class="p-5 space-y-4">
+        <div class="relative pl-6 border-l border-gray-200 ml-3 space-y-5 text-sm">
+          <div *ngFor="let hist of history" class="relative">
+            <!-- Timeline dot -->
+            <div class="absolute left-[-31px] top-1.5 size-2.5 rounded-full border-2 border-white bg-blue-500"></div>
+
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="font-semibold text-gray-900">{{ hist.currentReading }} m³</p>
+                <p class="text-xs text-gray-500">Lectura registrada</p>
+              </div>
+              <div class="text-right">
+                <span class="font-bold text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                  +{{ hist.consumption }} m³
+                </span>
+                <p class="text-[10px] text-gray-500 mt-1">{{ hist.readingDate | date: 'dd/MM/yyyy' }}</p>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="history.length === 0" class="text-center py-4 text-xs text-gray-500">
+            No hay lecturas anteriores registradas.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+</div>

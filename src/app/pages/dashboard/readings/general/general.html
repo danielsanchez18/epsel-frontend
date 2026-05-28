@@ -1,0 +1,30 @@
+<main class="flex flex-col gap-y-7 px-4 md:px-7 lg:px-10">
+
+    <div class="flex items-center gap-x-2">
+
+        <!-- Título y descripción -->
+        <div>
+            <h1 class="text-lg font-medium">Lecturas de Medidor</h1>
+            <p class="text-sm text-gray-700">Administra las lecturas de medidores y consumos del sistema.</p>
+        </div>
+
+        <!-- Botón para abrir modal -->
+        <button type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-scale-animation-modal"
+            data-hs-overlay="#hs-scale-animation-modal"
+            class="ml-auto rounded-lg font-medium bg-blue-500 text-white text-sm hover:bg-blue-600 px-3 py-2 transition-colors duration-200">
+            Registrar lectura
+        </button>
+
+    </div>
+
+    <component-dashboard-readings-kpis />
+    <component-dashboard-readings-list />
+
+</main>
+
+<!-- Modal de Registrar Lectura -->
+<div id="hs-scale-animation-modal"
+    class="hs-overlay hidden size-full fixed top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none [--overlay-backdrop:static]"
+    role="dialog" tabindex="-1" aria-labelledby="hs-scale-animation-modal-label">
+    <component-dashboard-readings-add />
+</div>
