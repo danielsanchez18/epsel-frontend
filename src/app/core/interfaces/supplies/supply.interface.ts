@@ -1,9 +1,16 @@
-export type SupplyStatus = 'PENDING_INSTALLATION' | 'ACTIVE' | 'SUSPENDED' | 'CUT_OFF' | 'RECONNECTED' | 'INACTIVE' | string;
+export type SupplyStatus =
+  | 'PENDING_INSTALLATION'
+  | 'ACTIVE'
+  | 'SUSPENDED'
+  | 'CUT_OFF'
+  | 'INACTIVE'
+  | string;
 
 export type SupplyType = 'HOUSE' | 'BUSINESS' | 'INDUSTRIAL' | string;
 
 export interface ReconnectSupplyDTO {
-  observation: string;
+  reason: string;
+  observations?: string;
 }
 
 export interface SuspendSupplyDTO {

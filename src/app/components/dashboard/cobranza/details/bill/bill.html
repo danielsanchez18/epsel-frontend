@@ -6,7 +6,7 @@
       </div>
       <h2 class="font-semibold text-sm text-gray-900">Detalle del Documento de Facturación</h2>
     </div>
-    
+
     <span *ngIf="billing" class="inline-flex items-center gap-x-1.5 px-2.5 py-1 rounded-md text-[13px] font-medium"
       [ngClass]="getStatusClass(billing.status)">
       <svg *ngIf="billing.status === 'PAID'" lucideBadgeCheck class="size-3.5"></svg>
@@ -39,7 +39,7 @@
       <span class="font-medium text-green-600">S/. {{ (billing?.amountPaid || 0).toFixed(2) }}</span>
     </div>
     <div class="flex flex-col gap-0.5">
-      <span class="text-xs text-gray-500 font-medium text-red-500">Monto Pendiente</span>
+      <span class="text-xs text-gray-500 font-medium">Monto Pendiente</span>
       <span class="font-bold text-red-600">S/. {{ getPendingAmount().toFixed(2) }}</span>
     </div>
   </div>

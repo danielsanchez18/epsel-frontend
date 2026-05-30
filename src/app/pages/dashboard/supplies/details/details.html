@@ -1,8 +1,70 @@
 <main class="flex flex-col gap-y-7 px-4 md:px-7 lg:px-10">
+
+  <!-- Breadcrumb / Header -->
   <div class="space-y-1">
     <a routerLink=".." class="font-medium text-sm text-blue-600 hover:underline">Regresar</a>
-    <h1 class="text-lg font-medium">Detalle del suministro</h1>
+    <h1 class="text-lg font-medium">Suministro N° {{ supplyNumber || '...' }}</h1>
   </div>
 
-  <component-dashboard-supplies-details />
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center py-10">
+    <div
+      class="animate-spin inline-block size-6 border-2 border-current border-t-transparent text-blue-600 rounded-full"
+      role="status" aria-label="loading"></div>
+  </div>
+
+  <!-- Content Section -->
+  <div *ngIf="!isLoading && supplyId" class="flex flex-col gap-y-6">
+
+    <!-- Tab headers -->
+    <div class="border-b border-gray-200">
+      <nav class="flex gap-x-5 -mb-px" aria-label="Tabs">
+        <button (click)="activeTab = 'info'"
+          [ngClass]="activeTab === 'info' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="py-3 px-1 border-b-2 font-medium text-sm cursor-pointer outline-hidden whitespace-nowrap">
+          Información
+        </button>
+        <button (click)="activeTab = 'billings'"
+          [ngClass]="activeTab === 'billings' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="py-3 px-1 border-b-2 font-medium text-sm cursor-pointer outline-hidden whitespace-nowrap">
+          Facturas
+        </button>
+        <button (click)="activeTab = 'payments'"
+          [ngClass]="activeTab === 'payments' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="py-3 px-1 border-b-2 font-medium text-sm cursor-pointer outline-hidden whitespace-nowrap">
+          Pagos
+        </button>
+        <button (click)="activeTab = 'readings'"
+          [ngClass]="activeTab === 'readings' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="py-3 px-1 border-b-2 font-medium text-sm cursor-pointer outline-hidden whitespace-nowrap">
+          Lecturas
+        </button>
+        <button (click)="activeTab = 'operations'"
+          [ngClass]="activeTab === 'operations' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="py-3 px-1 border-b-2 font-medium text-sm cursor-pointer outline-hidden whitespace-nowrap">
+          Operaciones
+        </button>
+      </nav>
+    </div>
+
+    <!-- Tab Contents -->
+    <div class="py-2">
+      <!-- 1. Información Component -->
+      <component-dashboard-supplies-details *ngIf="activeTab === 'info'" />
+
+      <!-- 2. Facturas Component -->
+      <component-dashboard-supplies-details-billings *ngIf="activeTab === 'billings'" [supplyId]="supplyId" />
+
+      <!-- 3. Pagos Component -->
+      <component-dashboard-supplies-details-payments *ngIf="activeTab === 'payments'" [supplyNumber]="supplyNumber" />
+
+      <!-- 4. Lecturas Component -->
+      <component-dashboard-supplies-details-readings *ngIf="activeTab === 'readings'" [supplyNumber]="supplyNumber" />
+
+      <!-- 5. Operaciones Component -->
+      <component-dashboard-supplies-details-operations *ngIf="activeTab === 'operations'" [supplyId]="supplyId" />
+    </div>
+
+  </div>
+
 </main>
