@@ -1,0 +1,162 @@
+<main class="flex flex-col gap-y-7 px-4 md:px-7 lg:px-10">
+
+  <div *ngIf="isLoading" class="flex justify-center py-20">
+    <div
+      class="animate-spin inline-block size-8 border-4 border-current border-t-transparent text-blue-600 rounded-full"
+      role="status" aria-label="loading"></div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="!isLoading && payment === null" class="bg-red-50 border border-red-200 rounded-xl p-5 text-center">
+    <p class="text-red-700 font-medium">No se pudo encontrar el pago seleccionado o no existe.</p>
+    <a routerLink="/dashboard/pagos" class="mt-3 inline-block text-sm text-blue-600 hover:underline">Volver a la lista</a>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading && payment !== null" class="space-y-6">
+
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <a routerLink=".." class="text-sm font-medium text-blue-600 hover:underline">Regresar</a>
+        <div class="flex items-center gap-x-3">
+          <h1 class="text-2xl font-medium">{{ payment.receiptNumber }}</h1>
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold border"
+            [ngClass]="getStatusClass(payment.status)">
+            {{ getStatusLabel(payment.status) }}
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Grid Layout -->
+    <div class="grid lg:grid-cols-[1.6fr_1.1fr] gap-6">
+
+      <!-- Left Column: Invoice Info & Payment Info -->
+      <div class="space-y-6">
+
+        <!-- INFO FACTURA -->
+        <section class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs">
+          <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center gap-x-2">
+            <svg lucideFileText class="size-4.5 text-gray-400"></svg>
+            <h2 class="font-semibold text-gray-800 text-sm uppercase tracking-wide">Información de la Factura</h2>
+          </div>
+
+          <div class="p-5 grid sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+            <div class="flex flex-col">
+              <span class="text-xs text-gray-500">Factura</span>
+              <span class="font-medium text-gray-900">{{ payment.billingNumber }}</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-gray-500">Periodo</span>
+              <span class="font-medium text-gray-900">
+                {{ getPeriodLabel(billing?.billingMonth, billing?.billingYear) }}
+              </span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-gray-500">Suministro</span>
+              <span class="font-bold text-blue-600">{{ payment.supplyNumber }}</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-gray-500">Cliente</span>
+              <span class="font-medium text-gray-900">{{ payment.customerFullName }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- INFO PAGO -->
+        <section class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs">
+          <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center gap-x-2">
+            <svg lucideCreditCard class="size-4.5 text-gray-400"></svg>
+            <h2 class="font-semibold text-gray-800 text-sm uppercase tracking-wide">Información del Pago</h2>
+          </div>
+
+          <div class="p-5 grid sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+            <div class="flex flex-col">
+              <span class="text-xs text-gray-500">Monto</span>
+              <span class="text-lg font-bold text-green-700">S/. {{ payment.amount.toFixed(2) }}</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-gray-500">Método de Pago</span>
+              <span class="font-medium text-gray-900">{{ getPaymentMethodLabel(payment.paymentMethod) }}</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-gray-500">Operación</span>
+              <span class="font-semibold text-gray-900">{{ payment.operationNumber || '-' }}</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-gray-500">Fecha</span>
+              <span class="font-medium text-gray-900">{{ payment.paymentDate | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-gray-500">Usuario Registrador</span>
+              <span class="font-medium text-gray-900 flex items-center gap-x-1.5 mt-0.5">
+                <span class="size-2 rounded-full bg-blue-500"></span>
+                {{ payment.registeredBy || 'Administrador' }}
+              </span>
+            </div>
+            <div class="flex flex-col col-span-2" *ngIf="payment.observations">
+              <span class="text-xs text-gray-500">Observaciones</span>
+              <span class="text-gray-700 italic">"{{ payment.observations }}"</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right Column: Billing Status & Actions -->
+      <div class="space-y-6">
+
+        <!-- ESTADO DE LA FACTURA -->
+        <section class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs">
+          <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center gap-x-2">
+            <svg lucideDollarSign class="size-4.5 text-gray-400"></svg>
+            <h2 class="font-semibold text-gray-800 text-sm uppercase tracking-wide">Estado de la Factura</h2>
+          </div>
+
+          <div class="p-5 space-y-4 text-sm">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 font-medium">Monto Total:</span>
+              <span class="font-bold text-gray-900">S/. {{ payment.billingTotalAmount.toFixed(2) }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 font-medium">Monto Pagado:</span>
+              <span class="font-bold text-green-700">S/. {{ (payment.billingTotalAmount - payment.billingPendingAmount).toFixed(2) }}</span>
+            </div>
+            <div class="flex justify-between items-center border-t border-gray-100 pt-3">
+              <span class="text-gray-500 font-medium">Saldo Pendiente:</span>
+              <span class="font-bold text-red-600">S/. {{ payment.billingPendingAmount.toFixed(2) }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ACCIONES -->
+        <section class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs">
+          <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50">
+            <h2 class="font-semibold text-gray-800 text-sm uppercase tracking-wide">Acciones de Gestión</h2>
+          </div>
+          <div class="p-5 flex flex-col gap-3">
+            <!-- Imprimir -->
+            <button (click)="printReceipt()"
+              class="w-full py-2.5 px-4 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-x-2 text-sm cursor-pointer shadow-xs">
+              <svg lucidePrinter class="size-4"></svg> Imprimir Recibo
+            </button>
+
+            <!-- Cancelar -->
+            <button (click)="cancelPayment()"
+              [disabled]="payment.status === 'CANCELLED'"
+              [class.opacity-50]="payment.status === 'CANCELLED'"
+              [class.cursor-not-allowed]="payment.status === 'CANCELLED'"
+              class="w-full py-2.5 px-4 rounded-lg bg-red-50 text-red-600 font-medium border border-red-100 flex items-center justify-center gap-x-2 text-sm cursor-pointer hover:bg-red-100 transition-colors">
+              <svg lucideBan class="size-4"></svg> Anular Pago
+            </button>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</main>

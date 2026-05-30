@@ -1,0 +1,91 @@
+<div class="overflow-x-auto">
+  <table class="w-full text-left">
+    <thead>
+      <tr class="bg-gray-100 text-sm">
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Recibo</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Factura</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Cliente</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Suministro</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Método</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Monto</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Fecha</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Estado</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start">Registrado por</th>
+        <th class="px-6 py-3 text-nowrap font-semibold text-xs uppercase text-start"></th>
+      </tr>
+    </thead>
+    <tbody class="text-sm divide-y divide-gray-200">
+      <tr [routerLink]="[payment.id]" *ngFor="let payment of payments"
+        class="group hover:bg-gray-50 transition-colors cursor-pointer max-xl:w-full">
+        <!-- Recibo -->
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 group-hover:underline">
+          {{ payment.receiptNumber }}
+        </td>
+        <!-- Factura -->
+        <td class="py-4 px-6 text-nowrap">
+          {{ payment.billingNumber }}
+        </td>
+        <!-- Cliente -->
+        <td class="py-4 px-6 text-nowrap">
+          {{ payment.customerFullName }}
+        </td>
+        <!-- Suministro -->
+        <td class="py-4 px-6 text-nowrap font-medium text-gray-700">
+          {{ payment.supplyNumber }}
+        </td>
+        <!-- Método -->
+        <td class="py-4 px-6 text-nowrap">
+          <span class="px-2 py-1 rounded-md text-xs font-medium bg-gray-50 border border-gray-200">
+            {{ getPaymentMethodLabel(payment.paymentMethod) }}
+          </span>
+        </td>
+        <!-- Monto -->
+        <td class="py-4 px-6 text-nowrap font-bold text-gray-900">
+          S/. {{ payment.amount.toFixed(2) }}
+        </td>
+        <!-- Fecha -->
+        <td class="py-4 px-6 text-nowrap text-gray-600">
+          {{ payment.paymentDate | date: 'dd/MM/yyyy HH:mm' }}
+        </td>
+        <!-- Estado -->
+        <td class="py-4 px-6">
+          <span class="inline-flex items-center gap-x-1.5 px-2.5 py-1.5 rounded-md text-[13px] font-medium"
+            [ngClass]="getStatusClass(payment.status)">
+            <svg *ngIf="payment.status === 'COMPLETED'" lucideBadgeCheck class="size-3.5"></svg>
+            <svg *ngIf="payment.status !== 'COMPLETED'" lucideBadgeAlert class="size-3.5"></svg>
+            {{ getStatusLabel(payment.status) }}
+          </span>
+        </td>
+        <!-- Usuario que registró -->
+        <td class="py-4 px-6 text-nowrap text-gray-500">
+          <span class="flex items-center gap-x-1">
+            <span class="size-2 rounded-full bg-blue-500"></span>
+            {{ payment.registeredBy }}
+          </span>
+        </td>
+        <!-- Acciones -->
+        <td class="py-4 px-6 text-right" (click)="$event.stopPropagation()">
+          <div class="flex items-center justify-end gap-x-1.5">
+            <!-- Ver detalle -->
+            <a [routerLink]="['/dashboard/pagos', payment.id]" title="Ver detalle"
+              class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
+              <svg lucideEye class="size-4"></svg>
+            </a>
+            <!-- Imprimir -->
+            <button (click)="onPrint(payment)" title="Imprimir Recibo"
+              class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
+              <svg lucidePrinter class="size-4"></svg>
+            </button>
+            <!-- Cancelar -->
+            <button (click)="onCancel(payment)" title="Cancelar Pago" [disabled]="payment.status === 'CANCELLED'"
+              [class.opacity-50]="payment.status === 'CANCELLED'"
+              [class.cursor-not-allowed]="payment.status === 'CANCELLED'"
+              class="flex items-center gap-x-1 font-medium text-xs border border-red-100 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg p-2 transition-colors cursor-pointer">
+              <svg lucideBan class="size-4"></svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

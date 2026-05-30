@@ -257,11 +257,11 @@
               <svg lucidePrinter class="size-4"></svg> Imprimir Factura
             </button>
 
-            <!-- Button: Registrar Pago (Después - Labeled) -->
+            <!-- Button: Registrar Pago (Active when there is a remaining balance) -->
             <button (click)="registerPayment()"
-              class="w-full py-2.5 px-4 rounded-lg bg-gray-50 border border-dashed border-gray-200 text-gray-400 font-medium flex items-center justify-center gap-x-2 text-sm cursor-pointer hover:bg-gray-100 transition-colors">
-              <svg lucideCreditCard class="size-4"></svg> Registrar Pago <span
-                class="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-md font-normal">Próximamente</span>
+              *ngIf="billing.status !== 'PAID' && billing.status !== 'CANCELLED'"
+              class="w-full py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors flex items-center justify-center gap-x-2 text-sm cursor-pointer shadow-xs">
+              <svg lucideCreditCard class="size-4"></svg> Registrar Pago
             </button>
 
             <!-- Button: Anular Factura (Después - Labeled) -->
@@ -280,6 +280,105 @@
 
     </div>
 
+  </div>
+
+  <!-- Modal de Registro de Pago -->
+  <div *ngIf="showPaymentModal && billing" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 transition-opacity">
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-xl max-w-lg w-full overflow-hidden flex flex-col">
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+        <h3 class="font-bold text-gray-800 text-base">Registrar Pago</h3>
+        <button (click)="closePaymentModal()" class="text-gray-400 hover:text-gray-600 cursor-pointer">
+          <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 space-y-5 overflow-y-auto max-h-[70vh]">
+        <!-- Resumen Factura -->
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2.5 text-sm">
+          <h4 class="font-semibold text-gray-700 uppercase text-xs tracking-wider">Resumen de Factura</h4>
+          <div class="grid grid-cols-2 gap-y-2 gap-x-4">
+            <div class="flex flex-col">
+              <span class="text-xs text-gray-400">Factura</span>
+              <span class="font-medium text-gray-800">{{ billing.billingNumber }}</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-gray-400">Cliente</span>
+              <span class="font-medium text-gray-800">{{ billing.customerName }}</span>
+            </div>
+            <div class="flex flex-col border-t border-gray-200/60 pt-2">
+              <span class="text-xs text-gray-400">Total Facturado</span>
+              <span class="font-semibold text-gray-800">S/. {{ billing.totalAmount.toFixed(2) }}</span>
+            </div>
+            <div class="flex flex-col border-t border-gray-200/60 pt-2">
+              <span class="text-xs text-gray-400">Pagado</span>
+              <span class="font-semibold text-green-700">S/. {{ billing.amountPaid.toFixed(2) }}</span>
+            </div>
+            <div class="flex flex-col col-span-2 border-t border-gray-200/60 pt-2 bg-blue-50/30 p-2.5 rounded-lg">
+              <span class="text-xs text-blue-700 font-medium">Saldo Pendiente</span>
+              <span class="font-bold text-blue-700 text-base">S/. {{ getRemainingBalance().toFixed(2) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulario -->
+        <div class="space-y-4">
+          <!-- Monto -->
+          <div class="flex flex-col gap-y-1">
+            <label for="payment-amount" class="text-sm font-semibold text-gray-700">Monto a Pagar (S/.)</label>
+            <input type="number" id="payment-amount" [(ngModel)]="paymentAmount" name="paymentAmount"
+              min="0.01" [max]="getRemainingBalance()" step="0.01"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-hidden focus:border-blue-500 bg-white"
+              placeholder="0.00" />
+          </div>
+
+          <!-- Método -->
+          <div class="flex flex-col gap-y-1">
+            <label for="payment-method" class="text-sm font-semibold text-gray-700">Método de Pago</label>
+            <select id="payment-method" [(ngModel)]="paymentMethod" name="paymentMethod"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white text-gray-800 cursor-pointer outline-hidden focus:border-blue-500">
+              <option value="CASH">Efectivo</option>
+              <option value="CARD">Tarjeta</option>
+              <option value="YAPE">Yape</option>
+              <option value="PLIN">Plin</option>
+              <option value="BANK_TRANSFER">Transferencia Bancaria</option>
+            </select>
+          </div>
+
+          <!-- Nro operación -->
+          <div class="flex flex-col gap-y-1" *ngIf="paymentMethod !== 'CASH'">
+            <label for="operation-number" class="text-sm font-semibold text-gray-700">Número de Operación</label>
+            <input type="text" id="operation-number" [(ngModel)]="operationNumber" name="operationNumber"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-hidden focus:border-blue-500 bg-white"
+              placeholder="Ingrese el número de operación o transacción" />
+          </div>
+
+          <!-- Observación -->
+          <div class="flex flex-col gap-y-1">
+            <label for="payment-observations" class="text-sm font-semibold text-gray-700">Observación</label>
+            <textarea id="payment-observations" [(ngModel)]="observations" name="observations" rows="2"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-hidden focus:border-blue-500 bg-white resize-none"
+              placeholder="Observaciones o notas adicionales..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+        <button (click)="closePaymentModal()" [disabled]="isSavingPayment"
+          class="py-2.5 px-4 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-sm font-medium transition-colors cursor-pointer disabled:opacity-50">
+          Cancelar
+        </button>
+        <button (click)="submitPayment()" [disabled]="isSavingPayment"
+          class="py-2.5 px-4 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition-colors flex items-center gap-x-2 cursor-pointer shadow-xs disabled:opacity-70 disabled:cursor-not-allowed">
+          <span *ngIf="isSavingPayment" class="animate-spin inline-block size-4 border-2 border-current border-t-transparent text-white rounded-full mr-1"></span>
+          Registrar Pago
+        </button>
+      </div>
+    </div>
   </div>
 
 </main>

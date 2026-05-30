@@ -35,7 +35,7 @@
       </thead>
 
       <tbody class="text-sm divide-y divide-gray-100">
-        <tr routerLink="{{ bill.id }}" *ngFor="let bill of filteredBillings"
+        <tr routerLink="/dashboard/facturacion/{{ bill.id }}" *ngFor="let bill of filteredBillings"
           class="group hover:bg-gray-50 transition-colors cursor-pointer max-xl:w-full">
           <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 group-hover:underline">
             {{ bill.billingNumber }}

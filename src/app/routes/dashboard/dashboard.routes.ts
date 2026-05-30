@@ -78,6 +78,15 @@ export const DASHBOARD_ROUTES: Routes = [
           ),
       },
       {
+        path: 'pagos',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MANAGEMENT'] },
+        loadChildren: () =>
+          import('@routes/dashboard/payments.routes').then(
+            (m) => m.PAYMENTS_ROUTES,
+          ),
+      },
+      {
         path: 'configuracion',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN', 'MANAGEMENT'] },

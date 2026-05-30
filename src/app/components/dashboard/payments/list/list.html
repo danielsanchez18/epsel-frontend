@@ -1,0 +1,52 @@
+<section class="lg:border border-gray-200 lg:rounded-xl lg:p-5 flex flex-col gap-10">
+
+  <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+    <!-- Search Box -->
+    <component-shared-search-box class="w-full md:max-w-md"
+      placeholder="Buscar pago por Recibo, Factura, Suministro o Cliente..." [searchQuery]="searchQuery"
+      (searchQueryChange)="onSearchQuery($event)" />
+
+    <!-- Filters -->
+    <div class="flex items-center gap-x-2.5">
+      <!-- Method Filter -->
+      <select [value]="selectedMethod" (change)="onMethodFilter($any($event.target).value)"
+        class="w-40 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 cursor-pointer outline-hidden focus:border-blue-500 shadow-2xs">
+        <option value="">Método de Pago</option>
+        <option value="CASH">Efectivo</option>
+        <option value="CARD">Tarjeta</option>
+        <option value="YAPE">Yape</option>
+        <option value="PLIN">Plin</option>
+        <option value="BANK_TRANSFER">Transferencia</option>
+      </select>
+
+      <!-- Status Filter -->
+      <select [value]="selectedStatus" (change)="onStatusFilter($any($event.target).value)"
+        class="w-40 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 cursor-pointer outline-hidden focus:border-blue-500 shadow-2xs">
+        <option value="">Todos los estados</option>
+        <option value="COMPLETED">Completados</option>
+        <option value="PENDING">Pendientes</option>
+        <option value="FAILED">Fallidos</option>
+        <option value="CANCELLED">Cancelados</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center py-10">
+    <div
+      class="animate-spin inline-block size-6 border-2 border-current border-t-transparent text-blue-600 rounded-full"
+      role="status" aria-label="loading"></div>
+  </div>
+
+  <!-- Table Component -->
+  <component-dashboard-payments-table *ngIf="!isLoading && payments.length > 0" [payments]="payments"
+    [isLoading]="isLoading" (print)="printReceipt($event)" (cancel)="cancelPayment($event)" />
+
+  <!-- Empty State Component -->
+  <component-dashboard-payments-empty *ngIf="!isLoading && payments.length === 0" />
+
+  <!-- Paginator Component -->
+  <component-shared-paginator *ngIf="!isLoading && totalPages > 1" [page]="currentPage" [totalPages]="totalPages"
+    [totalElements]="totalElements" (pageChange)="onPageChange($event)" />
+
+</section>

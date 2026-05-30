@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { Subscription, forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import Swal from 'sweetalert2';
@@ -18,16 +19,20 @@ import {
 import { BillingService } from '@core/services/billings/billing.service';
 import { SupplyService } from '@core/services/supplies/supply.service';
 import { MeterReadingService } from '@services/readings/meter-reading.service';
+import { PaymentService } from '@core/services/payments/payment.service';
+import { AuthService } from '@services/auth/auth.service';
 
 import { BillingResponseDTO } from '@interfaces/billings/billing.interface';
 import { SupplyDetailsDTO } from '@interfaces/supplies/supply.interface';
 import { MeterReadingResponseDTO } from '@interfaces/readings/meter-reading.interface';
+import { PaymentMethod } from '@interfaces/payments/payment.interface';
 
 @Component({
   selector: 'page-dashboard-billing-details',
   imports: [
     CommonModule,
     RouterLink,
+    FormsModule,
     LucideUser,
     LucideDroplets,
     LucideDollarSign,
@@ -44,11 +49,20 @@ export class PageDashboardBillingDetails implements OnInit, OnDestroy {
   private billingService = inject(BillingService);
   private supplyService = inject(SupplyService);
   private readingService = inject(MeterReadingService);
+  private paymentService = inject(PaymentService);
+  private authService = inject(AuthService);
 
   billing: BillingResponseDTO | null = null;
   supply: SupplyDetailsDTO | null = null;
   reading: MeterReadingResponseDTO | null = null;
   history: BillingResponseDTO[] = [];
+
+  showPaymentModal = false;
+  paymentAmount = 0;
+  paymentMethod: PaymentMethod = 'CASH';
+  operationNumber = '';
+  observations = '';
+  isSavingPayment = false;
 
   isLoading = true;
   private routeSub?: Subscription;
@@ -192,11 +206,107 @@ export class PageDashboardBillingDetails implements OnInit, OnDestroy {
   }
 
   registerPayment(): void {
-    Swal.fire({
-      title: 'Registrar Pago',
-      text: 'Esta funcionalidad se habilitará en la siguiente fase de pagos.',
-      icon: 'info',
-      confirmButtonColor: '#2563eb',
+    if (!this.billing) return;
+    this.paymentAmount = this.getRemainingBalance();
+    this.paymentMethod = 'CASH';
+    this.operationNumber = '';
+    this.observations = '';
+    this.showPaymentModal = true;
+  }
+
+  closePaymentModal(): void {
+    this.showPaymentModal = false;
+  }
+
+  submitPayment(): void {
+    if (!this.billing) return;
+
+    const user = this.authService.getUser();
+    if (!user || !user.userId) {
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo determinar el usuario que registra el pago.',
+        icon: 'error',
+        confirmButtonColor: '#2563eb',
+      });
+      return;
+    }
+
+    if (this.paymentAmount <= 0) {
+      Swal.fire({
+        title: 'Error',
+        text: 'El monto debe ser mayor a cero.',
+        icon: 'error',
+        confirmButtonColor: '#2563eb',
+      });
+      return;
+    }
+
+    if (this.paymentAmount > this.getRemainingBalance()) {
+      Swal.fire({
+        title: 'Error',
+        text: 'El monto no puede exceder el saldo pendiente.',
+        icon: 'error',
+        confirmButtonColor: '#2563eb',
+      });
+      return;
+    }
+
+    if (
+      this.paymentMethod !== 'CASH' &&
+      (!this.operationNumber || !this.operationNumber.trim())
+    ) {
+      Swal.fire({
+        title: 'Error',
+        text: 'El número de operación es requerido para este método de pago.',
+        icon: 'error',
+        confirmButtonColor: '#2563eb',
+      });
+      return;
+    }
+
+    this.isSavingPayment = true;
+
+    const dto = {
+      billingId: this.billing.id,
+      amount: this.paymentAmount,
+      paymentMethod: this.paymentMethod,
+      operationNumber:
+        this.paymentMethod === 'CASH' ? undefined : this.operationNumber,
+      observations: this.observations || undefined,
+      registeredBy: user.userId,
+    };
+
+    this.paymentService.create(dto).subscribe({
+      next: (res) => {
+        this.isSavingPayment = false;
+        if (res.success) {
+          this.showPaymentModal = false;
+          Swal.fire({
+            title: '¡Pago Registrado!',
+            text: 'El pago ha sido registrado exitosamente.',
+            icon: 'success',
+            confirmButtonColor: '#2563eb',
+          });
+          this.loadDetails(this.billing!.id);
+        } else {
+          Swal.fire({
+            title: 'Error',
+            text: res.message || 'No se pudo registrar el pago.',
+            icon: 'error',
+            confirmButtonColor: '#2563eb',
+          });
+        }
+      },
+      error: (err) => {
+        this.isSavingPayment = false;
+        Swal.fire({
+          title: 'Error',
+          text: err?.error?.message || 'Ocurrió un error al registrar el pago.',
+          icon: 'error',
+          confirmButtonColor: '#2563eb',
+        });
+      },
     });
   }
 
