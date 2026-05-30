@@ -1,0 +1,48 @@
+<main class="flex flex-col gap-y-7 px-4 md:px-7 lg:px-10">
+
+  <!-- Header Section -->
+  <div class="flex items-center gap-x-3">
+    <a routerLink="/dashboard/cobranza" class="flex items-center justify-center p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-gray-700">
+      <svg lucideChevronLeft class="size-5"></svg>
+    </a>
+    <div>
+      <h1 class="text-lg font-medium">Detalle de Deuda</h1>
+      <p class="text-sm text-gray-700" *ngIf="billing">Factura N° {{ billing.billingNumber }} | Suministro {{ billing.supplyNumber }}</p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center py-20">
+    <div
+      class="animate-spin inline-block size-8 border-4 border-current border-t-transparent text-blue-600 rounded-full"
+      role="status" aria-label="loading"></div>
+  </div>
+
+  <!-- Content Section -->
+  <div *ngIf="!isLoading && billing" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Left & Center: Info cards & Payments -->
+    <div class="lg:col-span-2 space-y-6">
+      
+      <!-- Info Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <component-dashboard-cobranza-detail-customer [supply]="supply" [customerName]="billing.customerName" />
+        <component-dashboard-cobranza-detail-supply [supply]="supply" [billing]="billing" />
+      </div>
+
+      <!-- Bill Details Card -->
+      <component-dashboard-cobranza-detail-bill [billing]="billing" />
+
+      <!-- Payment History Table -->
+      <component-dashboard-cobranza-detail-payments [payments]="payments" [billing]="billing" />
+
+    </div>
+
+    <!-- Right Column: Action Buttons -->
+    <div class="space-y-6">
+      <component-dashboard-cobranza-detail-actions [billing]="billing" (refresh)="onRefresh()" />
+    </div>
+
+  </div>
+
+</main>

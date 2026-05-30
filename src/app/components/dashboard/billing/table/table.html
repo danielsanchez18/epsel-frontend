@@ -51,10 +51,12 @@
         </td>
         <!-- Estado -->
         <td class="py-4 px-6">
-          <span class="inline-flex items-center gap-x-1.5 px-2.5 py-1.5 rounded-md text-[13px] font-medium"
+          <span class="inline-flex items-center gap-x-1.5 px-2.5 py-1.5 rounded-md text-nowrap text-[13px] font-medium"
             [ngClass]="getStatusClass(bill.status)">
             <svg *ngIf="bill.status === 'PAID'" lucideBadgeCheck class="size-3.5"></svg>
-            <svg *ngIf="bill.status !== 'PAID'" lucideBadgeAlert class="size-3.5"></svg>
+            <svg *ngIf="bill.status === 'PARTIALLY_PAID'" lucideBadgeDollarSign class="size-3.5"></svg>
+            <svg *ngIf="bill.status === 'PENDING'" lucideBadgeAlert class="size-3.5"></svg>
+            <svg *ngIf="bill.status === 'CANCELLED'" lucideCircleX class="size-3.5"></svg>
             {{ getStatusLabel(bill.status) }}
           </span>
         </td>

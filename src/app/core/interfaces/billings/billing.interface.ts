@@ -1,4 +1,4 @@
-export type BillingStatus = 'PENDING' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+export type BillingStatus = 'PENDING' | 'PAID' | 'PARTIALLY_PAID' | 'OVERDUE' | 'CANCELLED';
 
 export interface BillingResponseDTO {
   id: string;

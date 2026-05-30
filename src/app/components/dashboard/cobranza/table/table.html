@@ -1,0 +1,95 @@
+<div class="overflow-x-auto">
+  <table class="w-full text-left">
+    <thead>
+      <tr class="bg-gray-100 text-sm">
+        <th class="px-4 py-3 text-nowrap font-semibold text-xs uppercase text-start">Cliente</th>
+        <th class="px-4 py-3 text-nowrap font-semibold text-xs uppercase text-start">Documento</th>
+        <th class="px-4 py-3 text-nowrap font-semibold text-xs uppercase text-start">Suministro</th>
+        <th class="px-4 py-3 text-nowrap font-semibold text-xs uppercase text-start">Predio</th>
+        <th class="px-4 py-3 text-nowrap font-semibold text-xs uppercase text-start">Factura</th>
+        <th class="px-4 py-3 text-nowrap font-semibold text-xs uppercase text-start">Periodo</th>
+        <th class="px-4 py-3 text-nowrap font-semibold text-xs uppercase text-start">Vencimiento</th>
+        <th class="px-4 py-3 text-nowrap font-semibold text-xs uppercase text-start">Días Mora</th>
+        <th class="px-4 py-3 text-nowrap font-semibold text-xs uppercase text-start">Pendiente</th>
+        <th class="px-4 py-3 text-nowrap font-semibold text-xs uppercase text-start">Estado</th>
+        <th class="px-4 py-3 text-nowrap font-semibold text-xs uppercase text-start"></th>
+      </tr>
+    </thead>
+    <tbody class="text-sm divide-y divide-gray-200">
+      <tr [routerLink]="['/dashboard/cobranza', bill.id]" *ngFor="let bill of billings"
+        class="group hover:bg-gray-50 transition-colors max-xl:w-full cursor-pointer">
+        <!-- Cliente -->
+        <td class="py-4 px-4 text-nowrap font-medium text-gray-900">
+          {{ bill.customerName }}
+        </td>
+        <!-- Documento -->
+        <td class="py-4 px-4 text-nowrap text-gray-700">
+          {{ getCustomerDocument(bill) }}
+        </td>
+        <!-- Suministro -->
+        <td class="py-4 px-4 text-nowrap font-semibold text-blue-600">
+          {{ bill.supplyNumber }}
+        </td>
+        <!-- Predio -->
+        <td class="py-4 px-4 text-nowrap truncate max-w-44" [title]="bill.propertyAddress">
+          {{ bill.propertyAddress }}
+        </td>
+        <!-- Factura -->
+        <td class="py-4 px-4 text-nowrap">
+          {{ bill.billingNumber }}
+        </td>
+        <!-- Periodo -->
+        <td class="py-4 px-4 text-nowrap">
+          {{ getPeriodLabel(bill.billingMonth, bill.billingYear) }}
+        </td>
+        <!-- Vencimiento -->
+        <td class="py-4 px-4 text-nowrap">
+          {{ bill.dueDate | date: 'dd/MM/yyyy' }}
+        </td>
+        <!-- Días de mora -->
+        <td class="py-4 px-4 text-nowrap text-start font-bold"
+          [ngClass]="getDaysOverdue(bill.dueDate, bill.status) > 0 ? 'text-red-600' : 'text-gray-500'">
+          {{ getDaysOverdue(bill.dueDate, bill.status) }}
+        </td>
+        <!-- Pendiente -->
+        <td class="py-4 px-4 text-nowrap font-semibold text-start text-red-600">
+          S/. {{ getPendingAmount(bill).toFixed(2) }}
+        </td>
+        <!-- Estado -->
+        <td class="py-4 px-4 text-start">
+          <span class="inline-flex items-center gap-x-1.5 px-2.5 py-1.5 rounded-md text-nowrap text-[13px] font-medium"
+            [ngClass]="getStatusClass(bill.status)">
+            <svg *ngIf="bill.status === 'PAID'" lucideBadgeCheck class="size-3.5"></svg>
+            <svg *ngIf="bill.status === 'PARTIALLY_PAID'" lucideBadgeDollarSign class="size-3.5"></svg>
+            <svg *ngIf="bill.status === 'PENDING'" lucideBadgeAlert class="size-3.5"></svg>
+            <svg *ngIf="bill.status === 'OVERDUE'" lucideBadgeAlert class="size-3.5"></svg>
+            <svg *ngIf="bill.status === 'CANCELLED'" lucideCircleX class="size-3.5"></svg>
+            {{ getStatusLabel(bill.status) }}
+          </span>
+        </td>
+        <!-- Acciones -->
+        <td class="py-4 px-4 text-right">
+          <div class="flex items-center justify-end gap-x-1.5">
+            <a [routerLink]="['/dashboard/cobranza', bill.id]" title="Ver detalle"
+              class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
+              <svg lucideEye class="size-4"></svg>
+            </a>
+            <button (click)="onPay(bill)" title="Registrar pago"
+              class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
+              <svg lucideCreditCard class="size-4"></svg>
+            </button>
+            <button (click)="onGenerateAviso(bill)" title="Generar aviso de cobranza"
+              class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
+              <svg lucidePrinter class="size-4"></svg>
+            </button>
+            <button *ngIf="bill.status === 'OVERDUE' || getDaysOverdue(bill.dueDate, bill.status) > 0"
+              (click)="onSuspendSupply(bill)" title="Suspender suministro"
+              class="flex items-center gap-x-1 font-medium text-xs border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg p-2 transition-colors cursor-pointer">
+              <svg lucideScissors class="size-4"></svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -2,10 +2,10 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   LucideCalendar,
-  LucideDollarSign,
   LucideCreditCard,
   LucideSmartphone,
-  LucideCoins,
+  LucideHandCoins,
+  LucideBadgeDollarSign,
 } from '@lucide/angular';
 import { PaymentService } from '@core/services/payments/payment.service';
 import { PaymentResponseDTO } from '@interfaces/payments/payment.interface';
@@ -15,10 +15,10 @@ import { PaymentResponseDTO } from '@interfaces/payments/payment.interface';
   imports: [
     CommonModule,
     LucideCalendar,
-    LucideDollarSign,
     LucideCreditCard,
     LucideSmartphone,
-    LucideCoins,
+    LucideHandCoins,
+    LucideBadgeDollarSign,
   ],
   templateUrl: './kpis.html',
 })
@@ -92,7 +92,12 @@ export class ComponentDashboardPaymentsKpis implements OnInit {
 
     // Transferencias: BANK_TRANSFER + PLIN + CARD
     this.totalTransfer = completedPayments
-      .filter((p) => p.paymentMethod === 'BANK_TRANSFER' || p.paymentMethod === 'PLIN' || p.paymentMethod === 'CARD')
+      .filter(
+        (p) =>
+          p.paymentMethod === 'BANK_TRANSFER' ||
+          p.paymentMethod === 'PLIN' ||
+          p.paymentMethod === 'CARD',
+      )
       .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
   }
 }

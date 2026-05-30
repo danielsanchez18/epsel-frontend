@@ -1,0 +1,63 @@
+<article class="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-4 w-full">
+  <div class="flex items-center gap-x-2 border-b border-gray-100 pb-3">
+    <div class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+      <svg lucideHistory class="size-5"></svg>
+    </div>
+    <h2 class="font-semibold text-sm text-gray-900">Historial de Pagos Realizados</h2>
+  </div>
+
+  <div *ngIf="payments.length === 0" class="py-6 text-center text-sm text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+    No se han registrado pagos para este documento de facturación.
+  </div>
+
+  <div *ngIf="payments.length > 0" class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead>
+        <tr class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase border-b border-gray-150">
+          <th class="px-4 py-2.5 text-nowrap">Fecha</th>
+          <th class="px-4 py-2.5 text-nowrap text-end">Monto</th>
+          <th class="px-4 py-2.5 text-nowrap">Método</th>
+          <th class="px-4 py-2.5 text-nowrap">Estado</th>
+          <th class="px-4 py-2.5 text-nowrap">Cobranza</th>
+          <th class="px-4 py-2.5 text-nowrap text-center">Días Mora</th>
+          <th class="px-4 py-2.5 text-nowrap text-end font-semibold">Mora Acum.</th>
+          <th class="px-4 py-2.5 text-nowrap">Observaciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <tr *ngFor="let pay of payments" class="hover:bg-gray-50 transition-colors">
+          <td class="px-4 py-3 text-nowrap text-gray-700">
+            {{ pay.paymentDate | date: 'dd/MM/yyyy HH:mm' }}
+          </td>
+          <td class="px-4 py-3 text-nowrap text-end font-medium text-gray-900">
+            S/. {{ pay.amount.toFixed(2) }}
+          </td>
+          <td class="px-4 py-3 text-nowrap text-gray-700">
+            {{ getPaymentMethodLabel(pay.paymentMethod) }}
+          </td>
+          <td class="px-4 py-3 text-nowrap">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+              [ngClass]="getPaymentStatusClass(pay.status)">
+              {{ getPaymentStatusLabel(pay.status) }}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-nowrap">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+              [ngClass]="getDaysOverdueAtPayment(pay.paymentDate) > 0 ? 'bg-red-50 text-red-700' : 'bg-gray-100 text-gray-700'">
+              {{ getCobranzaLabel(pay.paymentDate) }}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-nowrap text-center font-semibold" [ngClass]="getDaysOverdueAtPayment(pay.paymentDate) > 0 ? 'text-red-600' : 'text-gray-500'">
+            {{ getDaysOverdueAtPayment(pay.paymentDate) }}
+          </td>
+          <td class="px-4 py-3 text-nowrap text-end text-gray-500">
+            S/. 0.00
+          </td>
+          <td class="px-4 py-3 text-gray-600 max-w-48 truncate" [title]="pay.observations || ''">
+            {{ pay.observations || '-' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</article>

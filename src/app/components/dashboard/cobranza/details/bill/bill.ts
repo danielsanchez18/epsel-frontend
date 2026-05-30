@@ -1,10 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import {
-  LucideEye,
-  LucideFileDown,
-  LucideCreditCard,
+  LucideFileText,
   LucideBadgeCheck,
   LucideBadgeAlert,
   LucideBadgeDollarSign,
@@ -13,26 +10,19 @@ import {
 import { BillingResponseDTO } from '@interfaces/billings/billing.interface';
 
 @Component({
-  selector: 'component-dashboard-billing-table',
+  selector: 'component-dashboard-cobranza-detail-bill',
   imports: [
     CommonModule,
-    RouterLink,
-    LucideEye,
-    LucideFileDown,
-    LucideCreditCard,
+    LucideFileText,
     LucideBadgeCheck,
     LucideBadgeAlert,
     LucideBadgeDollarSign,
     LucideCircleX,
   ],
-  templateUrl: './table.html',
+  templateUrl: './bill.html',
 })
-export class ComponentDashboardBillingTable {
-  @Input() billings: BillingResponseDTO[] = [];
-  @Input() isLoading = false;
-
-  @Output() downloadPdf = new EventEmitter<BillingResponseDTO>();
-  @Output() pay = new EventEmitter<BillingResponseDTO>();
+export class ComponentDashboardCobranzaDetailBill {
+  @Input() billing: BillingResponseDTO | null = null;
 
   getStatusClass(status: string): string {
     switch (status) {
@@ -68,7 +58,8 @@ export class ComponentDashboardBillingTable {
     }
   }
 
-  getPeriodLabel(month: number, year: number): string {
+  getPeriodLabel(month?: number, year?: number): string {
+    if (!month || !year) return '';
     const months = [
       'Ene',
       'Feb',
@@ -86,11 +77,8 @@ export class ComponentDashboardBillingTable {
     return `${months[month - 1] || month} ${year}`;
   }
 
-  onDownloadPdf(bill: BillingResponseDTO): void {
-    this.downloadPdf.emit(bill);
-  }
-
-  onPay(bill: BillingResponseDTO): void {
-    this.pay.emit(bill);
+  getPendingAmount(): number {
+    if (!this.billing) return 0;
+    return Number(this.billing.totalAmount) - (Number(this.billing.amountPaid) || 0);
   }
 }

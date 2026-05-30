@@ -78,6 +78,15 @@ export const DASHBOARD_ROUTES: Routes = [
           ),
       },
       {
+        path: 'cobranza',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MANAGEMENT'] },
+        loadChildren: () =>
+          import('@routes/dashboard/cobranza.routes').then(
+            (m) => m.COBRANZA_ROUTES,
+          ),
+      },
+      {
         path: 'pagos',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN', 'MANAGEMENT'] },

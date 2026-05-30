@@ -1,0 +1,33 @@
+<section class="lg:border border-gray-200 lg:rounded-xl lg:p-5 flex flex-col gap-10 bg-white">
+
+  <div class="flex items-center justify-between gap-2 flex-wrap">
+    <component-shared-search-box class="w-full md:max-w-md"
+      placeholder="Buscar por factura, suministro o cliente..." [searchQuery]="searchQuery"
+      (searchQueryChange)="onSearchQuery($event)" />
+
+    <div class="flex items-center gap-x-2.5">
+      <select [value]="selectedStatus" (change)="onStatusFilter($any($event.target).value)"
+        class="w-56 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 cursor-pointer outline-hidden focus:border-blue-500">
+        <option value="ALL_PENDING">Todos los pendientes de cobro</option>
+        <option value="PENDING">Facturas Pendientes</option>
+        <option value="OVERDUE">Facturas Vencidas</option>
+        <option value="PARTIALLY_PAID">Pagos Parciales</option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="flex justify-center py-10">
+    <div
+      class="animate-spin inline-block size-6 border-2 border-current border-t-transparent text-blue-600 rounded-full"
+      role="status" aria-label="loading"></div>
+  </div>
+
+  <component-dashboard-cobranza-table *ngIf="!isLoading && billings.length > 0" [billings]="billings"
+    [isLoading]="isLoading" (pay)="registerPayment($event)" (generateAviso)="generateAviso($event)" (suspendSupply)="suspendSupply($event)" />
+
+  <component-dashboard-cobranza-empty *ngIf="!isLoading && billings.length === 0" />
+
+  <component-shared-paginator *ngIf="!isLoading && totalPages > 1" [page]="currentPage" [totalPages]="totalPages"
+    [totalElements]="totalElements" (pageChange)="onPageChange($event)" />
+
+</section>

@@ -1,0 +1,42 @@
+<article class="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-4 w-full">
+  <div class="flex items-center gap-x-2 border-b border-gray-100 pb-3">
+    <div class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+      <svg lucidePlay class="size-5"></svg>
+    </div>
+    <h2 class="font-semibold text-sm text-gray-900">Acciones de Cobranza</h2>
+  </div>
+
+  <div class="flex flex-col gap-3">
+    
+    <!-- Registrar Pago -->
+    <button *ngIf="billing && billing.status !== 'PAID' && billing.status !== 'CANCELLED'" 
+      (click)="onPay()"
+      class="flex items-center justify-center gap-x-2 w-full px-4 py-2.5 rounded-lg border border-transparent bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors cursor-pointer">
+      <svg lucideCreditCard class="size-4"></svg>
+      Registrar Pago
+    </button>
+
+    <!-- Imprimir Factura -->
+    <button (click)="onPrintBill()"
+      class="flex items-center justify-center gap-x-2 w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium text-sm transition-colors cursor-pointer">
+      <svg lucidePrinter class="size-4"></svg>
+      Imprimir Factura
+    </button>
+
+    <!-- Generar Aviso de Cobranza -->
+    <button (click)="onGenerateAviso()"
+      class="flex items-center justify-center gap-x-2 w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium text-sm transition-colors cursor-pointer">
+      <svg lucideFileDown class="size-4"></svg>
+      Generar Aviso de Cobranza
+    </button>
+
+    <!-- Suspender Suministro -->
+    <button *ngIf="billing && (billing.status === 'OVERDUE' || getDaysOverdue(billing.dueDate, billing.status) > 0)"
+      (click)="onSuspendSupply()"
+      class="flex items-center justify-center gap-x-2 w-full px-4 py-2.5 rounded-lg border border-transparent bg-red-600 hover:bg-red-700 text-white font-medium text-sm transition-colors cursor-pointer">
+      <svg lucideScissors class="size-4"></svg>
+      Suspender Suministro
+    </button>
+
+  </div>
+</article>

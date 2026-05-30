@@ -1,0 +1,69 @@
+<section class="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+
+  <!-- Facturas Pendientes -->
+  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
+    <div class="flex text-sm text-gray-600 items-center justify-between">
+      <h3>Facturas Pendientes</h3>
+      <svg lucideClock class="size-5 stroke-[1.5] text-yellow-500" />
+    </div>
+    <div class="space-y-1">
+      <p class="font-medium text-xl">{{ pendingCount }}<span class="text-sm"> fac.</span></p>
+    </div>
+  </article>
+
+  <!-- Facturas Vencidas -->
+  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
+    <div class="flex text-sm text-gray-600 items-center justify-between">
+      <h3>Facturas Vencidas</h3>
+      <svg lucideBadgeAlert class="size-5 stroke-[1.5] text-red-500" />
+    </div>
+    <div class="space-y-1">
+      <p class="font-medium text-xl">{{ overdueCount }}<span class="text-sm"> fac.</span></p>
+    </div>
+  </article>
+
+  <!-- Monto Pendiente Total -->
+  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
+    <div class="flex text-sm text-gray-600 items-center justify-between">
+      <h3>Monto Pendiente</h3>
+      <svg lucideBadgeDollarSign class="size-5 stroke-[1.5] text-yellow-600" />
+    </div>
+    <div class="space-y-1">
+      <p class="font-medium text-xl">S/. {{ totalPendingAmount.toFixed(2) }}</p>
+    </div>
+  </article>
+
+  <!-- Monto Vencido Total -->
+  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
+    <div class="flex text-sm text-gray-600 items-center justify-between">
+      <h3>Monto Vencido</h3>
+      <svg lucideBadgeDollarSign class="size-5 stroke-[1.5] text-red-600" />
+    </div>
+    <div class="space-y-1">
+      <p class="font-medium text-xl">S/. {{ totalOverdueAmount.toFixed(2) }}</p>
+    </div>
+  </article>
+
+  <!-- Clientes Morosos -->
+  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
+    <div class="flex text-sm text-gray-600 items-center justify-between">
+      <h3>Clientes Morosos</h3>
+      <svg lucideUsers class="size-5 stroke-[1.5] text-purple-500" />
+    </div>
+    <div class="space-y-1">
+      <p class="font-medium text-xl">{{ delinquentCustomersCount }}<span class="text-sm"> clientes</span></p>
+    </div>
+  </article>
+
+  <!-- Suministros por Cortar -->
+  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
+    <div class="flex text-sm text-gray-600 items-center justify-between">
+      <h3>Cortes Requeridos</h3>
+      <svg lucideScissors class="size-5 stroke-[1.5] text-orange-500" />
+    </div>
+    <div class="space-y-1">
+      <p class="font-medium text-xl text-red-600">{{ suppliesToCutCount }}<span class="text-sm text-gray-700"> sumin.</span></p>
+    </div>
+  </article>
+
+</section>
