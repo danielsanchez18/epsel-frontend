@@ -8,6 +8,7 @@ import { CustomerService } from '@services/customers/customer.service';
 import { PropertyService } from '@services/properties/property.service';
 import { SupplyService } from '@services/supplies/supply.service';
 import { InstallationRequestService } from '@services/supplies/installation-request.service';
+import { SupplyWorkOrdersService } from '@services/supply-work-orders/supply-work-orders.service';
 
 import { CustomerResponse } from '@interfaces/customers/customer.interface';
 import { PropertyResponse } from '@interfaces/properties/properties.interface';
@@ -27,11 +28,13 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
   private customerService = inject(CustomerService);
   private propertyService = inject(PropertyService);
   private supplyService = inject(SupplyService);
+  private supplyWorkOrdersService = inject(SupplyWorkOrdersService);
 
   request: InstallationRequestResponse | null = null;
   customer: CustomerResponse | null = null;
   property: PropertyResponse | null = null;
   supply: SupplyDetailsDTO | null = null;
+  activeInstallationOrder: any = null;
 
   isLoading = true;
   isActionLoading = false;
@@ -66,6 +69,7 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
         if (res.success && res.data) {
           this.request = res.data;
           this.resolveRelatedData(res.data);
+          this.loadSupplyAndWorkOrders(res.data.id);
         } else {
           this.isLoading = false;
         }
@@ -195,37 +199,104 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
     });
   }
 
-  installRequest(): void {
-    if (!this.request) return;
+  loadSupplyAndWorkOrders(requestId: string): void {
+    if (!this.request || (this.request.status !== 'APPROVED' && this.request.status !== 'INSTALLED')) {
+      this.supply = null;
+      this.activeInstallationOrder = null;
+      return;
+    }
+
+    this.supplyService.getByInstallationRequestId(requestId).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.supply = res.data;
+          this.loadWorkOrders(res.data.id);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading supply by installation request:', err);
+      }
+    });
+  }
+
+  loadWorkOrders(supplyId: string): void {
+    this.supplyWorkOrdersService.search(0, 100, supplyId).subscribe({
+      next: (res: any) => {
+        const orders = res.data.content || [];
+        this.activeInstallationOrder = orders.find((o: any) => 
+          o.type === 'INSTALLATION' && (o.status === 'PENDING' || o.status === 'ASSIGNED' || o.status === 'IN_PROGRESS')
+        ) || null;
+      },
+      error: (err) => {
+        console.error('Error loading work orders for supply:', err);
+      }
+    });
+  }
+
+  generateInstallationOrder(): void {
+    if (!this.supply) return;
 
     Swal.fire({
       icon: 'question',
-      title: 'Registrar instalación',
-      input: 'text',
-      inputLabel: 'Número de medidor',
-      inputPlaceholder: 'Ingresa el número de medidor',
-      inputAttributes: {
-        maxlength: '50'
-      },
+      title: 'Generar Orden de Instalación',
+      text: '¿Deseas generar una nueva orden de trabajo de instalación para este suministro?',
       showCancelButton: true,
-      confirmButtonText: 'Sí, instalar',
+      confirmButtonText: 'Sí, generar',
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#16a34a'
-      ,
-      preConfirm: (value) => {
-        if (!value || !value.trim()) {
-          Swal.showValidationMessage('El número de medidor es requerido.');
-          return;
-        }
-        return value.trim();
-      }
+      confirmButtonColor: '#2563eb'
     }).then(result => {
-      if (!result.isConfirmed || !result.value) return;
-      this.executeAction(
-        () => this.requestService.install(this.request!.id, { meterNumber: result.value }),
-        'Solicitud marcada como instalada.'
-      );
+      if (!result.isConfirmed) return;
+
+      this.isActionLoading = true;
+      this.supplyWorkOrdersService.create({
+        supplyId: this.supply!.id,
+        type: 'INSTALLATION',
+        reason: 'Instalación de suministro'
+      }).subscribe({
+        next: (res) => {
+          this.isActionLoading = false;
+          if (res.success) {
+            Swal.fire({
+              icon: 'success',
+              title: '¡Generada!',
+              text: 'La orden de instalación ha sido creada correctamente.',
+              confirmButtonColor: '#2563eb'
+            });
+            if (this.request) {
+              this.loadRequest(this.request.id);
+            }
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: res.message || 'No se pudo generar la orden de instalación.',
+              confirmButtonColor: '#d33'
+            });
+          }
+        },
+        error: (err) => {
+          this.isActionLoading = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: err.error?.message || 'Error al generar la orden de instalación.',
+            confirmButtonColor: '#d33'
+          });
+        }
+      });
     });
+  }
+
+  translateStatus(status?: string): string {
+    switch (status) {
+      case 'PENDING': return 'Pendiente';
+      case 'ASSIGNED': return 'Asignada';
+      case 'IN_PROGRESS': return 'En progreso';
+      case 'COMPLETED': return 'Completada';
+      case 'CANCELLED': return 'Cancelada';
+      case 'FAILED': return 'Fallida';
+      default: return status || '';
+    }
   }
 
   private executeAction(action: () => any, successMessage: string): void {

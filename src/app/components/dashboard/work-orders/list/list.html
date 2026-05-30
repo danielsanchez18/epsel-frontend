@@ -1,0 +1,80 @@
+<section class="lg:border border-gray-200 lg:rounded-xl lg:p-5 flex flex-col gap-10">
+
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+
+    <!-- Search Box -->
+    <component-shared-search-box
+      class="w-full md:max-w-md"
+      placeholder="Buscar por número de suministro (ej: SUM-000145)"
+      [searchQuery]="searchQuery"
+      (searchQueryChange)="onSearchQuery($event)"
+    />
+
+    <!-- Filters Section -->
+    <div class="flex flex-wrap items-center gap-2">
+      <!-- Tipo Filter -->
+      <div class="flex items-center gap-x-1.5">
+        <label for="typeFilter" class="text-xs font-medium text-gray-500">Tipo:</label>
+        <select
+          id="typeFilter"
+          [(ngModel)]="selectedType"
+          (change)="onFilterChange()"
+          class="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 focus:border-blue-500 focus:outline-none transition-colors"
+        >
+          <option value="">Todos los tipos</option>
+          <option *ngFor="let t of types" [value]="t.value">{{ t.label }}</option>
+        </select>
+      </div>
+
+      <!-- Estado Filter -->
+      <div class="flex items-center gap-x-1.5">
+        <label for="statusFilter" class="text-xs font-medium text-gray-500">Estado:</label>
+        <select
+          id="statusFilter"
+          [(ngModel)]="selectedStatus"
+          (change)="onFilterChange()"
+          class="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 focus:border-blue-500 focus:outline-none transition-colors"
+        >
+          <option value="">Todos los estados</option>
+          <option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</option>
+        </select>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Table View -->
+  <component-dashboard-work-orders-table
+    *ngIf="workOrders.length > 0"
+    [workOrders]="workOrders"
+    [isLoading]="isLoading"
+    [pageOffset]="pageOffset"
+    (assign)="onAssign($event)"
+    (start)="onStart($event)"
+    (complete)="onComplete($event)"
+    (cancel)="onCancel($event)"
+    (view)="onView($event)"
+  />
+
+  <!-- Empty State -->
+  <component-dashboard-work-orders-empty
+    *ngIf="workOrders.length === 0 && !isLoading"
+    [title]="searchQuery || selectedType || selectedStatus ? 'No se encontraron resultados' : 'No hay órdenes de trabajo registradas'"
+    [message]="searchQuery || selectedType || selectedStatus ? 'Intenta ajustando los términos de búsqueda o filtros aplicados.' : 'Las órdenes de trabajo aparecerán aquí una vez que sean registradas en el sistema.'"
+  />
+
+  <!-- Loader overlay when fetching -->
+  <div *ngIf="isLoading" class="flex justify-center py-10">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  </div>
+
+  <!-- Paginator -->
+  <component-shared-paginator
+    *ngIf="totalPages > 1"
+    [page]="currentPage"
+    [totalPages]="totalPages"
+    [totalElements]="totalElements"
+    (pageChange)="onPageChange($event)"
+  />
+
+</section>

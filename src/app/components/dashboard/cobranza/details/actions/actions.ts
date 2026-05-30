@@ -12,6 +12,7 @@ import { BillingResponseDTO } from '@interfaces/billings/billing.interface';
 import { PaymentService } from '@core/services/payments/payment.service';
 import { SupplyService } from '@core/services/supplies/supply.service';
 import { AuthService } from '@core/services/auth/auth.service';
+import { SupplyWorkOrdersService } from '@services/supply-work-orders/supply-work-orders.service';
 
 @Component({
   selector: 'component-dashboard-cobranza-detail-actions',
@@ -29,9 +30,64 @@ export class ComponentDashboardCobranzaDetailActions {
   private paymentService = inject(PaymentService);
   private supplyService = inject(SupplyService);
   private authService = inject(AuthService);
+  private supplyWorkOrdersService = inject(SupplyWorkOrdersService);
 
-  @Input() billing: BillingResponseDTO | null = null;
+  _billing: BillingResponseDTO | null = null;
+  activeSuspensionOrder: any = null;
+
+  @Input()
+  set billing(value: BillingResponseDTO | null) {
+    this._billing = value;
+    if (value) {
+      this.loadActiveSuspensionOrder(value.supplyId);
+    } else {
+      this.activeSuspensionOrder = null;
+    }
+  }
+
+  get billing(): BillingResponseDTO | null {
+    return this._billing;
+  }
+
   @Output() refresh = new EventEmitter<void>();
+
+  loadActiveSuspensionOrder(supplyId: string): void {
+    this.supplyWorkOrdersService.search(0, 100, supplyId).subscribe({
+      next: (res: any) => {
+        const orders = res.data.content || [];
+        this.activeSuspensionOrder = orders.find((o: any) => 
+          o.type === 'SUSPENSION' && (o.status === 'PENDING' || o.status === 'ASSIGNED' || o.status === 'IN_PROGRESS')
+        ) || null;
+      },
+      error: () => {
+        this.activeSuspensionOrder = null;
+      }
+    });
+  }
+
+  translateType(type: string): string {
+    switch (type) {
+      case 'INSTALLATION': return 'Instalación';
+      case 'SUSPENSION': return 'Suspensión';
+      case 'CUT_OFF': return 'Corte';
+      case 'RECONNECTION': return 'Reconexión';
+      case 'INSPECTION': return 'Inspección';
+      case 'METER_CHANGE': return 'Cambio de Medidor';
+      default: return type;
+    }
+  }
+
+  translateStatus(status: string): string {
+    switch (status) {
+      case 'PENDING': return 'Pendiente';
+      case 'ASSIGNED': return 'Asignada';
+      case 'IN_PROGRESS': return 'En progreso';
+      case 'COMPLETED': return 'Completada';
+      case 'CANCELLED': return 'Cancelada';
+      case 'FAILED': return 'Fallida';
+      default: return status;
+    }
+  }
 
   getPendingAmount(): number {
     if (!this.billing) return 0;
@@ -218,18 +274,18 @@ export class ComponentDashboardCobranzaDetailActions {
     if (!this.billing) return;
     const bill = this.billing;
     Swal.fire({
-      title: 'Suspender Suministro',
-      text: `¿Está seguro que desea suspender el suministro ${bill.supplyNumber} del cliente ${bill.customerName}?`,
+      title: 'Crear Orden de Suspensión',
+      text: `¿Está seguro que desea crear una orden de suspensión para el suministro ${bill.supplyNumber} del cliente ${bill.customerName}?`,
       input: 'text',
       inputPlaceholder: 'Ingrese el motivo de la suspensión (obligatorio)...',
       showCancelButton: true,
-      confirmButtonText: 'Confirmar Suspensión',
+      confirmButtonText: 'Crear Orden',
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#dc2626',
       preConfirm: (reason) => {
         if (!reason || reason.trim() === '') {
           Swal.showValidationMessage(
-            'Debe ingresar un motivo para proceder con la suspensión.',
+            'Debe ingresar un motivo para crear la orden de suspensión.',
           );
           return false;
         }
@@ -237,14 +293,19 @@ export class ComponentDashboardCobranzaDetailActions {
       },
     }).then((result) => {
       if (result.isConfirmed && result.value) {
-        this.supplyService
-          .suspend(bill.supplyId, { reason: result.value })
+        this.supplyWorkOrdersService
+          .create({
+            supplyId: bill.supplyId,
+            type: 'SUSPENSION',
+            reason: result.value,
+            scheduledDate: new Date().toISOString().split('T')[0]
+          })
           .subscribe({
             next: (res) => {
               if (res.success) {
                 Swal.fire({
-                  title: 'Suministro Suspendido',
-                  text: `El suministro ${bill.supplyNumber} ha sido suspendido con éxito.`,
+                  title: 'Orden Creada',
+                  text: `La orden de suspensión para el suministro ${bill.supplyNumber} ha sido creada con éxito y está pendiente.`,
                   icon: 'success',
                   confirmButtonColor: '#2563eb',
                 });
@@ -252,7 +313,7 @@ export class ComponentDashboardCobranzaDetailActions {
               } else {
                 Swal.fire({
                   title: 'Error',
-                  text: res.message || 'No se pudo suspender el suministro.',
+                  text: res.message || 'No se pudo crear la orden de suspensión.',
                   icon: 'error',
                   confirmButtonColor: '#2563eb',
                 });
@@ -261,7 +322,7 @@ export class ComponentDashboardCobranzaDetailActions {
             error: () => {
               Swal.fire({
                 title: 'Error',
-                text: 'Ocurrió un error al suspender el suministro en el servidor.',
+                text: 'Ocurrió un error al crear la orden de suspensión en el servidor.',
                 icon: 'error',
                 confirmButtonColor: '#2563eb',
               });

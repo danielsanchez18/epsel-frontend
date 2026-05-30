@@ -1,0 +1,122 @@
+<section class="overflow-x-hidden hover:overflow-x-auto">
+  <div class="min-w-full inline-block align-middle">
+    <div class="overflow-hidden border border-gray-200 rounded-xl">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr class="text-sm">
+            <th scope="col" class="px-6 py-3.5 text-nowrap font-semibold text-xs uppercase text-gray-500 text-start">Número</th>
+            <th scope="col" class="px-6 py-3.5 text-nowrap font-semibold text-xs uppercase text-gray-500 text-start">Tipo</th>
+            <th scope="col" class="px-6 py-3.5 text-nowrap font-semibold text-xs uppercase text-gray-500 text-start">Suministro</th>
+            <th scope="col" class="px-6 py-3.5 text-nowrap font-semibold text-xs uppercase text-gray-500 text-start">Cliente</th>
+            <th scope="col" class="px-6 py-3.5 text-nowrap font-semibold text-xs uppercase text-gray-500 text-start">Dirección</th>
+            <th scope="col" class="px-6 py-3.5 text-nowrap font-semibold text-xs uppercase text-gray-500 text-start">Estado</th>
+            <th scope="col" class="px-6 py-3.5 text-nowrap font-semibold text-xs uppercase text-gray-500 text-start">Fecha Creación</th>
+            <th scope="col" class="px-6 py-3.5 text-nowrap font-semibold text-xs uppercase text-gray-500 text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <tr *ngFor="let order of workOrders; let i = index" 
+              (click)="onView(order, $event)"
+              class="group hover:bg-gray-50 hover:cursor-pointer transition-colors duration-150">
+            
+            <!-- Número -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+              {{ formatOrderNumber(i) }}
+            </td>
+            
+            <!-- Tipo -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+              {{ translateType(order.type) }}
+            </td>
+            
+            <!-- Suministro -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+              {{ order.supplyNumber }}
+            </td>
+            
+            <!-- Cliente -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 capitalize">
+              {{ order.customerName }}
+            </td>
+            
+            <!-- Dirección -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 max-w-[200px] truncate" [title]="order.propertyAddress">
+              {{ order.propertyAddress }}
+            </td>
+            
+            <!-- Estado -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ getStatusClass(order.status) }}">
+                {{ translateStatus(order.status) }}
+              </span>
+            </td>
+            
+            <!-- Fecha Creación -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+              {{ order.requestedDate | date:'dd/MM/yyyy' }}
+            </td>
+            
+            <!-- Acciones -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+              <div class="flex items-center justify-center gap-x-2">
+                
+                <!-- Action according to state -->
+                <ng-container [ngSwitch]="order.status">
+                  <!-- PENDING: Asignar, Cancelar -->
+                  <ng-container *ngSwitchCase="'PENDING'">
+                    <button type="button" 
+                            (click)="onAssign(order, $event)" 
+                            class="px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition duration-150">
+                      Asignar
+                    </button>
+                    <button type="button" 
+                            (click)="onCancel(order, $event)" 
+                            class="px-2.5 py-1 rounded-md text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition duration-150">
+                      Cancelar
+                    </button>
+                  </ng-container>
+
+                  <!-- ASSIGNED: Iniciar, Cancelar -->
+                  <ng-container *ngSwitchCase="'ASSIGNED'">
+                    <button type="button" 
+                            (click)="onStart(order, $event)" 
+                            class="px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition duration-150">
+                      Iniciar
+                    </button>
+                    <button type="button" 
+                            (click)="onCancel(order, $event)" 
+                            class="px-2.5 py-1 rounded-md text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition duration-150">
+                      Cancelar
+                    </button>
+                  </ng-container>
+
+                  <!-- IN_PROGRESS: Completar, Cancelar -->
+                  <ng-container *ngSwitchCase="'IN_PROGRESS'">
+                    <button type="button" 
+                            (click)="onComplete(order, $event)" 
+                            class="px-2.5 py-1 rounded-md text-xs font-semibold bg-green-600 text-white hover:bg-green-700 transition duration-150">
+                      Completar
+                    </button>
+                    <button type="button" 
+                            (click)="onCancel(order, $event)" 
+                            class="px-2.5 py-1 rounded-md text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition duration-150">
+                      Cancelar
+                    </button>
+                  </ng-container>
+                </ng-container>
+
+                <!-- Ver (Applicable to all states) -->
+                <button type="button" 
+                        (click)="onView(order, $event)" 
+                        class="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition duration-150">
+                  Ver
+                </button>
+                
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

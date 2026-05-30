@@ -1,4 +1,12 @@
-export type SupplyOperationType = 'SUSPENSION' | 'RECONNECTION' | 'CUT_OFF' | string;
+export type SupplyOperationType =
+  | 'INSTALLATION'
+  | 'SUSPENSION'
+  | 'CUT_OFF'
+  | 'RECONNECTION'
+  | 'METER_CHANGE'
+  | 'OWNER_CHANGE'
+  | 'STATUS_CHANGE'
+  | string;
 
 export interface CreateSupplyOperationDTO {
   supplyId: string;

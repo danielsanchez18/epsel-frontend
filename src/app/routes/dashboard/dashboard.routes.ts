@@ -69,6 +69,15 @@ export const DASHBOARD_ROUTES: Routes = [
           ),
       },
       {
+        path: 'ordenes',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'TECHNICIAN', 'MANAGEMENT', 'SUPERVISOR'] },
+        loadChildren: () =>
+          import('@routes/dashboard/work-orders.routes').then(
+            (m) => m.WORK_ORDERS_ROUTES,
+          ),
+      },
+      {
         path: 'facturacion',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN', 'MANAGEMENT'] },

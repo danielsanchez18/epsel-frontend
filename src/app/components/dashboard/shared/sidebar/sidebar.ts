@@ -6,7 +6,6 @@ import { RoleType } from '@core/interfaces/users/role.interface';
 import {
   LucideUserCog,
   LucideUsers,
-  LucideChartLine,
   LucideDynamicIcon,
   LucideLayoutDashboard,
   LucideDroplets,
@@ -14,13 +13,13 @@ import {
   LucideCreditCard,
   LucideFileText,
   LucideHandCoins,
-  LucideHeadset,
   LucideClipboardList,
   LucideSettings,
   LucideActivity,
   LucideBuilding2,
-  LucideBadgeAlert
-} from "@lucide/angular";
+  LucideBadgeAlert,
+  LucideClipboardPaste,
+} from '@lucide/angular';
 
 @Component({
   selector: 'component-dashboard-shared-sidebar',
@@ -28,12 +27,11 @@ import {
     RouterModule,
     CommonModule,
     LucideDynamicIcon,
-    LucideLayoutDashboard
+    LucideLayoutDashboard,
   ],
   templateUrl: './sidebar.html',
 })
 export class ComponentDashboardSharedSidebar {
-
   private auth = inject(AuthService);
 
   routes = [
@@ -42,8 +40,12 @@ export class ComponentDashboardSharedSidebar {
       links: [
         { name: 'Clientes', path: 'clientes', icon: LucideUsers },
         { name: 'Predios', path: 'predios', icon: LucideBuilding2 },
-        { name: 'Solicitudes', path: 'solicitudes', icon: LucideClipboardPenLine },
-      ]
+        {
+          name: 'Solicitudes',
+          path: 'solicitudes',
+          icon: LucideClipboardPenLine,
+        },
+      ],
     },
     {
       nameCategory: 'Operaciones de Campo',
@@ -51,8 +53,12 @@ export class ComponentDashboardSharedSidebar {
         { name: 'Suministros', path: 'suministros', icon: LucideDroplets },
         { name: 'Lecturas', path: 'lecturas', icon: LucideClipboardPenLine },
         { name: 'Incidencias', path: 'incidencias', icon: LucideBadgeAlert },
-        { name: 'Cortes y Reconexiones', path: 'cortes', icon: LucideActivity },
-      ]
+        {
+          name: 'Órdenes de Trabajo',
+          path: 'ordenes',
+          icon: LucideClipboardPaste,
+        },
+      ],
     },
     {
       nameCategory: 'Facturación y Finanzas',
@@ -60,22 +66,22 @@ export class ComponentDashboardSharedSidebar {
         { name: 'Facturación', path: 'facturacion', icon: LucideFileText },
         { name: 'Pagos', path: 'pagos', icon: LucideCreditCard },
         { name: 'Cobranza', path: 'cobranza', icon: LucideHandCoins },
-      ]
+      ],
     },
     {
       nameCategory: 'Administración del Sistema',
       links: [
         { name: 'Personal', path: 'personal', icon: LucideUserCog },
         { name: 'Configuración', path: 'configuracion', icon: LucideSettings },
-      ]
-    }
+      ],
+    },
   ];
 
   private categoryAllowedRoles: Record<string, RoleType[]> = {
     'Gestión Comercial': ['ADMIN', 'MANAGEMENT', 'SUPERVISOR'],
     'Operaciones de Campo': ['ADMIN', 'TECHNICIAN', 'MANAGEMENT', 'SUPERVISOR'],
     'Facturación y Finanzas': ['ADMIN', 'MANAGEMENT'],
-    'Administración del Sistema': ['ADMIN', 'MANAGEMENT']
+    'Administración del Sistema': ['ADMIN', 'MANAGEMENT'],
   };
 
   get filteredRoutes() {
@@ -83,12 +89,11 @@ export class ComponentDashboardSharedSidebar {
     const role: RoleType | undefined = user?.role;
     if (!role) return [];
 
-    return this.routes.filter(cat => {
+    return this.routes.filter((cat) => {
       const allowed = this.categoryAllowedRoles[cat.nameCategory];
       // Si no hay regla para la categoría, mostrar por defecto
       if (!allowed || allowed.length === 0) return true;
       return allowed.includes(role);
     });
   }
-
 }
