@@ -111,22 +111,19 @@
       <h3 class="px-5 py-3 text-sm font-medium border-b border-gray-200">Acciones de control</h3>
       <div class="p-5 flex flex-wrap gap-3">
         <!-- Suspender Suministro -->
-        <button *ngIf="supply.status === 'ACTIVE' || supply.status === 'RECONNECTED'"
-          (click)="onSuspend()"
+        <button *ngIf="supply.status === 'ACTIVE' || supply.status === 'RECONNECTED'" (click)="onSuspend()"
           class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white cursor-pointer transition-colors">
           Suspender Suministro
         </button>
 
         <!-- Cortar Suministro -->
-        <button *ngIf="supply.status === 'ACTIVE' || supply.status === 'RECONNECTED'"
-          (click)="onCutOff()"
+        <button *ngIf="supply.status === 'SUSPENDED'" (click)="onCutOff()"
           class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white cursor-pointer transition-colors">
           Cortar Suministro
         </button>
 
         <!-- Reconectar Suministro -->
-        <button *ngIf="supply.status === 'SUSPENDED' || supply.status === 'CUT_OFF'"
-          (click)="onReconnect()"
+        <button *ngIf="supply.status === 'CUT_OFF'" (click)="onReconnect()"
           class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg bg-green-600 hover:bg-green-700 text-white cursor-pointer transition-colors">
           Reconectar Suministro
         </button>
