@@ -1,53 +1,190 @@
-<section class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+<ng-container *ngIf="isLoading; else kpisTemplate">
+  <section class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div *ngFor="let item of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+      class="h-28 bg-gray-50 rounded-xl border border-gray-200 animate-pulse"></div>
+  </section>
+</ng-container>
 
-  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
-      <h3>Personal Activo</h3>
-      <svg lucideUserCheck class="size-5 stroke-[1.5]" />
-    </div>
+<ng-template #kpisTemplate>
+  <section *ngIf="kpis" class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <!-- Total Clientes -->
+    <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200 shadow-[13px]">
+      <div class="flex text-sm text-gray-600 items-center justify-between">
+        <h3 class="line-clamp-1">Total de Clientes</h3>
+        <svg lucideUsers class="size-5 stroke-[1.5] text-gray-600" />
+      </div>
+      <div class="space-y-1">
+        <p class="font-medium text-xl">{{ kpis.totalCustomers.value }} <span class="text-sm">clientes</span></p>
+        <p class="text-[13px] line-clamp-1" [ngClass]="{
+             'text-blue-600 font-medium': kpis.totalCustomers.change > 0,
+             'text-red-600 font-medium': kpis.totalCustomers.change < 0,
+             'text-gray-500 font-medium': kpis.totalCustomers.change === 0
+           }">
+          {{ kpis.totalCustomers.changeText }}
+        </p>
+      </div>
+    </article>
 
-    <div class="space-y-1">
-      <p class="font-medium text-xl">245 <span class="text-sm">empleados activos</span></p>
-      <p class="text-xs text-blue-600 font-medium">+12 este mes</p>
-    </div>
-  </article>
+    <!-- Total Predios -->
+    <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200 shadow-[13px]">
+      <div class="flex text-sm text-gray-600 items-center justify-between">
+        <h3 class="line-clamp-1">Total de Predios</h3>
+        <svg lucideHome class="size-5 stroke-[1.5]" />
+      </div>
+      <div class="space-y-1">
+        <p class="font-medium text-xl">{{ kpis.totalProperties.value }} <span class="text-sm">predios</span></p>
+        <p class="text-[13px] line-clamp-1" [ngClass]="{
+             'text-blue-600 font-medium': kpis.totalProperties.change > 0,
+             'text-red-600 font-medium': kpis.totalProperties.change < 0,
+             'text-gray-500 font-medium': kpis.totalProperties.change === 0
+           }">
+          {{ kpis.totalProperties.changeText }}
+        </p>
+      </div>
+    </article>
 
-  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
-      <h3>Asistencia / Sesiones del Día</h3>
-      <svg lucideBadgeCheck class="size-5 stroke-[1.5]" />
-    </div>
+    <!-- Suministros Activos -->
+    <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200 shadow-[13px]">
+      <div class="flex text-sm text-gray-600 items-center justify-between">
+        <h3 class="line-clamp-1">Suministros Activos</h3>
+        <svg lucideDroplets class="size-5 stroke-[1.5]" />
+      </div>
+      <div class="space-y-1">
+        <p class="font-medium text-xl">{{ kpis.activeSupplies.value }} <span class="text-sm">suministros</span></p>
+        <p class="text-[13px] line-clamp-1" [ngClass]="{
+             'text-blue-600 font-medium': kpis.activeSupplies.change > 0,
+             'text-red-600 font-medium': kpis.activeSupplies.change < 0,
+             'text-gray-500 font-medium': kpis.activeSupplies.change === 0
+           }">
+          {{ kpis.activeSupplies.changeText }}
+        </p>
+      </div>
+    </article>
 
-    <div class="space-y-1">
-      <p class="font-medium text-xl">186 <span class="text-sm">usuarios activos</span></p>
-      <p class="text-xs text-gray-700 font-medium">76% del personal</p>
-    </div>
-  </article>
+    <!-- Suministros Suspendidos -->
+    <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200 shadow-[13px]">
+      <div class="flex text-sm text-gray-600 items-center justify-between">
+        <h3 class="line-clamp-1">Suministros Suspendidos</h3>
+        <svg lucideAlertCircle class="size-5 stroke-[1.5]" />
+      </div>
+      <div class="space-y-1">
+        <p class="font-medium text-xl">{{ kpis.suspendedSupplies.value }} <span class="text-sm">suministros</span></p>
+        <p class="text-[13px] line-clamp-1" [ngClass]="{
+             'text-blue-600 font-medium': kpis.suspendedSupplies.change > 0,
+             'text-red-600 font-medium': kpis.suspendedSupplies.change < 0,
+             'text-gray-500 font-medium': kpis.suspendedSupplies.change === 0
+           }">
+          {{ kpis.suspendedSupplies.changeText }}
+        </p>
+      </div>
+    </article>
 
+    <!-- Suministros Cortados -->
+    <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200 shadow-[13px]">
+      <div class="flex text-sm text-gray-600 items-center justify-between">
+        <h3 class="line-clamp-1">Suministros Cortados</h3>
+        <svg lucideBan class="size-5 stroke-[1.5]" />
+      </div>
+      <div class="space-y-1">
+        <p class="font-medium text-xl">{{ kpis.cutOffSupplies.value }} <span class="text-sm">suministros</span></p>
+        <p class="text-[13px] line-clamp-1" [ngClass]="{
+             'text-blue-600 font-medium': kpis.cutOffSupplies.change > 0,
+             'text-red-600 font-medium': kpis.cutOffSupplies.change < 0,
+             'text-gray-500 font-medium': kpis.cutOffSupplies.change === 0
+           }">
+          {{ kpis.cutOffSupplies.changeText }}
+        </p>
+      </div>
+    </article>
 
-  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
-      <h3>Órdenes o Tareas Completadas</h3>
-      <svg lucideClipboardCheck class="size-5 stroke-[1.5]" />
-    </div>
+    <!-- Facturas Pendientes -->
+    <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200 shadow-[13px]">
+      <div class="flex text-sm text-gray-600 items-center justify-between">
+        <h3 class="line-clamp-1">Facturas Pendientes</h3>
+        <svg lucideFileText class="size-5 stroke-[1.5]" />
+      </div>
+      <div class="space-y-1">
+        <p class="font-medium text-xl">{{ kpis.pendingBillings.value }} <span class="text-sm">facturas</span></p>
+        <p class="text-[13px] line-clamp-1" [ngClass]="{
+             'text-blue-600 font-medium': kpis.pendingBillings.change > 0,
+             'text-red-600 font-medium': kpis.pendingBillings.change < 0,
+             'text-gray-500 font-medium': kpis.pendingBillings.change === 0
+           }">
+          {{ kpis.pendingBillings.changeText }}
+        </p>
+      </div>
+    </article>
 
-    <div class="space-y-1">
-      <p class="font-medium text-xl">128<span class="text-sm"> tareas completadas</span></p>
-      <p class="text-xs text-blue-600 font-medium">+18% vs ayer</p>
-    </div>
-  </article>
+    <!-- Facturas Vencidas -->
+    <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200 shadow-[13px]">
+      <div class="flex text-sm text-gray-600 items-center justify-between">
+        <h3 class="line-clamp-1">Facturas Vencidas</h3>
+        <svg lucideAlertTriangle class="size-5 stroke-[1.5]" />
+      </div>
+      <div class="space-y-1">
+        <p class="font-medium text-xl">{{ kpis.overdueBillings.value }} <span class="text-sm">facturas</span></p>
+        <p class="text-[13px] line-clamp-1" [ngClass]="{
+             'text-blue-600 font-medium': kpis.overdueBillings.change > 0,
+             'text-red-600 font-medium': kpis.overdueBillings.change < 0,
+             'text-gray-500 font-medium': kpis.overdueBillings.change === 0
+           }">
+          {{ kpis.overdueBillings.changeText }}
+        </p>
+      </div>
+    </article>
 
-  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
-      <h3>Incidentes o Pendientes</h3>
-      <svg lucideBadgeAlert class="size-5 stroke-[1.5]" />
-    </div>
+    <!-- Total Facturado del Mes -->
+    <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200 shadow-[13px]">
+      <div class="flex text-sm text-gray-600 items-center justify-between">
+        <h3 class="line-clamp-1">Facturado del Mes</h3>
+        <svg lucideTrendingUp class="size-5 stroke-[1.5]" />
+      </div>
+      <div class="space-y-1">
+        <p class="font-medium text-xl">S/. {{ kpis.totalBilledMonth.value | number:'1.2-2' }}</p>
+        <p class="text-[13px] line-clamp-1" [ngClass]="{
+             'text-blue-600 font-medium': kpis.totalBilledMonth.change > 0,
+             'text-red-600 font-medium': kpis.totalBilledMonth.change < 0,
+             'text-gray-500 font-medium': kpis.totalBilledMonth.change === 0
+           }">
+          {{ kpis.totalBilledMonth.changeText }}
+        </p>
+      </div>
+    </article>
 
-    <div class="space-y-1">
-      <p class="font-medium text-xl">23 <span class="text-sm">incidencias</span></p>
-      <p class="text-xs text-red-500 font-medium">5 alertas críticas</p>
-    </div>
-  </article>
+    <!-- Total Cobrado del Mes -->
+    <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200 shadow-[13px]">
+      <div class="flex text-sm text-gray-600 items-center justify-between">
+        <h3 class="line-clamp-1">Cobrado del Mes</h3>
+        <svg lucideDollarSign class="size-5 stroke-[1.5]" />
+      </div>
+      <div class="space-y-1">
+        <p class="font-medium text-xl">S/. {{ kpis.totalCollectedMonth.value | number:'1.2-2' }}</p>
+        <p class="text-[13px] line-clamp-1" [ngClass]="{
+             'text-blue-600 font-medium': kpis.totalCollectedMonth.change > 0,
+             'text-red-600 font-medium': kpis.totalCollectedMonth.change < 0,
+             'text-gray-500 font-medium': kpis.totalCollectedMonth.change === 0
+           }">
+          {{ kpis.totalCollectedMonth.changeText }}
+        </p>
+      </div>
+    </article>
 
-
-</section>
+    <!-- Pendiente de Cobranza -->
+    <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200 shadow-[13px]">
+      <div class="flex text-sm text-gray-600 items-center justify-between">
+        <h3 class="line-clamp-1">Pendiente de Cobranza</h3>
+        <svg lucideDollarSign class="size-5 stroke-[1.5]" />
+      </div>
+      <div class="space-y-1">
+        <p class="font-medium text-xl">S/. {{ kpis.totalPendingCollection.value | number:'1.2-2' }}</p>
+        <p class="text-[13px] line-clamp-1" [ngClass]="{
+             'text-blue-600 font-medium': kpis.totalPendingCollection.change > 0,
+             'text-red-600 font-medium': kpis.totalPendingCollection.change < 0,
+             'text-gray-500 font-medium': kpis.totalPendingCollection.change === 0
+           }">
+          {{ kpis.totalPendingCollection.changeText }}
+        </p>
+      </div>
+    </article>
+  </section>
+</ng-template>

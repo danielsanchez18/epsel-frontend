@@ -1,0 +1,98 @@
+<section class="w-full bg-white rounded-xl border border-gray-200 contain-content">
+
+    <!-- Header -->
+    <div
+        class="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto] gap-x-3 items-center justify-between px-5 py-3 border-b border-b-gray-200">
+
+        <!-- Titulo -->
+        <h3 class="font-medium text-gray-800">
+            {{ selectedCategory.name }}
+        </h3>
+
+        <!-- Calendario -->
+        <button
+            class="text-xs flex items-center gap-x-1 font-medium px-2 py-2 border border-gray-200 rounded-lg hover:bg-gray-100">
+            <span>Este Año</span>
+            <svg lucideChevronDown class="size-4 stroke-[1.5]" />
+        </button>
+
+    </div>
+
+    <!-- Contenido -->
+    <div class="grid xl:grid-cols-[1fr_auto] lg:min-h-88">
+
+        <!-- Chart -->
+        <div class="w-full min-h-80 -ml-1 sm:ml-1 pt-2 sm:pt-4 sm:pr-4 relative">
+            <div *ngIf="isLoading" class="absolute inset-0 flex items-center justify-center bg-white/50 z-10">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+
+            <div id="hs-single-bar-chart"></div>
+        </div>
+
+        <!-- Resumen -->
+        <div
+            class="xl:w-sm px-5 pt-3 pb-5 space-y-5 max-xl:border-t max-xl:border-t-gray-200 xl:border-l xl:border-l-gray-200 relative">
+
+            <!-- Skeleton Loader when loading -->
+            <div *ngIf="isLoading"
+                class="absolute inset-0 flex flex-col justify-center px-5 space-y-5 bg-white/60 z-10 animate-pulse">
+                <div class="h-5 bg-gray-200 rounded w-1/3"></div>
+                <div class="h-8 bg-gray-200 rounded w-1/2"></div>
+                <div class="h-2.5 bg-gray-200 rounded-full w-full"></div>
+                <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+            </div>
+
+            <!-- Header -->
+            <div class="border-b border-b-gray-200 flex gap-x-5">
+                @for (category of categories; track $index) {
+                <button type="button" (click)="selectCategory(category.name)"
+                    class="border-b-2 px-0 py-2 text-sm font-medium transition-colors duration-200" [ngClass]="{
+                      'border-b-blue-600 text-blue-600': category.isActive,
+                      'border-b-transparent text-gray-500 hover:text-gray-900': !category.isActive
+                    }">
+                    {{ category.name }}
+                </button>
+                }
+            </div>
+
+            <!-- Content -->
+            <div class="space-y-3">
+                <h3 class="text-2xl font-semibold text-gray-800">S/. {{ quantityDisplay | number:'1.0-0' }}</h3>
+
+                <!-- Ranger Slide -->
+                <div class="w-full bg-gray-200 relative rounded-full py-1">
+                    <div class="absolute py-1 rounded-l-full top-0 transition-all duration-300 ease-out bg-blue-600"
+                        [style.width.%]="progressPercentage">
+                    </div>
+                    <div class="py-2 rounded-full w-[10px] border-2 border-white absolute top-[-5px] transition-all duration-300 ease-out bg-blue-600"
+                        [style.left.%]="progressPercentage">
+                    </div>
+                </div>
+
+                <div class="text-xs flex items-center justify-between text-gray-600">
+                    <p>S/. {{ selectedCategory.minRange | number:'1.0-0' }}</p>
+                    <p>S/. {{ selectedCategory.maxRange | number:'1.0-0' }}</p>
+                </div>
+
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Un desglose de información detallada de {{ selectedCategory.name.toLowerCase() }} realizados.
+                </p>
+            </div>
+
+            <!-- Boton de mostrar estadísticas -->
+            <a routerLink="{{ selectedCategory.link }}"
+                class="grid grid-cols-[auto_1fr_auto] items-center gap-x-3 hover:bg-gray-100 rounded-md p-2 text-sm transition-colors duration-150">
+
+                <div class="p-1 rounded-md border border-gray-200 bg-white">
+                    <svg lucideChartColumn class="size-4 text-blue-600" />
+                </div>
+
+                <p class="text-xs font-medium text-gray-700">Mostrar Panel de Estadísticas</p>
+
+                <svg lucideChevronRight class="size-4 text-gray-500" />
+            </a>
+        </div>
+    </div>
+
+</section>
