@@ -5,7 +5,6 @@ import {
   LucideChartColumn,
   LucideChevronDown,
   LucideChevronRight,
-  LucidePlus,
 } from '@lucide/angular';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { DashboardChart } from '@interfaces/dashboard/dashboard.interface';
@@ -17,7 +16,6 @@ import ApexCharts, { ApexOptions } from 'apexcharts';
     CommonModule,
     RouterLink,
     LucideChevronDown,
-    LucidePlus,
     LucideChartColumn,
     LucideChevronRight,
   ],
@@ -45,6 +43,14 @@ export class ComponentDashboardGeneralChartsBarChart
       maxRange: 10000,
       isActive: false,
     },
+    {
+      name: 'Consumo',
+      link: '/dashboard/consumo',
+      quantity: 0,
+      minRange: 0,
+      maxRange: 1000,
+      isActive: false,
+    },
   ];
 
   selectedCategory = this.categories[0];
@@ -54,6 +60,7 @@ export class ComponentDashboardGeneralChartsBarChart
 
   billingData: DashboardChart[] = [];
   paymentData: DashboardChart[] = [];
+  consumptionData: DashboardChart[] = [];
   chart: any = null;
 
   ngOnInit() {
@@ -84,12 +91,10 @@ export class ComponentDashboardGeneralChartsBarChart
     const result: DashboardChart[] = [];
     const today = new Date();
 
-    // Generate the last 6 months chronologically leading up to today
     for (let i = 5; i >= 0; i--) {
       const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const monthLabel = monthNames[d.getMonth()];
 
-      // Find if we have data for this month (case insensitive search)
       const existing = data.find((item) =>
         item.label
           .toLowerCase()
@@ -111,6 +116,7 @@ export class ComponentDashboardGeneralChartsBarChart
         if (res.success && res.data) {
           this.billingData = res.data.billingChart || [];
           this.paymentData = res.data.paymentChart || [];
+          this.consumptionData = res.data.consumptionChart || [];
           this.updateCategoryTotals();
           this.animateAll();
 
@@ -137,6 +143,10 @@ export class ComponentDashboardGeneralChartsBarChart
       (sum, item) => sum + item.value,
       0,
     );
+    const consumptionSum = this.consumptionData.reduce(
+      (sum, item) => sum + item.value,
+      0,
+    );
 
     const billingCat = this.categories.find(
       (cat) => cat.name === 'Facturación',
@@ -147,6 +157,10 @@ export class ComponentDashboardGeneralChartsBarChart
     const paymentCat = this.categories.find((cat) => cat.name === 'Cobros')!;
     paymentCat.quantity = paymentSum;
     paymentCat.maxRange = Math.ceil((paymentSum * 1.25) / 1000) * 1000 || 10000;
+
+    const consumptionCat = this.categories.find((cat) => cat.name === 'Consumo')!;
+    consumptionCat.quantity = consumptionSum;
+    consumptionCat.maxRange = Math.ceil((consumptionSum * 1.25) / 100) * 100 || 1000;
 
     this.selectedCategory =
       this.categories.find((cat) => cat.isActive) || this.categories[0];
@@ -205,6 +219,19 @@ export class ComponentDashboardGeneralChartsBarChart
     requestAnimationFrame(step);
   }
 
+  private getCategoryColor(name: string): string[] {
+    switch (name) {
+      case 'Facturación':
+        return ['#2563eb']; // Blue
+      case 'Cobros':
+        return ['#10b981']; // Emerald/Green
+      case 'Consumo':
+        return ['#f59e0b']; // Amber/Orange
+      default:
+        return ['#2563eb'];
+    }
+  }
+
   private initializeChart(): void {
     if (this.chart) {
       this.chart.destroy();
@@ -213,7 +240,9 @@ export class ComponentDashboardGeneralChartsBarChart
     const activeData =
       this.selectedCategory.name === 'Facturación'
         ? this.billingData
-        : this.paymentData;
+        : this.selectedCategory.name === 'Cobros'
+        ? this.paymentData
+        : this.consumptionData;
     const last6Data = this.getLast6MonthsData(activeData);
     const categories = last6Data.map((item) => item.label);
     const seriesData = last6Data.map((item) => item.value);
@@ -293,8 +322,12 @@ export class ComponentDashboardGeneralChartsBarChart
             fontFamily: 'Inter, ui-sans-serif',
             fontWeight: 400,
           },
-          formatter: (value: number) =>
-            value >= 1000 ? `S/ ${(value / 1000).toFixed(0)}k` : `S/ ${value}`,
+          formatter: (value: number) => {
+            if (this.selectedCategory.name === 'Consumo') {
+              return `${value} m³`;
+            }
+            return value >= 1000 ? `S/ ${(value / 1000).toFixed(0)}k` : `S/ ${value}`;
+          },
         },
       },
       states: {
@@ -306,8 +339,12 @@ export class ComponentDashboardGeneralChartsBarChart
       },
       tooltip: {
         y: {
-          formatter: (value: number) =>
-            `S/ ${value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+          formatter: (value: number) => {
+            if (this.selectedCategory.name === 'Consumo') {
+              return `${value.toLocaleString('en-US')} m³`;
+            }
+            return `S/ ${value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+          },
         },
       },
       responsive: [
@@ -322,10 +359,7 @@ export class ComponentDashboardGeneralChartsBarChart
           },
         },
       ],
-      colors:
-        this.selectedCategory.name === 'Facturación'
-          ? ['#2563eb']
-          : ['#2563eb'],
+      colors: this.getCategoryColor(this.selectedCategory.name),
     };
 
     const container = document.querySelector(
@@ -343,7 +377,9 @@ export class ComponentDashboardGeneralChartsBarChart
     const activeData =
       this.selectedCategory.name === 'Facturación'
         ? this.billingData
-        : this.paymentData;
+        : this.selectedCategory.name === 'Cobros'
+        ? this.paymentData
+        : this.consumptionData;
     const last6Data = this.getLast6MonthsData(activeData);
     const categories = last6Data.map((item) => item.label);
     const seriesData = last6Data.map((item) => item.value);
@@ -352,10 +388,36 @@ export class ComponentDashboardGeneralChartsBarChart
       xaxis: {
         categories: categories,
       },
-      colors:
-        this.selectedCategory.name === 'Facturación'
-          ? ['#2563eb']
-          : ['#2563eb'],
+      colors: this.getCategoryColor(this.selectedCategory.name),
+      yaxis: {
+        labels: {
+          align: 'left',
+          minWidth: 0,
+          maxWidth: 140,
+          style: {
+            colors: '#9ca3af',
+            fontSize: '13px',
+            fontFamily: 'Inter, ui-sans-serif',
+            fontWeight: 400,
+          },
+          formatter: (value: number) => {
+            if (this.selectedCategory.name === 'Consumo') {
+              return `${value} m³`;
+            }
+            return value >= 1000 ? `S/ ${(value / 1000).toFixed(0)}k` : `S/ ${value}`;
+          },
+        },
+      },
+      tooltip: {
+        y: {
+          formatter: (value: number) => {
+            if (this.selectedCategory.name === 'Consumo') {
+              return `${value.toLocaleString('en-US')} m³`;
+            }
+            return `S/ ${value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+          },
+        },
+      },
     });
 
     this.chart.updateSeries([

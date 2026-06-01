@@ -60,6 +60,15 @@ export const DASHBOARD_ROUTES: Routes = [
           ),
       },
       {
+        path: 'incidencias',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'TECHNICIAN', 'MANAGEMENT', 'SUPERVISOR'] },
+        loadChildren: () =>
+          import('@routes/dashboard/incidents.routes').then(
+            (m) => m.INCIDENTS_ROUTES,
+          ),
+      },
+      {
         path: 'lecturas',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN', 'TECHNICIAN', 'SUPERVISOR'] },

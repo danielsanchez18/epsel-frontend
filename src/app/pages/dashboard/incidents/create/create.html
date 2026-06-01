@@ -1,0 +1,274 @@
+<main class="flex flex-col gap-y-7 px-4 md:px-7 lg:px-10">
+
+  <!-- Header -->
+  <div class="space-y-1">
+    <button (click)="goBack()" class="font-medium text-sm text-blue-600 hover:underline inline-flex items-center gap-x-1 cursor-pointer">
+      <svg lucideArrowLeft class="size-4"></svg> Regresar
+    </button>
+    <h1 class="text-xl font-semibold text-gray-900">Registrar Nueva Incidencia</h1>
+    <p class="text-sm text-gray-500">Completa los datos de asociación y detalle del problema reportado.</p>
+  </div>
+
+  <!-- Loading State for Data Parsing -->
+  <div *ngIf="isLoadingData" class="flex justify-center py-20 bg-white border border-gray-200 rounded-2xl shadow-xs">
+    <div class="flex flex-col items-center gap-y-3">
+      <div class="animate-spin inline-block size-8 border-4 border-current border-t-transparent text-blue-600 rounded-full" role="status"></div>
+      <p class="text-sm text-gray-500 font-medium">Cargando información contextual...</p>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoadingData" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+    
+    <!-- Left Column: Association Info (Client, Property, Supply) -->
+    <div class="lg:col-span-1 space-y-6">
+      
+      <!-- Card: Cliente -->
+      <section class="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center gap-x-2">
+          <svg lucideUser class="size-4.5 text-blue-600"></svg>
+          <h2 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Cliente Asociado</h2>
+        </div>
+        
+        <div class="p-5">
+          <!-- State 1: Search Customer (No customer selected) -->
+          <div *ngIf="!selectedCustomer" [formGroup]="searchCustomerForm" class="space-y-4">
+            <div class="flex flex-col gap-y-1.5">
+              <label class="text-xs font-semibold text-gray-700">Buscar Cliente</label>
+              <div class="relative">
+                <input
+                  type="text"
+                  formControlName="searchQuery"
+                  placeholder="Buscar por Nombre o Nro Documento..."
+                  class="w-full text-sm border border-gray-200 rounded-lg pl-3 pr-10 py-2.5 outline-hidden focus:border-blue-500 bg-white"
+                />
+                <div class="absolute right-3 top-3 flex items-center">
+                  <span *ngIf="isSearchingCustomer" class="animate-spin inline-block size-4 border-2 border-current border-t-transparent text-blue-600 rounded-full"></span>
+                </div>
+              </div>
+              <p class="text-[11px] text-gray-400">Escribe al menos 3 caracteres para iniciar la búsqueda.</p>
+            </div>
+
+            <!-- List of Results -->
+            <div *ngIf="customers.length > 0" class="border border-gray-150 rounded-lg overflow-hidden divide-y divide-gray-100 bg-white">
+              <button
+                type="button"
+                *ngFor="let customer of customers"
+                (click)="selectCustomer(customer)"
+                class="w-full px-3 py-2 text-left hover:bg-blue-50/40 transition-colors text-xs flex flex-col gap-y-0.5 cursor-pointer"
+              >
+                <span class="font-semibold text-gray-800">{{ customer.fullName }}</span>
+                <span class="text-gray-500">Doc: {{ customer.documentNumber }}</span>
+              </button>
+            </div>
+            <div *ngIf="customers.length === 0 && searchCustomerForm.get('searchQuery')?.value?.length >= 3 && !isSearchingCustomer" class="text-center py-4 text-xs text-gray-500 border border-dashed rounded-lg">
+              No se encontraron clientes.
+            </div>
+          </div>
+
+          <!-- State 2: Selected Customer -->
+          <div *ngIf="selectedCustomer" class="space-y-4">
+            <div class="bg-blue-50/40 border border-blue-100 rounded-xl p-4 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase">
+                  {{ selectedCustomer.type === 'PERSON' ? 'Natural' : 'Jurídica' }}
+                </span>
+                <button
+                  type="button"
+                  *ngIf="!isCustomerLocked"
+                  (click)="resetCustomerSelection()"
+                  class="text-[11px] text-red-500 hover:text-red-700 font-semibold cursor-pointer"
+                >
+                  Cambiar
+                </button>
+              </div>
+              <h3 class="font-bold text-gray-900 text-sm">{{ selectedCustomer.fullName }}</h3>
+              <p class="text-xs text-gray-600">Doc: <strong>{{ selectedCustomer.documentNumber }}</strong></p>
+              <p class="text-xs text-gray-600" *ngIf="selectedCustomer.email">Email: {{ selectedCustomer.email }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Card: Predio y Suministro -->
+      <section *ngIf="selectedCustomer" class="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center gap-x-2">
+          <svg lucideDroplets class="size-4.5 text-blue-600"></svg>
+          <h2 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Detalles de Asociación</h2>
+        </div>
+        
+        <div [formGroup]="incidentForm" class="p-5 space-y-5">
+          <!-- Predio Selector -->
+          <div class="flex flex-col gap-y-1.5">
+            <label for="property-select" class="text-xs font-semibold text-gray-700">Predio Relacionado</label>
+            <select
+              id="property-select"
+              formControlName="propertyId"
+              (change)="onPropertyChange($any($event.target).value)"
+              class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-gray-800 cursor-pointer outline-hidden focus:border-blue-500"
+            >
+              <option value="">-- Seleccionar Predio (Opcional) --</option>
+              <option *ngFor="let prop of properties" [value]="prop.id">
+                {{ prop.address }} (Cód: {{ prop.cadastralCode }})
+              </option>
+            </select>
+            <p *ngIf="properties.length === 0" class="text-[11px] text-amber-600">
+              * Este cliente no cuenta con predios registrados.
+            </p>
+          </div>
+
+          <!-- Suministro Selector -->
+          <div class="flex flex-col gap-y-1.5">
+            <label for="supply-select" class="text-xs font-semibold text-gray-700">Suministro Relacionado</label>
+            <select
+              id="supply-select"
+              formControlName="supplyId"
+              [attr.disabled]="isSupplyLocked ? true : null"
+              (change)="onSupplyChange($any($event.target).value)"
+              class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-gray-800 cursor-pointer outline-hidden focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            >
+              <option value="">-- Seleccionar Suministro (Opcional) --</option>
+              <option *ngFor="let s of supplies" [value]="s.id">
+                N° {{ s.supplyNumber }} (Medidor: {{ s.meterNumber }})
+              </option>
+            </select>
+            <p *ngIf="supplies.length === 0" class="text-[11px] text-amber-600">
+              * Este cliente no cuenta con suministros registrados.
+            </p>
+          </div>
+
+          <!-- Resumen de Predio / Suministro seleccionado -->
+          <div *ngIf="selectedSupply" class="bg-gray-50 border border-gray-150 rounded-xl p-3.5 space-y-2 text-xs">
+            <h4 class="font-bold text-gray-700 uppercase text-[10px] tracking-wider">Suministro Seleccionado</h4>
+            <div class="grid grid-cols-2 gap-y-1.5 gap-x-2">
+              <div>
+                <span class="text-gray-400">Nro Suministro:</span>
+                <p class="font-semibold text-blue-600">{{ selectedSupply.supplyNumber }}</p>
+              </div>
+              <div>
+                <span class="text-gray-400">Medidor:</span>
+                <p class="font-semibold text-gray-800">{{ selectedSupply.meterNumber }}</p>
+              </div>
+              <div class="col-span-2">
+                <span class="text-gray-400">Dirección:</span>
+                <p class="font-semibold text-gray-800 truncate" [title]="selectedSupply.propertyAddress">{{ selectedSupply.propertyAddress }}</p>
+              </div>
+              <div>
+                <span class="text-gray-400">Zona:</span>
+                <p class="font-semibold text-gray-800">{{ selectedSupply.zoneName }}</p>
+              </div>
+              <div>
+                <span class="text-gray-400">Estado Suministro:</span>
+                <p class="font-semibold text-gray-800">{{ selectedSupply.status }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+    </div>
+
+    <!-- Right Column: Incident Form Details -->
+    <div class="lg:col-span-2">
+      <section class="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center gap-x-2">
+          <svg lucideAlertTriangle class="size-4.5 text-blue-600"></svg>
+          <h2 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Detalles de la Incidencia</h2>
+        </div>
+
+        <form [formGroup]="incidentForm" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
+          <div *ngIf="!selectedCustomer" class="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl text-sm flex gap-x-3 items-center">
+            <svg lucideAlertTriangle class="size-5 text-amber-500 shrink-0"></svg>
+            <p>Por favor, <strong>seleccione un cliente</strong> en el panel de la izquierda para habilitar el registro de la incidencia.</p>
+          </div>
+
+          <fieldset [disabled]="!selectedCustomer" class="space-y-6">
+            <div class="grid sm:grid-cols-2 gap-5">
+              <!-- Tipo de Incidencia -->
+              <div class="flex flex-col gap-y-1.5">
+                <label for="incident-type" class="text-sm font-semibold text-gray-700">Tipo de Incidencia *</label>
+                <select
+                  id="incident-type"
+                  formControlName="type"
+                  class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-gray-800 cursor-pointer outline-hidden focus:border-blue-500"
+                >
+                  <option value="">-- Seleccionar Tipo --</option>
+                  <option *ngFor="let t of incidentTypes" [value]="t.value">{{ t.label }}</option>
+                </select>
+                <span *ngIf="incidentForm.get('type')?.invalid && incidentForm.get('type')?.touched" class="text-xs text-red-500">
+                  * El tipo de incidencia es obligatorio.
+                </span>
+              </div>
+
+              <!-- Prioridad -->
+              <div class="flex flex-col gap-y-1.5">
+                <label for="incident-priority" class="text-sm font-semibold text-gray-700">Prioridad *</label>
+                <select
+                  id="incident-priority"
+                  formControlName="priority"
+                  class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-gray-800 cursor-pointer outline-hidden focus:border-blue-500"
+                >
+                  <option *ngFor="let p of priorities" [value]="p.value">{{ p.label }}</option>
+                </select>
+                <span *ngIf="incidentForm.get('priority')?.invalid && incidentForm.get('priority')?.touched" class="text-xs text-red-500">
+                  * La prioridad es obligatoria.
+                </span>
+              </div>
+            </div>
+
+            <!-- Título -->
+            <div class="flex flex-col gap-y-1.5">
+              <label for="incident-title" class="text-sm font-semibold text-gray-700">Título de la Incidencia *</label>
+              <input
+                type="text"
+                id="incident-title"
+                formControlName="title"
+                placeholder="Breve título descriptivo (ej. Fuga detectada en vereda externa)"
+                class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 outline-hidden focus:border-blue-500 bg-white"
+              />
+              <span *ngIf="incidentForm.get('title')?.invalid && incidentForm.get('title')?.touched" class="text-xs text-red-500">
+                * El título es obligatorio y debe tener entre 5 y 100 caracteres.
+              </span>
+            </div>
+
+            <!-- Descripción -->
+            <div class="flex flex-col gap-y-1.5">
+              <label for="incident-desc" class="text-sm font-semibold text-gray-700">Descripción Detallada *</label>
+              <textarea
+                id="incident-desc"
+                formControlName="description"
+                rows="6"
+                placeholder="Describa el problema detalladamente, indicando referencias, horarios, impacto u otros datos clave..."
+                class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 outline-hidden focus:border-blue-500 bg-white resize-none"
+              ></textarea>
+              <span *ngIf="incidentForm.get('description')?.invalid && incidentForm.get('description')?.touched" class="text-xs text-red-500">
+                * La descripción es obligatoria y debe tener entre 10 y 1000 caracteres.
+              </span>
+            </div>
+          </fieldset>
+
+          <!-- Buttons -->
+          <div class="border-t border-gray-100 pt-5 flex justify-end gap-3">
+            <button
+              type="button"
+              (click)="goBack()"
+              [disabled]="isSaving"
+              class="py-2.5 px-4 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-sm font-medium transition-colors cursor-pointer disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              [disabled]="incidentForm.invalid || !selectedCustomer || isSaving"
+              class="py-2.5 px-5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors flex items-center gap-x-2 cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span *ngIf="isSaving" class="animate-spin inline-block size-4 border-2 border-current border-t-transparent text-white rounded-full"></span>
+              {{ isSaving ? 'Guardando...' : 'Registrar Incidencia' }}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+  </div>
+
+</main>

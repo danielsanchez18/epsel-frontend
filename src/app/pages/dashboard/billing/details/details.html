@@ -264,6 +264,13 @@
               <svg lucideCreditCard class="size-4"></svg> Registrar Pago
             </button>
 
+            <!-- Button: Reclamar Factura -->
+            <button [routerLink]="['/dashboard/incidencias/crear']"
+              [queryParams]="{ supplyId: billing.supplyId, type: 'BILLING_COMPLAINT', title: 'Reclamo sobre Factura ' + billing.billingNumber, description: 'Reclamo generado para la factura con número ' + billing.billingNumber + ' del periodo ' + getPeriodLabel(billing.billingMonth, billing.billingYear) + '.' }"
+              class="w-full py-2.5 px-4 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium transition-colors flex items-center justify-center gap-x-2 text-sm cursor-pointer shadow-xs">
+              <svg lucideAlertTriangle class="size-4"></svg> Reclamar Factura
+            </button>
+
             <!-- Button: Anular Factura (Después - Labeled) -->
             <button (click)="cancelInvoice()"
               class="w-full py-2.5 px-4 rounded-lg bg-red-50 text-red-600 font-medium border border-red-100 flex items-center justify-center gap-x-2 text-sm cursor-pointer hover:bg-red-100 transition-colors">
@@ -271,8 +278,7 @@
                 class="text-[10px] bg-red-200 text-red-800 px-1.5 py-0.5 rounded-md font-normal">Próximamente</span>
             </button>
 
-            <p class="text-xs text-gray-400 text-center mt-1">Gestione y controle el flujo de caja e impresiones de esta
-              factura.</p>
+            <p class="text-xs text-gray-400 text-center mt-1">Gestione y controle el flujo de caja e impresiones de esta factura.</p>
           </div>
         </section>
 

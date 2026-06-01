@@ -1,0 +1,95 @@
+<section class="flex flex-col gap-y-7">
+  
+  <!-- KPI Component -->
+  <component-dashboard-incidents-kpis 
+    [total]="kpiTotal" 
+    [open]="kpiOpen" 
+    [inProgress]="kpiInProgress" 
+    [resolved]="kpiResolved" />
+
+  <div class="lg:border border-gray-200 lg:rounded-xl lg:p-5 flex flex-col gap-6 bg-white shadow-2xs">
+    
+    <!-- Filter bar -->
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <!-- Search Box -->
+        <component-shared-search-box class="w-full md:max-w-md"
+          placeholder="Buscar incidencia por Código, Cliente o Título..." [searchQuery]="searchQuery"
+          (searchQueryChange)="onSearchQuery($event)" />
+
+        <!-- Status & Priority Filters -->
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Type Filter -->
+          <select [value]="selectedType" (change)="onTypeFilter($any($event.target).value)"
+            class="w-40 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 cursor-pointer outline-hidden focus:border-blue-500 shadow-2xs">
+            <option value="">Tipo Incidente</option>
+            <option value="BILLING_COMPLAINT">Facturación</option>
+            <option value="PAYMENT_COMPLAINT">Pago no aplicado</option>
+            <option value="SERVICE_INTERRUPTION">Interrupción</option>
+            <option value="LOW_PRESSURE">Baja Presión</option>
+            <option value="WATER_LEAK">Fuga de Agua</option>
+            <option value="METER_DAMAGE">Medidor Dañado</option>
+            <option value="METER_REPLACEMENT">Reemplazo Medidor</option>
+            <option value="ABNORMAL_CONSUMPTION">Consumo Anormal</option>
+            <option value="OCR_ANOMALY">Anomalía OCR</option>
+            <option value="SUPPLY_CUT_COMPLAINT">Reclamo por Corte</option>
+            <option value="OTHER">Otros</option>
+          </select>
+
+          <!-- Status Filter -->
+          <select [value]="selectedStatus" (change)="onStatusFilter($any($event.target).value)"
+            class="w-40 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 cursor-pointer outline-hidden focus:border-blue-500 shadow-2xs">
+            <option value="">Estado</option>
+            <option value="OPEN">Abiertas</option>
+            <option value="IN_PROGRESS">En proceso</option>
+            <option value="RESOLVED">Resueltas</option>
+            <option value="CLOSED">Cerradas</option>
+            <option value="REJECTED">Rechazadas</option>
+          </select>
+
+          <!-- Priority Filter -->
+          <select [value]="selectedPriority" (change)="onPriorityFilter($any($event.target).value)"
+            class="w-40 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 cursor-pointer outline-hidden focus:border-blue-500 shadow-2xs">
+            <option value="">Prioridad</option>
+            <option value="LOW">Baja</option>
+            <option value="MEDIUM">Media</option>
+            <option value="HIGH">Alta</option>
+            <option value="CRITICAL">Crítica</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Date Filters -->
+      <div class="flex items-center gap-x-2 border-t border-gray-100 pt-3">
+        <span class="text-xs font-medium text-gray-500">Fecha de Reporte:</span>
+        <input type="date" [value]="selectedStartDate" (change)="onStartDateFilter($any($event.target).value)"
+          class="border border-gray-200 rounded-lg px-2 py-1 text-sm bg-white text-gray-700 focus:border-blue-500 outline-hidden" />
+        <span class="text-xs text-gray-400">al</span>
+        <input type="date" [value]="selectedEndDate" (change)="onEndDateFilter($any($event.target).value)"
+          class="border border-gray-200 rounded-lg px-2 py-1 text-sm bg-white text-gray-700 focus:border-blue-500 outline-hidden" />
+        <button *ngIf="selectedStartDate || selectedEndDate" (click)="selectedStartDate = ''; selectedEndDate = ''; loadData(0)"
+          class="text-xs text-red-500 font-medium hover:underline ml-2">
+          Limpiar fechas
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center py-10">
+      <div
+        class="animate-spin inline-block size-6 border-2 border-current border-t-transparent text-blue-600 rounded-full"
+        role="status" aria-label="loading"></div>
+    </div>
+
+    <!-- Table Component -->
+    <component-dashboard-incidents-table *ngIf="!isLoading && incidents.length > 0" [items]="incidents" />
+
+    <!-- Empty State Component -->
+    <component-dashboard-incidents-empty *ngIf="!isLoading && incidents.length === 0" />
+
+    <!-- Paginator Component -->
+    <component-shared-paginator *ngIf="!isLoading && totalPages > 1" [page]="currentPage" [totalPages]="totalPages"
+      [totalElements]="totalElements" (pageChange)="onPageChange($event)" />
+
+  </div>
+</section>

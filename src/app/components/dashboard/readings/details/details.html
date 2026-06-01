@@ -161,6 +161,13 @@
           </button>
         </ng-container>
 
+        <!-- Botón: Reportar anomalía -->
+        <button [routerLink]="['/dashboard/incidencias/crear']"
+          [queryParams]="{ supplyId: reading.supplyId, type: 'READING_ANOMALY', title: 'Anomalía en lectura Suministro ' + reading.supplyNumber, description: 'Se reporta anomalía en la lectura con ID ' + reading.id + '. Lectura actual registrada: ' + reading.currentReading + ' m³. Consumo: ' + reading.consumption + ' m³.' }"
+          class="w-full py-2.5 px-4 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 font-medium hover:bg-amber-100 transition-colors flex items-center justify-center gap-x-2 text-sm cursor-pointer shadow-xs">
+          <svg lucideAlertTriangle class="size-4"></svg> Reportar anomalía
+        </button>
+
         <p class="text-xs text-gray-500 text-center">Acciones permitidas según el estado actual de la lectura</p>
       </div>
     </section>

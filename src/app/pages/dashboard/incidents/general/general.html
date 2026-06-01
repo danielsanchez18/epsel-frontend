@@ -1,0 +1,18 @@
+<main class="flex flex-col gap-y-7 px-4 md:px-7 lg:px-10">
+
+  <div class="flex items-center justify-between gap-x-2 border-b border-gray-100 pb-4">
+    <!-- Título y descripción -->
+    <div>
+      <h1 class="text-lg font-medium text-gray-900">Incidencias</h1>
+      <p class="text-sm text-gray-500">Administra las incidencias y reclamos del sistema.</p>
+    </div>
+    
+    <a routerLink="crear"
+      class="text-sm px-4 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg inline-flex items-center gap-x-2 transition-colors cursor-pointer shadow-xs">
+      Nueva incidencia
+    </a>
+  </div>
+
+  <component-dashboard-incidents-list />
+
+</main>

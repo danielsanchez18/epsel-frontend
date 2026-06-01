@@ -47,9 +47,11 @@
             <div class="border-b border-b-gray-200 flex gap-x-5">
                 @for (category of categories; track $index) {
                 <button type="button" (click)="selectCategory(category.name)"
-                    class="border-b-2 px-0 py-2 text-sm font-medium transition-colors duration-200" [ngClass]="{
-                      'border-b-blue-600 text-blue-600': category.isActive,
-                      'border-b-transparent text-gray-500 hover:text-gray-900': !category.isActive
+                    class="border-b-2 px-0 py-2 text-sm transition-colors duration-200" [ngClass]="{
+                      'border-b-blue-600 text-blue-600 font-medium': category.isActive && category.name === 'Facturación',
+                      'border-b-emerald-600 text-emerald-600 font-medium': category.isActive && category.name === 'Cobros',
+                      'border-b-amber-500 text-amber-500 font-medium': category.isActive && category.name === 'Consumo',
+                      'border-b-transparent text-gray-800 hover:text-black': !category.isActive
                     }">
                     {{ category.name }}
                 </button>
@@ -58,21 +60,46 @@
 
             <!-- Content -->
             <div class="space-y-3">
-                <h3 class="text-2xl font-semibold text-gray-800">S/. {{ quantityDisplay | number:'1.0-0' }}</h3>
+                <h3 class="text-2xl font-semibold text-gray-800">
+                    @if (selectedCategory.name === 'Consumo') {
+                    {{ quantityDisplay | number:'1.0-0' }} m³
+                    } @else {
+                    S/. {{ quantityDisplay | number:'1.0-0' }}
+                    }
+                </h3>
 
                 <!-- Ranger Slide -->
                 <div class="w-full bg-gray-200 relative rounded-full py-1">
-                    <div class="absolute py-1 rounded-l-full top-0 transition-all duration-300 ease-out bg-blue-600"
-                        [style.width.%]="progressPercentage">
+                    <div class="absolute py-1 rounded-l-full top-0 transition-all duration-300 ease-out" [ngClass]="{
+                          'bg-blue-600': selectedCategory.name === 'Facturación',
+                          'bg-emerald-600': selectedCategory.name === 'Cobros',
+                          'bg-amber-500': selectedCategory.name === 'Consumo'
+                        }" [style.width.%]="progressPercentage">
                     </div>
-                    <div class="py-2 rounded-full w-[10px] border-2 border-white absolute top-[-5px] transition-all duration-300 ease-out bg-blue-600"
-                        [style.left.%]="progressPercentage">
+                    <div class="py-2 rounded-full w-[10px] border-2 border-white absolute top-[-5px] transition-all duration-300 ease-out"
+                        [ngClass]="{
+                          'bg-blue-600': selectedCategory.name === 'Facturación',
+                          'bg-emerald-600': selectedCategory.name === 'Cobros',
+                          'bg-amber-500': selectedCategory.name === 'Consumo'
+                        }" [style.left.%]="progressPercentage">
                     </div>
                 </div>
 
                 <div class="text-xs flex items-center justify-between text-gray-600">
-                    <p>S/. {{ selectedCategory.minRange | number:'1.0-0' }}</p>
-                    <p>S/. {{ selectedCategory.maxRange | number:'1.0-0' }}</p>
+                    <p>
+                        @if (selectedCategory.name === 'Consumo') {
+                        {{ selectedCategory.minRange | number:'1.0-0' }} m³
+                        } @else {
+                        S/. {{ selectedCategory.minRange | number:'1.0-0' }}
+                        }
+                    </p>
+                    <p>
+                        @if (selectedCategory.name === 'Consumo') {
+                        {{ selectedCategory.maxRange | number:'1.0-0' }} m³
+                        } @else {
+                        S/. {{ selectedCategory.maxRange | number:'1.0-0' }}
+                        }
+                    </p>
                 </div>
 
                 <p class="text-xs text-gray-500 leading-relaxed">
@@ -85,7 +112,11 @@
                 class="grid grid-cols-[auto_1fr_auto] items-center gap-x-3 hover:bg-gray-100 rounded-md p-2 text-sm transition-colors duration-150">
 
                 <div class="p-1 rounded-md border border-gray-200 bg-white">
-                    <svg lucideChartColumn class="size-4 text-blue-600" />
+                    <svg lucideChartColumn class="size-4" [ngClass]="{
+                          'text-blue-600': selectedCategory.name === 'Facturación',
+                          'text-emerald-600': selectedCategory.name === 'Cobros',
+                          'text-amber-500': selectedCategory.name === 'Consumo'
+                        }" />
                 </div>
 
                 <p class="text-xs font-medium text-gray-700">Mostrar Panel de Estadísticas</p>

@@ -1,0 +1,312 @@
+<main class="flex flex-col gap-y-7 px-4 md:px-7 lg:px-10 py-5">
+
+  <!-- Breadcrumb & Header -->
+  <div class="space-y-2">
+    <a routerLink="/dashboard/incidencias" class="font-medium text-sm text-blue-600 hover:underline flex items-center gap-x-1">
+      &larr; Regresar a Incidencias
+    </a>
+    
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-xl font-bold text-gray-900">Incidencia {{ incident?.incidentNumber || '...' }}</h1>
+        <p class="text-xs text-gray-500" *ngIf="incident">Reportado el {{ formatDate(incident.reportedDate) }}</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-x-2" *ngIf="incident">
+        <button *ngIf="incident.status === 'OPEN'" (click)="onStartProgress()"
+          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-all shadow-xs hover:cursor-pointer">
+          Iniciar atención
+        </button>
+
+        <button *ngIf="incident.status === 'IN_PROGRESS'" (click)="onResolve()"
+          class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition-all shadow-xs hover:cursor-pointer">
+          Resolver
+        </button>
+
+        <button *ngIf="incident.status === 'RESOLVED'" (click)="onClose()"
+          class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-semibold transition-all shadow-xs hover:cursor-pointer">
+          Cerrar
+        </button>
+
+        <button *ngIf="incident.status === 'OPEN' || incident.status === 'IN_PROGRESS'" (click)="onReject()"
+          class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-all shadow-xs hover:cursor-pointer">
+          Rechazar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center py-20">
+    <div class="animate-spin inline-block size-8 border-2 border-current border-t-transparent text-blue-600 rounded-full"
+      role="status" aria-label="loading"></div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" *ngIf="!isLoading && incident">
+    
+    <!-- Left Panel (Details, Description, Resolution) -->
+    <div class="lg:col-span-2 space-y-6">
+      
+      <!-- Información General -->
+      <section class="bg-white rounded-xl border border-gray-200 p-5 space-y-4 shadow-2xs">
+        <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 pb-2">Información General</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p class="text-xs font-semibold text-gray-500 uppercase">Título del reclamo</p>
+            <p class="text-sm font-semibold text-gray-800 mt-0.5">{{ incident.title }}</p>
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold text-gray-500 uppercase">Tipo de incidencia</p>
+            <p class="text-sm font-medium text-gray-800 mt-0.5">{{ getTypeLabel(incident.type) }}</p>
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold text-gray-500 uppercase">Prioridad de atención</p>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold mt-1 border"
+              [ngClass]="getPriorityClass(incident.priority)">
+              {{ getPriorityLabel(incident.priority) }}
+            </span>
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold text-gray-500 uppercase">Estado actual</p>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold mt-1 border"
+              [ngClass]="getStatusClass(incident.status)">
+              {{ getStatusLabel(incident.status) }}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Descripción -->
+      <section class="bg-white rounded-xl border border-gray-200 p-5 space-y-3 shadow-2xs">
+        <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 pb-2">Descripción del Motivo</h2>
+        <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{{ incident.description }}</p>
+      </section>
+
+      <!-- Resolución -->
+      <section *ngIf="incident.resolution || incident.status === 'RESOLVED' || incident.status === 'CLOSED' || incident.status === 'REJECTED'"
+        class="bg-emerald-50/50 rounded-xl border border-emerald-200 p-5 space-y-3 shadow-2xs">
+        <h2 class="text-sm font-bold text-emerald-800 uppercase tracking-wider border-b border-emerald-200/60 pb-2">Resolución / Dictamen</h2>
+        <div class="space-y-2">
+          <p class="text-sm text-emerald-950 font-medium whitespace-pre-line">{{ incident.resolution ?? 'Pendiente de registrar resolución.' }}</p>
+          <div class="text-xs text-emerald-800 flex gap-x-4 mt-2 font-semibold" *ngIf="incident.resolvedDate">
+            <span>Fecha de dictamen: {{ formatDate(incident.resolvedDate) }}</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Right Panel (Customer, Property, Supply, Timeline) -->
+    <div class="space-y-6">
+
+      <!-- Cliente -->
+      <section class="bg-white rounded-xl border border-gray-200 p-5 space-y-4 shadow-2xs">
+        <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 pb-2">Cliente</h2>
+        
+        <div class="space-y-3" *ngIf="customer; else noCustomer">
+          <div>
+            <p class="text-xs font-semibold text-gray-500 uppercase">Nombre completo</p>
+            <p class="text-sm font-semibold text-gray-800 mt-0.5">{{ customer.fullName }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-gray-500 uppercase">Documento</p>
+            <p class="text-sm font-medium text-gray-800 mt-0.5">{{ customer.documentNumber }} ({{ customer.type === 'PERSON' ? 'DNI' : 'RUC' }})</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-gray-500 uppercase">Contacto</p>
+            <p class="text-sm text-gray-800 mt-0.5 font-medium">{{ customer.phone || 'Sin teléfono' }}</p>
+            <p class="text-xs text-gray-600 font-medium">{{ customer.email || 'Sin correo electrónico' }}</p>
+          </div>
+          <div>
+            <a [routerLink]="['/dashboard/clientes', customer.id]" class="text-xs font-bold text-blue-600 hover:underline">
+              Ver perfil de cliente &rarr;
+            </a>
+          </div>
+        </div>
+        <ng-template #noCustomer>
+          <div class="text-sm text-gray-500 py-2">
+            No hay un cliente directamente asociado (Registrado por el Sistema).
+          </div>
+        </ng-template>
+      </section>
+
+      <!-- Predio -->
+      <section class="bg-white rounded-xl border border-gray-200 p-5 space-y-4 shadow-2xs" *ngIf="property">
+        <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 pb-2">Predio</h2>
+        
+        <div class="space-y-3">
+          <div>
+            <p class="text-xs font-semibold text-gray-500 uppercase">Dirección</p>
+            <p class="text-sm font-semibold text-gray-800 mt-0.5">{{ property.address }}</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase">Tipo</p>
+              <p class="text-xs font-medium text-gray-700 mt-0.5">
+                {{ property.type === 'HOUSE' ? 'Residencial' : property.type === 'BUSINESS' ? 'Comercial' : property.type === 'INDUSTRIAL' ? 'Industrial' : property.type }}
+              </p>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase">Zona</p>
+              <p class="text-xs font-medium text-gray-700 mt-0.5">{{ property.zoneName || 'Sector General' }}</p>
+            </div>
+          </div>
+          <div>
+            <a [routerLink]="['/dashboard/predios', property.id]" class="text-xs font-bold text-blue-600 hover:underline">
+              Ver detalles de predio &rarr;
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Suministro -->
+      <section class="bg-white rounded-xl border border-gray-200 p-5 space-y-4 shadow-2xs" *ngIf="supply">
+        <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 pb-2">Suministro</h2>
+        
+        <div class="space-y-3">
+          <div>
+            <p class="text-xs font-semibold text-gray-500 uppercase">Código Suministro</p>
+            <p class="text-sm font-bold text-blue-600 mt-0.5">{{ supply.supplyNumber }}</p>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase">Estado</p>
+              <p class="text-xs font-medium text-gray-700 mt-0.5">
+                {{ supply.status === 'ACTIVE' ? 'Activo' : supply.status }}
+              </p>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase">Última lectura</p>
+              <p class="text-xs font-medium text-gray-700 mt-0.5">{{ supply.lastReading ?? '-' }} m³</p>
+            </div>
+          </div>
+          <div>
+            <a [routerLink]="['/dashboard/suministros', supply.id]" class="text-xs font-bold text-blue-600 hover:underline">
+              Ver detalles de suministro &rarr;
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Historial / Línea de tiempo -->
+      <section class="bg-white rounded-xl border border-gray-200 p-5 space-y-4 shadow-2xs">
+        <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 pb-2">Historial de Flujo</h2>
+        
+        <div class="flow-root">
+          <ul role="list" class="-mb-8">
+            
+            <!-- Paso 1: OPEN -->
+            <li>
+              <div class="relative pb-8">
+                <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"
+                  *ngIf="incident.status !== 'OPEN'"></span>
+                <div class="relative flex space-x-3">
+                  <div>
+                    <span class="size-8 rounded-full flex items-center justify-center ring-8 ring-white bg-blue-100 text-blue-600 font-bold text-xs">
+                      1
+                    </span>
+                  </div>
+                  <div class="flex-1 min-w-0 pt-1.5 flex justify-between space-x-4">
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Registrado / Abierto</p>
+                      <p class="text-xs text-gray-500">Fecha de reporte: {{ formatDate(incident.reportedDate) }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- Paso 2: IN_PROGRESS -->
+            <li *ngIf="incident.status !== 'OPEN'">
+              <div class="relative pb-8">
+                <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"
+                  *ngIf="incident.status === 'RESOLVED' || incident.status === 'CLOSED'"></span>
+                <div class="relative flex space-x-3">
+                  <div>
+                    <span class="size-8 rounded-full flex items-center justify-center ring-8 ring-white bg-amber-100 text-amber-600 font-bold text-xs">
+                      2
+                    </span>
+                  </div>
+                  <div class="flex-1 min-w-0 pt-1.5 flex justify-between space-x-4">
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">En Atención / Proceso</p>
+                      <p class="text-xs text-gray-500">Estado de evaluación activa</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- Paso 3: RESOLVED -->
+            <li *ngIf="incident.status === 'RESOLVED' || incident.status === 'CLOSED'">
+              <div class="relative pb-8">
+                <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"
+                  *ngIf="incident.status === 'CLOSED'"></span>
+                <div class="relative flex space-x-3">
+                  <div>
+                    <span class="size-8 rounded-full flex items-center justify-center ring-8 ring-white bg-emerald-100 text-emerald-600 font-bold text-xs">
+                      3
+                    </span>
+                  </div>
+                  <div class="flex-1 min-w-0 pt-1.5 flex justify-between space-x-4">
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Resuelto</p>
+                      <p class="text-xs text-gray-500" *ngIf="incident.resolvedDate">Dictamen: {{ formatDate(incident.resolvedDate) }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- Paso 4: CLOSED -->
+            <li *ngIf="incident.status === 'CLOSED'">
+              <div class="relative pb-8">
+                <div class="relative flex space-x-3">
+                  <div>
+                    <span class="size-8 rounded-full flex items-center justify-center ring-8 ring-white bg-gray-100 text-gray-600 font-bold text-xs">
+                      4
+                    </span>
+                  </div>
+                  <div class="flex-1 min-w-0 pt-1.5 flex justify-between space-x-4">
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Cerrado / Concluido</p>
+                      <p class="text-xs text-gray-500">Incidencia cerrada definitivamente</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- Caso especial: REJECTED -->
+            <li *ngIf="incident.status === 'REJECTED'">
+              <div class="relative pb-8">
+                <div class="relative flex space-x-3">
+                  <div>
+                    <span class="size-8 rounded-full flex items-center justify-center ring-8 ring-white bg-red-100 text-red-600 font-bold text-xs">
+                      X
+                    </span>
+                  </div>
+                  <div class="flex-1 min-w-0 pt-1.5 flex justify-between space-x-4">
+                    <div>
+                      <p class="text-sm font-semibold text-red-700">Incidencia Rechazada</p>
+                      <p class="text-xs text-gray-500">Rechazado en frontend</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+</main>

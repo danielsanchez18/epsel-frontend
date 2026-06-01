@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
 import {
@@ -26,6 +26,7 @@ import { PublicUrlPipe } from '@core/pipes/public-url.pipe';
   selector: 'component-dashboard-readings-details',
   imports: [
     CommonModule,
+    RouterLink,
     LucideImage,
     LucideAlertTriangle,
     LucideCheck,

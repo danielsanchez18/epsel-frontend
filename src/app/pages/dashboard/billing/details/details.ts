@@ -14,6 +14,7 @@ import {
   LucideDownload,
   LucideBan,
   LucideCreditCard,
+  LucideAlertTriangle,
 } from '@lucide/angular';
 
 import { BillingService } from '@core/services/billings/billing.service';
@@ -41,6 +42,7 @@ import { PaymentMethod } from '@interfaces/payments/payment.interface';
     LucideDownload,
     LucideBan,
     LucideCreditCard,
+    LucideAlertTriangle,
   ],
   templateUrl: './details.html',
 })

@@ -9,6 +9,7 @@ import { ComponentDashboardSuppliesDetailsBillings } from '@components/dashboard
 import { ComponentDashboardSuppliesDetailsPayments } from '@components/dashboard/supplies/details/tabs/payments/payments';
 import { ComponentDashboardSuppliesDetailsReadings } from '@components/dashboard/supplies/details/tabs/readings/readings';
 import { ComponentDashboardSuppliesDetailsOperations } from '@components/dashboard/supplies/details/tabs/operations/operations';
+import { ComponentDashboardSuppliesDetailsIncidents } from '@components/dashboard/supplies/details/tabs/incidents/incidents';
 
 @Component({
   selector: 'page-dashboard-supplies-details',
@@ -20,6 +21,7 @@ import { ComponentDashboardSuppliesDetailsOperations } from '@components/dashboa
     ComponentDashboardSuppliesDetailsPayments,
     ComponentDashboardSuppliesDetailsReadings,
     ComponentDashboardSuppliesDetailsOperations,
+    ComponentDashboardSuppliesDetailsIncidents,
   ],
   templateUrl: './details.html',
 })

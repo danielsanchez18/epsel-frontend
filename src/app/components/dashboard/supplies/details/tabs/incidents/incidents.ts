@@ -1,33 +1,29 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { IncidentService } from '@services/incidents/incident.service';
-import { PageDashboardCustomersDetailsGeneral } from '../general/general';
 import { IncidentResponseDTO, IncidentStatus, IncidentType } from '@interfaces/incidents/incident.interface';
-import { ComponentSharedSearchBox } from "@components/shared/search-box/search-box";
-import { ComponentSharedPaginator } from "@components/shared/paginator/paginator";
-import { LucidePlus, LucideBadgeInfo } from "@lucide/angular";
+import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
+import { LucideBadgeAlert, LucidePlus } from '@lucide/angular';
 
 @Component({
-  selector: 'page-dashboard-customers-details-claims',
+  selector: 'component-dashboard-supplies-details-incidents',
   imports: [
     CommonModule,
-    RouterModule,
-    ComponentSharedSearchBox,
+    RouterLink,
     ComponentSharedPaginator,
-    LucidePlus,
-    LucideBadgeInfo
+    LucideBadgeAlert,
+    LucidePlus
   ],
-  templateUrl: './claims.html',
+  templateUrl: './incidents.html',
 })
-export class PageDashboardCustomersDetailsClaims implements OnInit {
+export class ComponentDashboardSuppliesDetailsIncidents implements OnInit {
   private incidentService = inject(IncidentService);
-  private route = inject(ActivatedRoute);
-  private parent = inject(PageDashboardCustomersDetailsGeneral);
 
-  customerId: string | null = null;
+  @Input() supplyId!: string | null;
+  @Input() supplyNumber!: string | null;
+
   incidents: IncidentResponseDTO[] = [];
-  filteredIncidents: IncidentResponseDTO[] = [];
   isLoading = true;
 
   currentPage = 0;
@@ -35,11 +31,8 @@ export class PageDashboardCustomersDetailsClaims implements OnInit {
   totalPages = 0;
   totalElements = 0;
 
-  searchQuery = '';
-
   ngOnInit(): void {
-    this.customerId = this.parent.customerId || this.route.parent?.snapshot.paramMap.get('id') || null;
-    if (this.customerId) {
+    if (this.supplyId) {
       this.loadIncidents();
     } else {
       this.isLoading = false;
@@ -47,56 +40,38 @@ export class PageDashboardCustomersDetailsClaims implements OnInit {
   }
 
   loadIncidents(page: number = 0): void {
-    if (!this.customerId) return;
+    if (!this.supplyId) return;
     this.isLoading = true;
-    this.incidentService.search(page, this.pageSize, undefined, undefined, undefined, this.customerId).subscribe({
-      next: (res) => {
-        if (res.success && res.data) {
-          this.incidents = res.data.content || [];
-          this.totalPages = res.data.totalPages || 0;
-          this.totalElements = res.data.totalElements || 0;
-          this.currentPage = page;
-          this.applyFilter();
-        } else {
+    this.incidentService
+      .search(page, this.pageSize, undefined, undefined, undefined, undefined, this.supplyId)
+      .subscribe({
+        next: (res) => {
+          if (res.success && res.data) {
+            this.incidents = res.data.content ?? [];
+            this.totalPages = res.data.totalPages ?? 0;
+            this.totalElements = res.data.totalElements ?? 0;
+            this.currentPage = page;
+          } else {
+            this.resetList();
+          }
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading supply incidents:', err);
           this.resetList();
-        }
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading customer claims:', err);
-        this.resetList();
-        this.isLoading = false;
-      }
-    });
+          this.isLoading = false;
+        },
+      });
   }
 
-  private resetList() {
+  private resetList(): void {
     this.incidents = [];
-    this.filteredIncidents = [];
     this.totalPages = 0;
     this.totalElements = 0;
   }
 
   onPageChange(page: number): void {
     this.loadIncidents(page);
-  }
-
-  onSearch(query: string): void {
-    this.searchQuery = query;
-    this.applyFilter();
-  }
-
-  private applyFilter(): void {
-    if (!this.searchQuery.trim()) {
-      this.filteredIncidents = [...this.incidents];
-    } else {
-      const q = this.searchQuery.toLowerCase().trim();
-      this.filteredIncidents = this.incidents.filter(inc => 
-        inc.incidentNumber.toLowerCase().includes(q) ||
-        inc.title.toLowerCase().includes(q) ||
-        this.getTypeLabel(inc.type).toLowerCase().includes(q)
-      );
-    }
   }
 
   getTypeLabel(type?: IncidentType): string {
