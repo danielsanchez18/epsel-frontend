@@ -4,13 +4,10 @@ import { SupplyWorkOrderResponseDTO } from '@interfaces/supply-work-orders/suppl
 
 @Component({
   selector: 'component-dashboard-work-orders-table',
-  imports: [
-    CommonModule,
-  ],
+  imports: [CommonModule],
   templateUrl: './table.html',
 })
 export class ComponentDashboardWorkOrdersTable {
-
   @Input() workOrders: SupplyWorkOrderResponseDTO[] = [];
   @Input() isLoading = false;
   @Input() pageOffset = 0;
@@ -70,18 +67,18 @@ export class ComponentDashboardWorkOrdersTable {
   getStatusClass(status: string): string {
     switch (status) {
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
+        return 'bg-yellow-100 text-yellow-800';
       case 'ASSIGNED':
-        return 'bg-blue-100 text-blue-800 border border-blue-200';
+        return 'bg-blue-100 text-blue-800';
       case 'IN_PROGRESS':
-        return 'bg-purple-100 text-purple-800 border border-purple-200';
+        return 'bg-purple-100 text-purple-800';
       case 'COMPLETED':
-        return 'bg-green-100 text-green-800 border border-green-200';
+        return 'bg-green-100 text-green-800';
       case 'CANCELLED':
       case 'FAILED':
-        return 'bg-red-100 text-red-800 border border-red-200';
+        return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800 border border-gray-200';
+        return 'bg-gray-100 text-gray-800';
     }
   }
 

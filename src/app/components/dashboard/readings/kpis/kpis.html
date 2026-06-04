@@ -1,70 +1,112 @@
-<section class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+@if (loading) {
+<section class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+  @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+  <article class="w-full bg-white py-5 space-y-4 px-5 rounded-xl border border-gray-200 shadow-sm animate-pulse">
+    <div class="flex items-center justify-between">
+      <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+      <div class="h-8 bg-gray-200 rounded-lg w-8"></div>
+    </div>
+    <div class="space-y-2">
+      <div class="h-7 bg-gray-200 rounded w-1/3"></div>
+    </div>
+  </article>
+  }
+</section>
+} @else if (error) {
+<div
+  class="p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 flex items-center justify-between col-span-full">
+  <p class="text-sm font-medium">Error al cargar las métricas de lecturas. Por favor, intenta de nuevo.</p>
+  <button (click)="loadKpis()"
+    class="text-xs bg-red-600 hover:bg-red-700 text-white font-medium py-1.5 px-3 rounded-lg transition-colors cursor-pointer">
+    Reintentar
+  </button>
+</div>
+} @else {
+<section class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2">
 
   <!-- Lecturas registradas hoy -->
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
+    <div class="flex text-sm text-gray-700 items-center justify-between">
       <h3>Registradas hoy</h3>
       <svg lucideClipboardList class="size-5 stroke-[1.5]" />
     </div>
     <div class="space-y-1">
-      <p class="font-medium text-xl">24 <span class="text-sm">lecturas</span></p>
+      <p class="font-semibold text-2xl text-gray-900">
+        {{ kpis.registeredToday }}
+        <span class="text-sm font-normal">lecturas</span>
+      </p>
     </div>
   </article>
 
-  <!-- Pendientes de validar -->
+  <!-- Pendientes -->
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
-      <h3>Pendientes de Validar</h3>
+    <div class="flex text-sm text-gray-700 items-center justify-between">
+      <h3>Pendientes</h3>
       <svg lucideClipboardPenLine class="size-5 stroke-[1.5]" />
     </div>
     <div class="space-y-1">
-      <p class="font-medium text-xl">18 <span class="text-sm">pendientes</span></p>
+      <p class="font-semibold text-2xl text-gray-900">
+        {{ kpis.pending }}
+        <span class="text-sm font-normal">lecturas</span>
+      </p>
     </div>
   </article>
 
   <!-- Validadas -->
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
+    <div class="flex text-sm text-gray-700 items-center justify-between">
       <h3>Validadas</h3>
       <svg lucideBadgeCheck class="size-5 stroke-[1.5]" />
     </div>
     <div class="space-y-1">
-      <p class="font-medium text-xl">145 <span class="text-sm">validadas</span></p>
+      <p class="font-semibold text-2xl text-gray-900">
+        {{ kpis.validated }}
+        <span class="text-sm font-normal">validadas</span>
+      </p>
     </div>
   </article>
 
   <!-- Facturadas -->
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
+    <div class="flex text-sm text-gray-700 items-center justify-between">
       <h3>Facturadas</h3>
       <svg lucideFileText class="size-5 stroke-[1.5]" />
     </div>
     <div class="space-y-1">
-      <p class="font-medium text-xl">1,820 <span class="text-sm">facturadas</span></p>
+      <p class="font-semibold text-2xl text-gray-900">
+        {{ kpis.billed }}
+        <span class="text-sm font-normal">facturadas</span>
+      </p>
     </div>
   </article>
 
   <!-- Canceladas -->
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
+    <div class="flex text-sm text-gray-700 items-center justify-between">
       <h3>Canceladas</h3>
       <svg lucideBan class="size-5 stroke-[1.5]" />
     </div>
     <div class="space-y-1">
-      <p class="font-medium text-xl">3 <span class="text-sm">canceladas</span></p>
+      <p class="font-semibold text-2xl text-gray-900">
+        {{ kpis.cancelled }}
+        <span class="text-sm font-normal">canceladas</span>
+      </p>
     </div>
   </article>
 
-  <!-- Consumo total del mes -->
-  <!-- <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
-      <h3 class="truncate text-xs font-semibold uppercase text-gray-500">Consumo Mes</h3>
-      <svg lucideDroplets class="size-5 stroke-[1.5] text-blue-500" />
+  <!-- Consumo Mes -->
+  <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
+    <div class="flex text-sm text-gray-700 items-center justify-between">
+      <h3>Consumo Mes</h3>
+      <svg lucideDroplets class="size-5 stroke-[1.5]" />
     </div>
     <div class="space-y-1">
-      <p class="font-medium text-xl">45,210 <span class="text-sm font-semibold">m³</span></p>
-      <p class="text-xs text-gray-500 font-medium">Mayo 2026</p>
+      <p class="font-semibold text-2xl text-gray-900">
+        {{ kpis.monthConsumption | number }}
+        <span class="text-sm font-normal">m³</span>
+      </p>
     </div>
-  </article> -->
+  </article>
 
 </section>
+}

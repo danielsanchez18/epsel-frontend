@@ -1,3 +1,27 @@
+@if (loading) {
+<section class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+  @for (item of [1, 2, 3, 4]; track item) {
+  <article class="w-full bg-white py-5 space-y-4 px-5 rounded-xl border border-gray-200 shadow-sm animate-pulse">
+    <div class="flex items-center justify-between">
+      <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+      <div class="h-8 bg-gray-200 rounded-lg w-8"></div>
+    </div>
+    <div class="space-y-2">
+      <div class="h-7 bg-gray-200 rounded w-1/3"></div>
+      <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+    </div>
+  </article>
+  }
+</section>
+} @else if (error) {
+<div class="p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 flex items-center justify-between">
+  <p class="text-sm font-medium">Error al cargar las métricas de detalle. Por favor, intenta de nuevo.</p>
+  <button (click)="loadKpis()"
+    class="text-xs bg-red-600 hover:bg-red-700 text-white font-medium py-1.5 px-3 rounded-lg transition-colors cursor-pointer">
+    Reintentar
+  </button>
+</div>
+} @else {
 <section class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
@@ -7,8 +31,10 @@
     </div>
 
     <div class="space-y-1">
-      <p class="font-medium text-xl">S/. 420.50 <span class="text-sm">pendientes</span></p>
-      <p class="text-xs text-red-600 font-medium">2 recibos vencidos</p>
+      <p class="font-medium text-xl">S/. {{ kpis.totalDebt | number:'1.2-2' }} <span class="text-sm">pendientes</span></p>
+      <p class="text-xs font-medium" [class.text-red-600]="kpis.overdueBillsCount > 0" [class.text-gray-500]="kpis.overdueBillsCount === 0">
+        {{ kpis.overdueBillsCount }} recibos vencidos
+      </p>
     </div>
   </article>
 
@@ -19,11 +45,12 @@
     </div>
 
     <div class="space-y-1">
-      <p class="font-medium text-xl">18 <span class="text-sm">m³ mensuales</span></p>
-      <p class="text-xs text-blue-600 font-medium">+2.5% respecto al mes anterior</p>
+      <p class="font-medium text-xl">{{ kpis.averageConsumption | number:'1.0-1' }} <span class="text-sm">m³ mensuales</span></p>
+      <p class="text-xs font-medium" [class.text-blue-600]="kpis.consumptionChangePercentage >= 0" [class.text-green-600]="kpis.consumptionChangePercentage < 0">
+        {{ kpis.consumptionChangePercentage >= 0 ? '+' : '' }}{{ kpis.consumptionChangePercentage | number:'1.0-1' }}% respecto al mes anterior
+      </p>
     </div>
   </article>
-
 
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
     <div class="flex text-sm text-gray-600 items-center justify-between">
@@ -32,8 +59,13 @@
     </div>
 
     <div class="space-y-1">
-      <p class="font-medium text-xl">08 mayo 2026</p>
-      <p class="text-xs text-red-600 font-medium">Pago con retraso</p>
+      <p class="font-medium text-xl">{{ kpis.lastPaymentDate ? (kpis.lastPaymentDate | date:'dd MMMM yyyy':'':'es') : 'Sin pagos' }}</p>
+      <p class="text-xs font-medium" 
+         [class.text-red-600]="kpis.lastPaymentDate && kpis.lastPaymentDelayed" 
+         [class.text-green-600]="kpis.lastPaymentDate && !kpis.lastPaymentDelayed"
+         [class.text-gray-500]="!kpis.lastPaymentDate">
+        {{ kpis.lastPaymentDate ? (kpis.lastPaymentDelayed ? 'Pago con retraso' : 'Pago a tiempo') : 'Sin historial' }}
+      </p>
     </div>
   </article>
 
@@ -44,10 +76,11 @@
     </div>
 
     <div class="space-y-1">
-      <p class="font-medium text-xl">2 <span class="text-sm">reclamos abiertos</span></p>
-      <p class="text-xs text-gray-700 font-medium">Últimos 30 días</p>
+      <p class="font-medium text-xl">{{ kpis.activeIncidentsCount }} <span class="text-sm">reclamos abiertos</span></p>
+      <p class="text-xs text-gray-700 font-medium">{{ kpis.recentIncidentsCount }} en los últimos 30 días</p>
     </div>
   </article>
 
-
 </section>
+}
+

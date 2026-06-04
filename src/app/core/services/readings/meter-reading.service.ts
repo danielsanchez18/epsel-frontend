@@ -86,4 +86,8 @@ export class MeterReadingService {
       { params },
     );
   }
+
+  getKpis(): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/kpis`);
+  }
 }

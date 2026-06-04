@@ -1,53 +1,106 @@
+@if (loading) {
+<section class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+  @for (item of [1, 2, 3, 4]; track item) {
+  <article class="w-full bg-white py-5 space-y-4 px-5 rounded-xl border border-gray-200 shadow-sm animate-pulse">
+    <div class="flex items-center justify-between">
+      <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+      <div class="h-8 bg-gray-200 rounded-lg w-8"></div>
+    </div>
+    <div class="space-y-2">
+      <div class="h-7 bg-gray-200 rounded w-1/3"></div>
+      <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+    </div>
+  </article>
+  }
+</section>
+} @else if (error) {
+<div class="p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 flex items-center justify-between">
+  <p class="text-sm font-medium">Error al cargar las métricas de personal. Por favor, intenta de nuevo.</p>
+  <button (click)="loadKpis()"
+    class="text-xs bg-red-600 hover:bg-red-700 text-white font-medium py-1.5 px-3 rounded-lg transition-colors cursor-pointer">
+    Reintentar
+  </button>
+</div>
+} @else {
 <section class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
+  <!-- Card 1: Personal Activo -->
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
+    <div class="flex text-sm text-gray-700 items-center justify-between">
       <h3>Personal Activo</h3>
       <svg lucideUserCheck class="size-5 stroke-[1.5]" />
     </div>
 
     <div class="space-y-1">
-      <p class="font-medium text-xl">245 <span class="text-sm">empleados activos</span></p>
-      <p class="text-xs text-blue-600 font-medium">+12 este mes</p>
+      <p class="font-semibold text-2xl text-gray-900">
+        {{ kpis.totalActiveWorkers }}
+        <span class="text-sm font-normal">empleados</span>
+      </p>
+      <p class="text-[13px] text-green-600 font-medium flex items-center gap-1.5">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-green-500"></span>
+        +{{ kpis.activeWorkersChange }} este mes
+      </p>
     </div>
   </article>
 
+  <!-- Card 2: Sesiones del Día -->
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
-      <h3>Asistencia / Sesiones del Día</h3>
+    <div class="flex text-sm text-gray-700 items-center justify-between">
+      <h3>Sesiones del Día</h3>
       <svg lucideBadgeCheck class="size-5 stroke-[1.5]" />
     </div>
 
     <div class="space-y-1">
-      <p class="font-medium text-xl">186 <span class="text-sm">usuarios activos</span></p>
-      <p class="text-xs text-gray-700 font-medium">76% del personal</p>
+      <p class="font-semibold text-2xl text-gray-900">
+        {{ kpis.activeSessionsToday }}
+        <span class="text-sm font-normal">activos</span>
+      </p>
+      <p class="text-[13px] text-blue-600 font-medium flex items-center gap-1.5">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+        {{ kpis.activeSessionsPercentage }}% del personal
+      </p>
     </div>
   </article>
 
-
+  <!-- Card 3: Tareas Completadas -->
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
-      <h3>Órdenes o Tareas Completadas</h3>
+    <div class="flex text-sm text-gray-700 items-center justify-between">
+      <h3>Tareas Completadas</h3>
       <svg lucideClipboardCheck class="size-5 stroke-[1.5]" />
     </div>
 
     <div class="space-y-1">
-      <p class="font-medium text-xl">128<span class="text-sm"> tareas completadas</span></p>
-      <p class="text-xs text-blue-600 font-medium">+18% vs ayer</p>
+      <p class="font-semibold text-2xl text-gray-900">
+        {{ kpis.completedTasks }}
+        <span class="text-sm font-normal">completadas</span>
+      </p>
+      <p class="text-[13px] text-indigo-600 font-medium flex items-center gap-1.5">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+        +{{ kpis.completedTasksChange }}% vs mes anterior
+      </p>
     </div>
   </article>
 
+  <!-- Card 4: Incidentes Pendientes -->
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
-      <h3>Incidentes o Pendientes</h3>
+    <div class="flex text-sm text-gray-700 items-center justify-between">
+      <h3>Incidentes Pendientes</h3>
       <svg lucideBadgeAlert class="size-5 stroke-[1.5]" />
     </div>
 
     <div class="space-y-1">
-      <p class="font-medium text-xl">23 <span class="text-sm">incidencias</span></p>
-      <p class="text-xs text-red-500 font-medium">5 alertas críticas</p>
+      <p class="font-semibold text-2xl text-gray-900">
+        {{ kpis.pendingIncidents }}
+        <span class="text-sm font-normal">pendientes</span>
+      </p>
+      <p class="text-[13px] font-medium flex items-center gap-1.5" [class.text-rose-600]="kpis.criticalAlerts > 0"
+        [class.text-gray-500]="kpis.criticalAlerts === 0">
+        <span class="inline-block w-1.5 h-1.5 rounded-full" [class.bg-rose-500]="kpis.criticalAlerts > 0"
+          [class.animate-ping]="kpis.criticalAlerts > 0" [class.bg-gray-400]="kpis.criticalAlerts === 0"></span>
+        {{ kpis.criticalAlerts }} alertas críticas
+      </p>
     </div>
   </article>
 
-
 </section>
+}

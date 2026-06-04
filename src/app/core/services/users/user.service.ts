@@ -84,5 +84,9 @@ export class UserService {
 
   }
 
+  getKpis(): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/kpis`);
+  }
+
 
 }

@@ -41,7 +41,7 @@
     </div>
 
     <div class="space-y-1">
-      <p class="font-medium text-xl">S/. {{ totalCollected }}</p>
+      <p class="font-medium text-xl">S/. {{ totalCollected | number : '1.2-2' }}</p>
     </div>
   </article>
 
@@ -52,7 +52,7 @@
     </div>
 
     <div class="space-y-1">
-      <p class="font-medium text-xl">S/. {{ totalPending }}</p>
+      <p class="font-medium text-xl">S/. {{ totalPending | number : '1.2-2' }}</p>
     </div>
   </article>
 

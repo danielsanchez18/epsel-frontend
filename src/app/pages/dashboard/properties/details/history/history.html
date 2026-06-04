@@ -1,1 +1,77 @@
-<p>history works!</p>,
+<section class="p-5 border border-gray-200 rounded-2xl bg-white grid gap-5 shadow-2xs">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+    <div>
+      <h2 class="text-base font-medium">Historial de Operaciones</h2>
+      <p class="text-sm text-gray-700">Registro cronológico de todas las operaciones realizadas en los suministros de este predio.</p>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="flex items-center justify-between gap-x-3">
+    <component-shared-search-box placeholder="Buscar por suministro, tipo, motivo o responsable..." class="max-w-md w-full"
+      (searchQueryChange)="onSearch($event)" />
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center py-10">
+    <div
+      class="animate-spin inline-block size-6 border-[3px] border-current border-t-transparent text-blue-600 rounded-full"
+      role="status"></div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && filteredOperations.length === 0"
+    class="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+    <svg lucideHistory class="size-8 text-gray-400 mx-auto mb-2"></svg>
+    <p class="text-sm text-gray-500 font-medium">No se encontraron operaciones registradas para este predio.</p>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!isLoading && filteredOperations.length > 0" class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead>
+        <tr class="bg-gray-100 text-xs font-semibold uppercase">
+          <th class="py-3 px-4 text-nowrap font-semibold">Suministro</th>
+          <th class="py-3 px-4 text-nowrap font-semibold">Tipo de Operación</th>
+          <th class="py-3 px-4 text-nowrap font-semibold">Motivo</th>
+          <th class="py-3 px-4 text-nowrap font-semibold">Fecha</th>
+          <th class="py-3 px-4 text-nowrap font-semibold">Responsable</th>
+          <th class="py-3 px-4 text-nowrap font-semibold">Observaciones</th>
+        </tr>
+      </thead>
+
+      <tbody class="text-sm divide-y divide-gray-100">
+        <tr *ngFor="let op of filteredOperations" class="hover:bg-gray-50/50 transition-colors">
+          <td class="py-3.5 px-4 text-nowrap font-medium text-blue-600 hover:underline">
+            <a [routerLink]="['/dashboard/suministros', op.supplyId]">{{ op.supplyNumber }}</a>
+          </td>
+          <td class="py-3.5 px-4 text-nowrap">
+            <span class="inline-flex items-center px-2.5 py-1.5 rounded-md text-[13px] font-medium"
+              [ngClass]="getTypeClass(op.operationType)">
+              {{ getTypeLabel(op.operationType) }}
+            </span>
+          </td>
+          <td class="py-3.5 px-4 max-w-xs">
+            <span class="text-gray-700 truncate block" [title]="op.reason || '-'">{{ op.reason || '-' }}</span>
+          </td>
+          <td class="py-3.5 px-4 text-nowrap text-gray-700">
+            {{ op.operationDate | date: 'dd/MM/yyyy' }}
+          </td>
+          <td class="py-3.5 px-4 text-nowrap text-gray-700">
+            {{ op.performedBy }}
+          </td>
+          <td class="py-3.5 px-4 max-w-xs">
+            <span class="text-gray-500 text-xs truncate block" [title]="op.observations || '-'">{{ op.observations || '-' }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginator -->
+  <component-shared-paginator *ngIf="!isLoading && totalPages > 1" [page]="currentPage" [totalPages]="totalPages"
+    [totalElements]="totalElements" (pageChange)="onPageChange($event)" />
+
+</section>

@@ -23,54 +23,65 @@
       </thead>
 
       <tbody class="text-sm divide-y divide-gray-200">
-        <tr class="group cursor-pointer hover:bg-gray-50">
-          <td class="py-3 px-6 text-nowrap text-blue-600 font-medium group-hover:underline">COD-522546</td>
-          <td class="py-3 px-6 text-nowrap">$1,200.00</td>
-          <td class="py-3 px-6">
-            <div class="flex items-center gap-x-1 font-medium text-[13px] bg-gray-100 rounded-lg px-3 py-2 w-fit">
-              <svg lucideCreditCard class="size-4" />
-              Tarjeta
-            </div>
-          </td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">Caja 1</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">30 oct 2023 - 10:30 AM</td>
-          <td class="py-3 px-4 text-right">
-            <div class="flex items-center gap-x-1">
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucideDownload class="size-4" />
-              </button>
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucidePrinter class="size-4" />
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr class="group cursor-pointer hover:bg-gray-50">
-          <td class="py-3 px-6 text-nowrap text-blue-600 font-medium group-hover:underline">COD-522546</td>
-          <td class="py-3 px-6 text-nowrap">$1,200.00</td>
-          <td class="py-3 px-6">
-            <div class="flex items-center gap-x-1 font-medium text-[13px] bg-gray-100 rounded-lg px-3 py-2 w-fit">
-              <svg lucideHandCoins class="size-4" />
-              Efectivo
-            </div>
-          </td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">Caja 1</td>
-          <td class="py-3 px-6 text-nowrap text-gray-700">30 oct 2023 - 10:30 AM</td>
-          <td class="py-3 px-4 text-right">
-            <div class="flex items-center gap-x-1">
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucideDownload class="size-4" />
-              </button>
-              <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
-                <svg lucidePrinter class="size-4" />
-              </button>
-            </div>
-          </td>
-        </tr>
+        @if (isLoading) {
+          <tr>
+            <td colspan="6" class="py-6 text-center text-gray-500">Cargando historial de pagos...</td>
+          </tr>
+        } @else if (payments.length === 0) {
+          <tr>
+            <td colspan="6" class="py-6 text-center text-gray-500">No se encontraron pagos registrados para este cliente.</td>
+          </tr>
+        } @else {
+          @for (payment of payments; track payment.id) {
+            <tr class="group cursor-pointer hover:bg-gray-50">
+              <td class="py-3 px-6 text-nowrap text-blue-600 font-medium group-hover:underline">{{ payment.receiptNumber }}</td>
+              <td class="py-3 px-6 text-nowrap">S/. {{ payment.amount | number:'1.2-2' }}</td>
+              <td class="py-3 px-6">
+                <div class="flex items-center gap-x-1 font-medium text-[13px] bg-gray-100 rounded-lg px-3 py-2 w-fit">
+                  @if (payment.paymentMethod === 'CASH') {
+                    <svg lucideHandCoins class="size-4" />
+                    Efectivo
+                  } @else if (payment.paymentMethod === 'CARD') {
+                    <svg lucideCreditCard class="size-4" />
+                    Tarjeta
+                  } @else if (payment.paymentMethod === 'YAPE') {
+                    <svg lucideHandCoins class="size-4" />
+                    Yape
+                  } @else if (payment.paymentMethod === 'PLIN') {
+                    <svg lucideHandCoins class="size-4" />
+                    Plin
+                  } @else {
+                    <svg lucideCreditCard class="size-4" />
+                    Transferencia
+                  }
+                </div>
+              </td>
+              <td class="py-3 px-6 text-nowrap text-gray-700">{{ payment.registeredBy || 'Sistema' }}</td>
+              <td class="py-3 px-6 text-nowrap text-gray-700">{{ payment.paymentDate | date:'dd MMM yyyy - hh:mm a':'':'es' }}</td>
+              <td class="py-3 px-4 text-right">
+                <div class="flex items-center gap-x-1">
+                  <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
+                    <svg lucideDownload class="size-4" />
+                  </button>
+                  <button class="flex items-center gap-x-1 font-medium text-[13px] border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded-lg px-2 py-2 w-fit">
+                    <svg lucidePrinter class="size-4" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        }
       </tbody>
     </table>
   </div>
 
-  <component-shared-paginator />
+  <component-shared-paginator
+    *ngIf="totalPages > 1"
+    [page]="currentPage"
+    [totalPages]="totalPages"
+    [totalElements]="totalElements"
+    (pageChange)="onPageChange($event)"
+  />
 
 </section>
+

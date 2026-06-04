@@ -1,46 +1,47 @@
 <section class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
+    <div class="flex text-sm text-gray-700 items-center justify-between">
       <h3>Total Incidencias</h3>
       <svg lucideClipboardList class="size-5 stroke-[1.5]" />
     </div>
     <div class="space-y-1">
       <p class="font-medium text-xl">{{ total }} <span class="text-sm">registradas</span></p>
-      <p class="text-xs text-blue-600 font-medium">Historial completo</p>
+      <p class="text-[13px] text-blue-600 font-medium">Historial completo</p>
     </div>
   </article>
 
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
+    <div class="flex text-sm text-gray-700 items-center justify-between">
       <h3>Abiertas</h3>
-      <svg lucideBadgeAlert class="size-5 stroke-[1.5] text-blue-500" />
+      <svg lucideBadgeAlert class="size-5 stroke-[1.5]" />
     </div>
     <div class="space-y-1">
-      <p class="font-medium text-xl text-blue-600">{{ open }} <span class="text-sm text-gray-500"> pendientes</span></p>
-      <p class="text-xs text-blue-500 font-medium">Por iniciar atención</p>
+      <p class="font-medium text-xl">{{ open }} <span class="text-sm"> pendientes</span></p>
+      <p class="text-[13px] text-blue-600 font-medium">Por iniciar atención</p>
     </div>
   </article>
 
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
+    <div class="flex text-sm text-gray-700 items-center justify-between">
       <h3>En Proceso</h3>
-      <svg lucideActivity class="size-5 stroke-[1.5] text-amber-500" />
+      <svg lucideActivity class="size-5 stroke-[1.5]" />
     </div>
     <div class="space-y-1">
-      <p class="font-medium text-xl text-amber-600">{{ inProgress }} <span class="text-sm text-gray-500"> en curso</span></p>
-      <p class="text-xs text-amber-500 font-medium">Bajo revisión técnica</p>
+      <p class="font-medium text-xl">{{ inProgress }} <span class="text-sm"> en
+          curso</span></p>
+      <p class="text-[13px] text-amber-500 font-medium">Bajo revisión técnica</p>
     </div>
   </article>
 
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">
-    <div class="flex text-sm text-gray-600 items-center justify-between">
+    <div class="flex text-sm text-gray-700 items-center justify-between">
       <h3>Resueltas</h3>
-      <svg lucideBadgeCheck class="size-5 stroke-[1.5] text-emerald-500" />
+      <svg lucideBadgeCheck class="size-5 stroke-[1.5]" />
     </div>
     <div class="space-y-1">
-      <p class="font-medium text-xl text-emerald-600">{{ resolved }} <span class="text-sm text-gray-500"> finalizadas</span></p>
-      <p class="text-xs text-emerald-500 font-medium">Resueltas exitosamente</p>
+      <p class="font-medium text-xl">{{ resolved }} <span class="text-sm">finalizadas</span></p>
+      <p class="text-[13px] text-green-600 font-medium">Resueltas exitosamente</p>
     </div>
   </article>
 

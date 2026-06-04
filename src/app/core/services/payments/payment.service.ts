@@ -71,4 +71,20 @@ export class PaymentService {
       { params },
     );
   }
+
+  getByCustomer(
+    customerId: string,
+    page: number = 0,
+    size: number = 10,
+  ): Observable<ApiResponse<PaginatedResponse<PaymentResponseDTO>['data']>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<ApiResponse<PaginatedResponse<PaymentResponseDTO>['data']>>(
+      `${this.baseUrl}/customer/${customerId}`,
+      { params },
+    );
+  }
 }
+

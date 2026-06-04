@@ -54,4 +54,8 @@ export class InstallationRequestService {
     return this.http.get<ApiResponse<InstallationRequestResponse>>(`${this.baseUrl}/${id}`);
   }
 
+  getKpis(): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/kpis`);
+  }
 }
+

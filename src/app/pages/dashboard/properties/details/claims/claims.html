@@ -1,1 +1,81 @@
-<p>claims works!</p>,
+<section class="p-5 border border-gray-200 rounded-2xl bg-white grid gap-5 shadow-2xs">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+    <div>
+      <h2 class="text-base font-medium">Incidencias y Reclamos del Predio</h2>
+      <p class="text-sm text-gray-700">Historial de incidencias registradas en los suministros de este predio.</p>
+    </div>
+
+    <a [routerLink]="['/dashboard/incidencias/crear']" [queryParams]="{ propertyId: propertyId }"
+      class="text-sm px-3.5 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg inline-flex items-center gap-x-1.5 transition-colors cursor-pointer shadow-xs whitespace-nowrap">
+      Registrar incidencia
+    </a>
+  </div>
+
+  <!-- Search -->
+  <div class="flex items-center justify-between gap-x-3">
+    <component-shared-search-box placeholder="Buscar por código, tipo o título..." class="max-w-md w-full"
+      (searchQueryChange)="onSearch($event)" />
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center py-10">
+    <div
+      class="animate-spin inline-block size-6 border-[3px] border-current border-t-transparent text-blue-600 rounded-full"
+      role="status"></div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && filteredIncidents.length === 0"
+    class="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+    <svg lucideBadgeInfo class="size-8 text-gray-400 mx-auto mb-2"></svg>
+    <p class="text-sm text-gray-500 font-medium">No se encontraron incidencias registradas para este predio.</p>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!isLoading && filteredIncidents.length > 0" class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead>
+        <tr class="bg-gray-100 text-xs font-semibold uppercase">
+          <th class="py-3 px-4 text-nowrap font-semibold">Código</th>
+          <th class="py-3 px-4 text-nowrap font-semibold">Título / Tipo</th>
+          <th class="py-3 px-4 text-nowrap font-semibold">Suministro</th>
+          <th class="py-3 px-4 text-nowrap font-semibold">Fecha Reporte</th>
+          <th class="py-3 px-4 text-nowrap font-semibold">Estado</th>
+        </tr>
+      </thead>
+
+      <tbody class="text-sm divide-y divide-gray-100">
+        <tr *ngFor="let inc of filteredIncidents" class="hover:bg-gray-50/50 transition-colors">
+          <td class="py-3.5 px-4 text-nowrap font-medium text-blue-600 hover:underline">
+            <a [routerLink]="['/dashboard/incidencias', inc.id]">{{ inc.incidentNumber }}</a>
+          </td>
+          <td class="py-3.5 px-4 max-w-xs md:max-w-md">
+            <div class="flex flex-col">
+              <span class="font-medium text-gray-900 truncate" [title]="inc.title">{{ inc.title }}</span>
+              <span class="text-xs text-gray-500">{{ getTypeLabel(inc.type) }}</span>
+            </div>
+          </td>
+          <td class="py-3.5 px-4 text-nowrap text-gray-700">
+            {{ inc.supplyNumber || '-' }}
+          </td>
+          <td class="py-3.5 px-4 text-nowrap text-gray-700">
+            {{ inc.reportedDate | date: 'dd/MM/yyyy hh:mm a' }}
+          </td>
+          <td class="py-3.5 px-4 text-nowrap">
+            <span class="inline-flex items-center px-2.5 py-1.5 rounded-md text-[13px] font-medium"
+              [ngClass]="getStatusClass(inc.status)">
+              {{ getStatusLabel(inc.status) }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginator -->
+  <component-shared-paginator *ngIf="!isLoading && totalPages > 1" [page]="currentPage" [totalPages]="totalPages"
+    [totalElements]="totalElements" (pageChange)="onPageChange($event)" />
+
+</section>

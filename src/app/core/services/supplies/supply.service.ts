@@ -78,4 +78,8 @@ export class SupplyService {
   reconnect(id: string, dto: ReconnectSupplyDTO): Observable<ApiResponse<SupplyResponseDTO>> {
     return this.http.patch<ApiResponse<SupplyResponseDTO>>(`${this.baseUrl}/${id}/reconnect`, dto);
   }
+
+  getKpis(): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/kpis`);
+  }
 }
