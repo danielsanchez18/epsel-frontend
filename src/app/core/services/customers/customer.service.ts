@@ -8,23 +8,30 @@ import {
   CustomerResponse,
   CreateCustomerRequest,
   UpdateCustomerRequest,
-  CustomerType
+  CustomerType,
 } from '@interfaces/customers/customer.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CustomerService {
-
   private http = inject(HttpClient);
   private apiUrl = `${API_URL}/customers`;
 
-  create(dto: CreateCustomerRequest): Observable<ApiResponse<CustomerResponse>> {
+  create(
+    dto: CreateCustomerRequest,
+  ): Observable<ApiResponse<CustomerResponse>> {
     return this.http.post<ApiResponse<CustomerResponse>>(this.apiUrl, dto);
   }
 
-  update(id: string, dto: UpdateCustomerRequest): Observable<ApiResponse<CustomerResponse>> {
-    return this.http.put<ApiResponse<CustomerResponse>>(`${this.apiUrl}/${id}`, dto);
+  update(
+    id: string,
+    dto: UpdateCustomerRequest,
+  ): Observable<ApiResponse<CustomerResponse>> {
+    return this.http.put<ApiResponse<CustomerResponse>>(
+      `${this.apiUrl}/${id}`,
+      dto,
+    );
   }
 
   getById(id: string): Observable<ApiResponse<CustomerResponse>> {
@@ -34,12 +41,14 @@ export class CustomerService {
   search(
     page: number = 0,
     size: number = 10,
+    sort: string,
     search?: string,
-    type?: CustomerType
-  ): Observable<ApiResponse<PaginatedResponse<CustomerResponse>['data']>> { // O ajustarlo basado en tu paginated-response
+    type?: CustomerType,
+  ): Observable<ApiResponse<PaginatedResponse<CustomerResponse>['data']>> {
     let params = new HttpParams()
       .set('page', page.toString())
-      .set('size', size.toString());
+      .set('size', size.toString())
+      .set('sort', sort);
 
     if (search) {
       params = params.set('search', search);
@@ -48,7 +57,9 @@ export class CustomerService {
       params = params.set('type', type);
     }
 
-    return this.http.get<ApiResponse<PaginatedResponse<CustomerResponse>['data']>>(this.apiUrl, { params });
+    return this.http.get<
+      ApiResponse<PaginatedResponse<CustomerResponse>['data']>
+    >(this.apiUrl, { params });
   }
 
   delete(id: string): Observable<ApiResponse<void>> {
@@ -63,5 +74,3 @@ export class CustomerService {
     return this.http.get<ApiResponse<any>>(`${this.apiUrl}/${id}/kpis`);
   }
 }
-
-

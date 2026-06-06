@@ -1,6 +1,19 @@
-import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+  AbstractControl,
+  ValidatorFn,
+} from '@angular/forms';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import Swal from 'sweetalert2';
@@ -49,7 +62,7 @@ export class ComponentDashboardApplicationsAdd implements OnInit {
       internalReference: ['', [Validators.required, Validators.maxLength(100)]],
       propertyId: ['', [Validators.required]],
       requestedDate: ['', [Validators.required, this.minDateValidator()]],
-      observations: ['', [Validators.maxLength(500)]]
+      observations: ['', [Validators.maxLength(500)]],
     });
   }
 
@@ -61,7 +74,9 @@ export class ComponentDashboardApplicationsAdd implements OnInit {
       input.setHours(0, 0, 0, 0);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      return input < today ? { minDate: { required: today.toISOString().slice(0, 10) } } : null;
+      return input < today
+        ? { minDate: { required: today.toISOString().slice(0, 10) } }
+        : null;
     };
   }
 
@@ -70,37 +85,42 @@ export class ComponentDashboardApplicationsAdd implements OnInit {
   }
 
   onCustomerSearch() {
-    this.searchCustomerForm.get('documentNumber')?.valueChanges.pipe(
-      debounceTime(500),
-      distinctUntilChanged(),
-      switchMap(term => {
-        if (term && term.length >= 3) {
-          this.isSearching = true;
-          return this.customerService.search(0, 5, term);
-        } else {
+    this.searchCustomerForm
+      .get('documentNumber')
+      ?.valueChanges.pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        switchMap((term) => {
+          if (term && term.length >= 3) {
+            this.isSearching = true;
+            return this.customerService.search(0, 5, 'createdAt', term);
+          } else {
+            this.customers = [];
+            return of(null);
+          }
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          this.isSearching = false;
+          if (res && res.success && res.data) {
+            this.customers = res.data.content;
+          }
+        },
+        error: () => {
+          this.isSearching = false;
           this.customers = [];
-          return of(null);
-        }
-      })
-    ).subscribe({
-      next: (res) => {
-        this.isSearching = false;
-        if (res && res.success && res.data) {
-          this.customers = res.data.content;
-        }
-      },
-      error: () => {
-        this.isSearching = false;
-        this.customers = [];
-      }
-    });
+        },
+      });
   }
 
   selectCustomer(customer: CustomerResponse) {
     this.selectedCustomer = customer;
     this.requestForm.patchValue({ customerId: customer.id, propertyId: '' });
     this.customers = [];
-    this.searchCustomerForm.get('documentNumber')?.setValue(customer.documentNumber, { emitEvent: false });
+    this.searchCustomerForm
+      .get('documentNumber')
+      ?.setValue(customer.documentNumber, { emitEvent: false });
     this.propertiesLoaded = false;
     this.loadProperties(customer.id);
   }
@@ -114,7 +134,7 @@ export class ComponentDashboardApplicationsAdd implements OnInit {
   }
 
   loadProperties(customerId: string) {
-    this.propertyService.getAll(0, 50, '', '', customerId).subscribe({
+    this.propertyService.getAll(0, 50, '', '', '', customerId).subscribe({
       next: (res) => {
         if (res.success && res.data) {
           this.properties = res.data.content;
@@ -126,7 +146,7 @@ export class ComponentDashboardApplicationsAdd implements OnInit {
       error: () => {
         this.properties = [];
         this.propertiesLoaded = true;
-      }
+      },
     });
   }
 
@@ -142,7 +162,7 @@ export class ComponentDashboardApplicationsAdd implements OnInit {
       internalReference: this.requestForm.value.internalReference,
       propertyId: this.requestForm.value.propertyId,
       requestedDate: this.requestForm.value.requestedDate,
-      observations: this.requestForm.value.observations
+      observations: this.requestForm.value.observations,
     };
 
     this.requestService.create(payload).subscribe({
@@ -152,8 +172,10 @@ export class ComponentDashboardApplicationsAdd implements OnInit {
           Swal.fire({
             icon: 'success',
             title: '¡Éxito!',
-            text: res.message || 'Solicitud de instalación registrada exitosamente.',
-            confirmButtonColor: '#2563eb'
+            text:
+              res.message ||
+              'Solicitud de instalación registrada exitosamente.',
+            confirmButtonColor: '#2563eb',
           }).then(() => {
             this.closeButton.nativeElement.click();
             window.location.reload();
@@ -164,8 +186,10 @@ export class ComponentDashboardApplicationsAdd implements OnInit {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: res.message || 'Ocurrió un error inesperado al registrar la solicitud.',
-            confirmButtonColor: '#d33'
+            text:
+              res.message ||
+              'Ocurrió un error inesperado al registrar la solicitud.',
+            confirmButtonColor: '#d33',
           });
         }
       },
@@ -175,9 +199,9 @@ export class ComponentDashboardApplicationsAdd implements OnInit {
           icon: 'error',
           title: 'Error',
           text: err.error?.message || 'Error de conexión con el servidor.',
-          confirmButtonColor: '#d33'
+          confirmButtonColor: '#d33',
         });
-      }
+      },
     });
   }
 }

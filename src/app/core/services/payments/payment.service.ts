@@ -5,7 +5,13 @@ import { Observable } from 'rxjs';
 import { API_URL } from '@core/utils/api';
 import { ApiResponse } from '@core/interfaces/shared/api-response.interface';
 import { PaginatedResponse } from '@core/interfaces/shared/paginated-response.interface';
-import { CreatePaymentDTO, PaymentResponseDTO, PaymentMethod, PaymentStatus, CancelPaymentDTO } from '@interfaces/payments/payment.interface';
+import {
+  CreatePaymentDTO,
+  PaymentResponseDTO,
+  PaymentMethod,
+  PaymentStatus,
+  CancelPaymentDTO,
+} from '@interfaces/payments/payment.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -19,16 +25,25 @@ export class PaymentService {
   }
 
   getById(id: string): Observable<ApiResponse<PaymentResponseDTO>> {
-    return this.http.get<ApiResponse<PaymentResponseDTO>>(`${this.baseUrl}/${id}`);
+    return this.http.get<ApiResponse<PaymentResponseDTO>>(
+      `${this.baseUrl}/${id}`,
+    );
   }
 
-  cancel(id: string, dto: CancelPaymentDTO): Observable<ApiResponse<PaymentResponseDTO>> {
-    return this.http.patch<ApiResponse<PaymentResponseDTO>>(`${this.baseUrl}/${id}/cancel`, dto);
+  cancel(
+    id: string,
+    dto: CancelPaymentDTO,
+  ): Observable<ApiResponse<PaymentResponseDTO>> {
+    return this.http.patch<ApiResponse<PaymentResponseDTO>>(
+      `${this.baseUrl}/${id}/cancel`,
+      dto,
+    );
   }
 
   search(
     page: number = 0,
     size: number = 10,
+    sort: string,
     receiptNumber?: string,
     billingNumber?: string,
     supplyNumber?: string,
@@ -40,7 +55,8 @@ export class PaymentService {
   ): Observable<ApiResponse<PaginatedResponse<PaymentResponseDTO>['data']>> {
     let params = new HttpParams()
       .set('page', page.toString())
-      .set('size', size.toString());
+      .set('size', size.toString())
+      .set('sort', sort);
 
     if (receiptNumber) params = params.set('receiptNumber', receiptNumber);
     if (billingNumber) params = params.set('billingNumber', billingNumber);
@@ -51,10 +67,9 @@ export class PaymentService {
     if (startDate) params = params.set('startDate', startDate);
     if (endDate) params = params.set('endDate', endDate);
 
-    return this.http.get<ApiResponse<PaginatedResponse<PaymentResponseDTO>['data']>>(
-      this.baseUrl,
-      { params },
-    );
+    return this.http.get<
+      ApiResponse<PaginatedResponse<PaymentResponseDTO>['data']>
+    >(this.baseUrl, { params });
   }
 
   getByBilling(
@@ -66,10 +81,9 @@ export class PaymentService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get<ApiResponse<PaginatedResponse<PaymentResponseDTO>['data']>>(
-      `${this.baseUrl}/billing/${billingId}`,
-      { params },
-    );
+    return this.http.get<
+      ApiResponse<PaginatedResponse<PaymentResponseDTO>['data']>
+    >(`${this.baseUrl}/billing/${billingId}`, { params });
   }
 
   getByCustomer(
@@ -81,10 +95,8 @@ export class PaymentService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get<ApiResponse<PaginatedResponse<PaymentResponseDTO>['data']>>(
-      `${this.baseUrl}/customer/${customerId}`,
-      { params },
-    );
+    return this.http.get<
+      ApiResponse<PaginatedResponse<PaymentResponseDTO>['data']>
+    >(`${this.baseUrl}/customer/${customerId}`, { params });
   }
 }
-

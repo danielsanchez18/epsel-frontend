@@ -1,11 +1,18 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { ComponentSharedSearchBox } from "@components/shared/search-box/search-box";
-import { ComponentSharedFilters } from "@components/shared/filters/filters";
-import { ComponentSharedPaginator } from "@components/shared/paginator/paginator";
-import { LucidePrinter, LucideDownload, LucideCreditCard, LucideHandCoins } from "@lucide/angular";
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
+import { ComponentSharedFilters } from '@components/shared/filters/filters';
+import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
+import {
+  LucidePrinter,
+  LucideDownload,
+  LucideCreditCard,
+  LucideHandCoins,
+  LucideBadgeInfo,
+} from '@lucide/angular';
 import { PaymentService } from '@services/payments/payment.service';
+import { ComponentDashboardPaymentsReceipt } from '@components/dashboard/payments/receipt/receipt';
 
 @Component({
   selector: 'page-dashboard-customers-details-payments',
@@ -17,7 +24,10 @@ import { PaymentService } from '@services/payments/payment.service';
     LucidePrinter,
     LucideDownload,
     LucideCreditCard,
-    LucideHandCoins
+    LucideHandCoins,
+    LucideBadgeInfo,
+    RouterLink,
+    ComponentDashboardPaymentsReceipt,
   ],
   templateUrl: './payments.html',
 })
@@ -34,9 +44,10 @@ export class PageDashboardCustomersDetailsPayments implements OnInit {
   isLoading = true;
 
   ngOnInit(): void {
-    this.customerId = this.route.snapshot.paramMap.get('id') || 
-                      this.route.parent?.snapshot.paramMap.get('id') || 
-                      null;
+    this.customerId =
+      this.route.snapshot.paramMap.get('id') ||
+      this.route.parent?.snapshot.paramMap.get('id') ||
+      null;
     if (this.customerId) {
       this.loadPayments();
     }
@@ -46,24 +57,25 @@ export class PageDashboardCustomersDetailsPayments implements OnInit {
     if (!this.customerId) return;
     this.isLoading = true;
     this.currentPage = page;
-    this.paymentService.getByCustomer(this.customerId, page, this.pageSize).subscribe({
-      next: (res: any) => {
-        if (res.success && res.data) {
-          this.payments = res.data.content;
-          this.totalPages = res.data.totalPages;
-          this.totalElements = res.data.totalElements;
-        }
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading customer payments:', err);
-        this.isLoading = false;
-      }
-    });
+    this.paymentService
+      .getByCustomer(this.customerId, page, this.pageSize)
+      .subscribe({
+        next: (res: any) => {
+          if (res.success && res.data) {
+            this.payments = res.data.content;
+            this.totalPages = res.data.totalPages;
+            this.totalElements = res.data.totalElements;
+          }
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading customer payments:', err);
+          this.isLoading = false;
+        },
+      });
   }
 
   onPageChange(page: number): void {
     this.loadPayments(page);
   }
 }
-

@@ -7,11 +7,7 @@ import { ComponentSharedPaginator } from '@components/shared/paginator/paginator
 
 @Component({
   selector: 'component-dashboard-supplies-details-payments',
-  imports: [
-    CommonModule,
-    LucideCreditCard,
-    ComponentSharedPaginator,
-  ],
+  imports: [CommonModule, LucideCreditCard, ComponentSharedPaginator],
   templateUrl: './payments.html',
 })
 export class ComponentDashboardSuppliesDetailsPayments implements OnInit {
@@ -38,29 +34,32 @@ export class ComponentDashboardSuppliesDetailsPayments implements OnInit {
   loadPayments(page: number = 0): void {
     if (!this.supplyNumber) return;
     this.isLoading = true;
-    this.paymentService.search(
-      page,
-      this.pageSize,
-      undefined,
-      undefined,
-      this.supplyNumber
-    ).subscribe({
-      next: (res) => {
-        if (res.success && res.data) {
-          this.payments = res.data.content ?? [];
-          this.totalPages = res.data.totalPages ?? 0;
-          this.totalElements = res.data.totalElements ?? 0;
-          this.currentPage = page;
-        } else {
+    this.paymentService
+      .search(
+        page,
+        this.pageSize,
+        'paymentDate,desc',
+        undefined,
+        undefined,
+        this.supplyNumber,
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.success && res.data) {
+            this.payments = res.data.content ?? [];
+            this.totalPages = res.data.totalPages ?? 0;
+            this.totalElements = res.data.totalElements ?? 0;
+            this.currentPage = page;
+          } else {
+            this.resetList();
+          }
+          this.isLoading = false;
+        },
+        error: () => {
           this.resetList();
-        }
-        this.isLoading = false;
-      },
-      error: () => {
-        this.resetList();
-        this.isLoading = false;
-      },
-    });
+          this.isLoading = false;
+        },
+      });
   }
 
   private resetList(): void {

@@ -41,6 +41,7 @@ export class SupplyWorkOrdersService {
   search(
     page: number = 0,
     size: number = 10,
+    sort: string,
     supplyId?: string,
     type?: WorkOrderType,
     status?: WorkOrderStatus,
@@ -49,7 +50,8 @@ export class SupplyWorkOrdersService {
   > {
     let params = new HttpParams()
       .set('page', page.toString())
-      .set('size', size.toString());
+      .set('size', size.toString())
+      .set('sort', sort);
 
     if (supplyId) params = params.set('supplyId', supplyId);
     if (type) params = params.set('type', type);

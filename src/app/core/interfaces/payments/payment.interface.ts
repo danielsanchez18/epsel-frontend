@@ -27,6 +27,7 @@ export interface PaymentResponseDTO {
   paymentDate: string; // ISO 8601 LocalDateTime
   operationNumber?: string;
   observations?: string;
+  registeredById?: string;
   registeredBy?: string;
 }
 

@@ -1,6 +1,17 @@
-import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import Swal from 'sweetalert2';
@@ -15,11 +26,7 @@ import { LucideLoader } from '@lucide/angular';
 
 @Component({
   selector: 'component-dashboard-properties-add',
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    LucideLoader
-  ],
+  imports: [CommonModule, ReactiveFormsModule, LucideLoader],
   templateUrl: './add.html',
 })
 export class ComponentDashboardPropertiesAdd implements OnInit {
@@ -73,37 +80,42 @@ export class ComponentDashboardPropertiesAdd implements OnInit {
   }
 
   onCustomerSearch() {
-    this.searchCustomerForm.get('documentNumber')?.valueChanges.pipe(
-      debounceTime(500),
-      distinctUntilChanged(),
-      switchMap(term => {
-        if (term && term.length >= 3) {
-          this.isSearching = true;
-          return this.customerService.search(0, 5, term);
-        } else {
+    this.searchCustomerForm
+      .get('documentNumber')
+      ?.valueChanges.pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        switchMap((term) => {
+          if (term && term.length >= 3) {
+            this.isSearching = true;
+            return this.customerService.search(0, 5, 'createdAt,desc', term);
+          } else {
+            this.customers = [];
+            return of(null);
+          }
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          this.isSearching = false;
+          if (res && res.success && res.data) {
+            this.customers = res.data.content;
+          }
+        },
+        error: () => {
+          this.isSearching = false;
           this.customers = [];
-          return of(null);
-        }
-      })
-    ).subscribe({
-      next: (res) => {
-        this.isSearching = false;
-        if (res && res.success && res.data) {
-          this.customers = res.data.content;
-        }
-      },
-      error: () => {
-        this.isSearching = false;
-        this.customers = [];
-      }
-    });
+        },
+      });
   }
 
   selectCustomer(customer: CustomerResponse) {
     this.selectedCustomer = customer;
     this.propertyForm.patchValue({ customerId: customer.id });
     this.customers = [];
-    this.searchCustomerForm.get('documentNumber')?.setValue(customer.documentNumber, { emitEvent: false });
+    this.searchCustomerForm
+      .get('documentNumber')
+      ?.setValue(customer.documentNumber, { emitEvent: false });
   }
 
   resetCustomerSelection() {
@@ -129,7 +141,7 @@ export class ComponentDashboardPropertiesAdd implements OnInit {
             icon: 'success',
             title: '¡Éxito!',
             text: 'Predio registrado exitosamente.',
-            confirmButtonColor: '#2563eb'
+            confirmButtonColor: '#2563eb',
           }).then(() => {
             this.closeButton.nativeElement.click();
             window.location.reload();
@@ -141,10 +153,11 @@ export class ComponentDashboardPropertiesAdd implements OnInit {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: err.error?.message || 'Ocurrió un error al registrar el predio.',
-          confirmButtonColor: '#d33'
+          text:
+            err.error?.message || 'Ocurrió un error al registrar el predio.',
+          confirmButtonColor: '#d33',
         });
-      }
+      },
     });
   }
 }

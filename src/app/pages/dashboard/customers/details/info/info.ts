@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { LucideBadgeInfo, LucideCalendar1, LucideCalendarCheck, LucideUserCheck } from "@lucide/angular";
+import { LucideBadgeInfo, LucideCalendar1, LucideCalendarCheck, LucideUserCheck, LucideUser } from "@lucide/angular";
 import { ComponentDashboardCustomersDetailsKpis } from "@components/dashboard/customers/details/kpis/kpis";
 import { CustomerService } from '@services/customers/customer.service';
 import { CustomerResponse, UpdateCustomerRequest } from '@interfaces/customers/customer.interface';
@@ -15,7 +15,7 @@ import Swal from 'sweetalert2';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    LucideBadgeInfo, LucideCalendar1, LucideCalendarCheck, LucideUserCheck,
+    LucideBadgeInfo, LucideCalendar1, LucideCalendarCheck, LucideUserCheck, LucideUser,
     ComponentDashboardCustomersDetailsKpis,
     DatePipe
 ],

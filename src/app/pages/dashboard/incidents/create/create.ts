@@ -137,7 +137,7 @@ export class PageDashboardIncidentsCreate implements OnInit {
         switchMap((term) => {
           if (term && term.length >= 3) {
             this.isSearchingCustomer = true;
-            return this.customerService.search(0, 5, term);
+            return this.customerService.search(0, 5, '', term);
           } else {
             this.customers = [];
             return of(null);
@@ -279,7 +279,7 @@ export class PageDashboardIncidentsCreate implements OnInit {
 
   private loadCustomerProperties(customerId: string) {
     this.propertyService
-      .getAll(0, 100, undefined, undefined, customerId)
+      .getAll(0, 100, 'createdAt,desc', undefined, undefined, customerId)
       .subscribe({
         next: (res) => {
           if (res.success && res.data) {

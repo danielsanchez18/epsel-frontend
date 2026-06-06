@@ -35,7 +35,7 @@ export class ComponentDashboardSuppliesDetailsOperations implements OnInit {
     if (!this.supplyId) return;
     this.isLoading = true;
     this.operationsService
-      .search(page, this.pageSize, this.supplyId)
+      .search(page, this.pageSize, 'createdAt,desc', this.supplyId)
       .subscribe({
         next: (res) => {
           if (res.success && res.data) {

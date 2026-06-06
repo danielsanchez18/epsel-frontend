@@ -47,7 +47,7 @@ export class ComponentDashboardWorkersList {
           { search: this.searchQuery },
           this.currentPage,
           this.pageSize,
-          'names,asc',
+          'createdAt,desc',
         )
         .subscribe({
           next: (res: any) => {
@@ -66,7 +66,12 @@ export class ComponentDashboardWorkersList {
         });
     } else {
       this.userService
-        .getAll({ search: this.searchQuery }, page, this.pageSize, 'names,asc')
+        .getAll(
+          { search: this.searchQuery },
+          page,
+          this.pageSize,
+          'createdAt,desc',
+        )
         .subscribe({
           next: (res: any) => {
             this.users = res.data.content;

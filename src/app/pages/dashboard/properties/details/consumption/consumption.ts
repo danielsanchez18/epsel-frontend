@@ -6,7 +6,7 @@ import { catchError } from 'rxjs/operators';
 
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
-import { LucideDroplets, LucideBadgeInfo } from '@lucide/angular';
+import { LucideDroplets } from '@lucide/angular';
 
 import { SupplyService } from '@services/supplies/supply.service';
 import { MeterReadingService } from '@services/readings/meter-reading.service';
@@ -24,7 +24,6 @@ import {
     ComponentSharedSearchBox,
     ComponentSharedPaginator,
     LucideDroplets,
-    LucideBadgeInfo,
   ],
   templateUrl: './consumption.html',
 })
@@ -70,17 +69,26 @@ export class PageDashboardPropertiesDetailsConsumption implements OnInit {
           suppliesRes.data.content &&
           suppliesRes.data.content.length > 0
         ) {
-          const supplyNumbers = suppliesRes.data.content.map((s) => s.supplyNumber);
+          const supplyNumbers = suppliesRes.data.content.map(
+            (s) => s.supplyNumber,
+          );
           const readingRequests = supplyNumbers.map((sn) =>
-            (this.readingService.search as Function)(sn, undefined, undefined, undefined, undefined, page, this.pageSize)
-              .pipe(
-                catchError(() =>
-                  of({
-                    success: true,
-                    data: { content: [], totalPages: 0, totalElements: 0 },
-                  }),
-                ),
+            (this.readingService.search as Function)(
+              sn,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              page,
+              this.pageSize,
+            ).pipe(
+              catchError(() =>
+                of({
+                  success: true,
+                  data: { content: [], totalPages: 0, totalElements: 0 },
+                }),
               ),
+            ),
           );
 
           forkJoin(readingRequests).subscribe({

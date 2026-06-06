@@ -14,12 +14,14 @@ import {
   LucideBadgeAlert,
   LucideFileText,
   LucideInfo,
+  LucideDownload,
 } from '@lucide/angular';
 
 import { SupplyService } from '@core/services/supplies/supply.service';
 import { BillingService } from '@core/services/billings/billing.service';
 import { PageDashboardCustomersDetailsGeneral } from '../general/general';
 import { BillingResponseDTO } from '@interfaces/billings/billing.interface';
+import { ComponentDashboardBillingInvoice } from '@components/dashboard/billing/invoice/invoice';
 
 @Component({
   selector: 'page-dashboard-customers-details-billing',
@@ -34,6 +36,8 @@ import { BillingResponseDTO } from '@interfaces/billings/billing.interface';
     LucideFileText,
     LucideInfo,
     RouterLink,
+    LucideDownload,
+    ComponentDashboardBillingInvoice,
   ],
   templateUrl: './billing.html',
 })

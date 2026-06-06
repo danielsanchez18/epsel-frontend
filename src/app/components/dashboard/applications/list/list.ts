@@ -1,11 +1,10 @@
-
 import { Component, inject, OnInit } from '@angular/core';
-import { ComponentSharedSearchBox } from "@components/shared/search-box/search-box";
-import { ComponentSharedImport } from "@components/shared/import/import";
-import { ComponentSharedFilters } from "@components/shared/filters/filters";
-import { ComponentDashboardApplicationsTable } from "../table/table";
-import { ComponentDashboardApplicationsEmpty } from "../empty/empty";
-import { ComponentSharedPaginator } from "@components/shared/paginator/paginator";
+import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
+import { ComponentSharedImport } from '@components/shared/import/import';
+import { ComponentSharedFilters } from '@components/shared/filters/filters';
+import { ComponentDashboardApplicationsTable } from '../table/table';
+import { ComponentDashboardApplicationsEmpty } from '../empty/empty';
+import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
 import { CommonModule } from '@angular/common';
 import { InstallationRequestService } from '@services/supplies/installation-request.service';
 import { InstallationRequestResponse } from '@interfaces/supplies/installation-request.interface';
@@ -19,11 +18,11 @@ import { InstallationRequestResponse } from '@interfaces/supplies/installation-r
     ComponentSharedFilters,
     ComponentDashboardApplicationsTable,
     ComponentDashboardApplicationsEmpty,
-    ComponentSharedPaginator],
+    ComponentSharedPaginator,
+  ],
   templateUrl: './list.html',
 })
 export class ComponentDashboardApplicationsList implements OnInit {
-
   private requestService = inject(InstallationRequestService);
 
   requests: InstallationRequestResponse[] = [];
@@ -31,6 +30,7 @@ export class ComponentDashboardApplicationsList implements OnInit {
   totalPages = 0;
   totalElements = 0;
   pageSize = 10;
+  sort = 'createdAt,desc';
   searchQuery = '';
   isLoading = false;
 
@@ -40,19 +40,24 @@ export class ComponentDashboardApplicationsList implements OnInit {
 
   loadRequests(page: number = 0): void {
     this.isLoading = true;
-    this.requestService.findAll(page, this.pageSize, this.searchQuery).subscribe({
-      next: (res: any) => {
-        this.requests = res.data.content;
-        this.totalPages = res.data.totalPages;
-        this.totalElements = res.data.totalElements;
-        this.currentPage = page;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('[ComponentDashboardApplicationsList] Error loading requests', err?.message || err);
-        this.isLoading = false;
-      }
-    });
+    this.requestService
+      .findAll(page, this.pageSize, this.sort, this.searchQuery)
+      .subscribe({
+        next: (res: any) => {
+          this.requests = res.data.content;
+          this.totalPages = res.data.totalPages;
+          this.totalElements = res.data.totalElements;
+          this.currentPage = page;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error(
+            '[ComponentDashboardApplicationsList] Error loading requests',
+            err?.message || err,
+          );
+          this.isLoading = false;
+        },
+      });
   }
 
   onPageChange(page: number): void {
@@ -63,5 +68,4 @@ export class ComponentDashboardApplicationsList implements OnInit {
     this.searchQuery = query;
     this.loadRequests(0);
   }
-
 }

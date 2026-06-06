@@ -4,10 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
-import { ComponentSharedSearchBox } from "@components/shared/search-box/search-box";
-import { ComponentSharedPaginator } from "@components/shared/paginator/paginator";
+import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
+import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
 import { SupplyWorkOrdersService } from '@services/supply-work-orders/supply-work-orders.service';
-import { SupplyWorkOrderResponseDTO, WorkOrderStatus, WorkOrderType } from '@interfaces/supply-work-orders/supply-work-orders.interface';
+import {
+  SupplyWorkOrderResponseDTO,
+  WorkOrderStatus,
+  WorkOrderType,
+} from '@interfaces/supply-work-orders/supply-work-orders.interface';
 import { ComponentDashboardWorkOrdersTable } from '../table/table';
 import { ComponentDashboardWorkOrdersEmpty } from '../empty/empty';
 
@@ -24,7 +28,6 @@ import { ComponentDashboardWorkOrdersEmpty } from '../empty/empty';
   templateUrl: './list.html',
 })
 export class ComponentDashboardWorkOrdersList implements OnInit {
-
   private workOrdersService = inject(SupplyWorkOrdersService);
   private router = inject(Router);
 
@@ -33,6 +36,7 @@ export class ComponentDashboardWorkOrdersList implements OnInit {
   totalPages = 0;
   totalElements = 0;
   pageSize = 10;
+  sort: string = 'createdAt,desc';
   searchQuery = ''; // bound to supplyId / supplyNumber search
   isLoading = false;
 
@@ -66,26 +70,34 @@ export class ComponentDashboardWorkOrdersList implements OnInit {
     this.isLoading = true;
     const typeFilter = this.selectedType ? this.selectedType : undefined;
     const statusFilter = this.selectedStatus ? this.selectedStatus : undefined;
-    const searchFilter = this.searchQuery.trim() ? this.searchQuery.trim() : undefined;
+    const searchFilter = this.searchQuery.trim()
+      ? this.searchQuery.trim()
+      : undefined;
 
-    this.workOrdersService.search(
-      page,
-      this.pageSize,
-      searchFilter,
-      typeFilter,
-      statusFilter
-    ).subscribe({
-      next: (res: any) => {
-        this.workOrders = res.data.content;
-        this.totalPages = res.data.totalPages;
-        this.totalElements = res.data.totalElements;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('[ComponentWorkOrdersList] Error loading work orders', err.message);
-        this.isLoading = false;
-      }
-    });
+    this.workOrdersService
+      .search(
+        page,
+        this.pageSize,
+        this.sort,
+        searchFilter,
+        typeFilter,
+        statusFilter,
+      )
+      .subscribe({
+        next: (res: any) => {
+          this.workOrders = res.data.content;
+          this.totalPages = res.data.totalPages;
+          this.totalElements = res.data.totalElements;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error(
+            '[ComponentWorkOrdersList] Error loading work orders',
+            err.message,
+          );
+          this.isLoading = false;
+        },
+      });
   }
 
   onPageChange(page: number): void {
@@ -111,26 +123,40 @@ export class ComponentDashboardWorkOrdersList implements OnInit {
   // Translates the English types to Spanish for detailed view
   translateType(type: string): string {
     switch (type) {
-      case 'INSTALLATION': return 'Instalación';
-      case 'SUSPENSION': return 'Suspensión';
-      case 'CUT_OFF': return 'Corte';
-      case 'RECONNECTION': return 'Reconexión';
-      case 'INSPECTION': return 'Inspección';
-      case 'METER_CHANGE': return 'Cambio de Medidor';
-      default: return type;
+      case 'INSTALLATION':
+        return 'Instalación';
+      case 'SUSPENSION':
+        return 'Suspensión';
+      case 'CUT_OFF':
+        return 'Corte';
+      case 'RECONNECTION':
+        return 'Reconexión';
+      case 'INSPECTION':
+        return 'Inspección';
+      case 'METER_CHANGE':
+        return 'Cambio de Medidor';
+      default:
+        return type;
     }
   }
 
   // Translates the English status to Spanish for detailed view
   translateStatus(status: string): string {
     switch (status) {
-      case 'PENDING': return 'Pendiente';
-      case 'ASSIGNED': return 'Asignada';
-      case 'IN_PROGRESS': return 'En progreso';
-      case 'COMPLETED': return 'Completada';
-      case 'CANCELLED': return 'Cancelada';
-      case 'FAILED': return 'Fallida';
-      default: return status;
+      case 'PENDING':
+        return 'Pendiente';
+      case 'ASSIGNED':
+        return 'Asignada';
+      case 'IN_PROGRESS':
+        return 'En progreso';
+      case 'COMPLETED':
+        return 'Completada';
+      case 'CANCELLED':
+        return 'Cancelada';
+      case 'FAILED':
+        return 'Fallida';
+      default:
+        return status;
     }
   }
 
@@ -149,15 +175,25 @@ export class ComponentDashboardWorkOrdersList implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         const obs = result.value || '';
-        this.workOrdersService.assign(order.id, { observations: obs }).subscribe({
-          next: () => {
-            Swal.fire('¡Asignada!', 'La orden ha sido asignada correctamente.', 'success');
-            this.loadWorkOrders(this.currentPage);
-          },
-          error: (err) => {
-            Swal.fire('Error', err.error?.message || 'No se pudo asignar la orden.', 'error');
-          }
-        });
+        this.workOrdersService
+          .assign(order.id, { observations: obs })
+          .subscribe({
+            next: () => {
+              Swal.fire(
+                '¡Asignada!',
+                'La orden ha sido asignada correctamente.',
+                'success',
+              );
+              this.loadWorkOrders(this.currentPage);
+            },
+            error: (err) => {
+              Swal.fire(
+                'Error',
+                err.error?.message || 'No se pudo asignar la orden.',
+                'error',
+              );
+            },
+          });
       }
     });
   }
@@ -176,15 +212,25 @@ export class ComponentDashboardWorkOrdersList implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         const obs = result.value || '';
-        this.workOrdersService.start(order.id, { observations: obs }).subscribe({
-          next: () => {
-            Swal.fire('¡Iniciada!', 'La orden de trabajo ahora está en progreso.', 'success');
-            this.loadWorkOrders(this.currentPage);
-          },
-          error: (err) => {
-            Swal.fire('Error', err.error?.message || 'No se pudo iniciar la orden.', 'error');
-          }
-        });
+        this.workOrdersService
+          .start(order.id, { observations: obs })
+          .subscribe({
+            next: () => {
+              Swal.fire(
+                '¡Iniciada!',
+                'La orden de trabajo ahora está en progreso.',
+                'success',
+              );
+              this.loadWorkOrders(this.currentPage);
+            },
+            error: (err) => {
+              Swal.fire(
+                'Error',
+                err.error?.message || 'No se pudo iniciar la orden.',
+                'error',
+              );
+            },
+          });
       }
     });
   }
@@ -215,8 +261,12 @@ export class ComponentDashboardWorkOrdersList implements OnInit {
         confirmButtonColor: '#16a34a',
         cancelButtonColor: '#6b7280',
         preConfirm: () => {
-          const meterInput = document.getElementById('swal-install-meter') as HTMLInputElement;
-          const obsInput = document.getElementById('swal-install-obs') as HTMLTextAreaElement;
+          const meterInput = document.getElementById(
+            'swal-install-meter',
+          ) as HTMLInputElement;
+          const obsInput = document.getElementById(
+            'swal-install-obs',
+          ) as HTMLTextAreaElement;
 
           const meter = meterInput.value.trim();
           const obs = obsInput.value.trim();
@@ -232,19 +282,27 @@ export class ComponentDashboardWorkOrdersList implements OnInit {
 
           return {
             observations: obs,
-            meterNumber: meter
+            meterNumber: meter,
           };
-        }
+        },
       }).then((result) => {
         if (result.isConfirmed && result.value) {
           this.workOrdersService.complete(order.id, result.value).subscribe({
             next: () => {
-              Swal.fire('¡Completada!', 'La orden de instalación ha sido completada y el suministro activado.', 'success');
+              Swal.fire(
+                '¡Completada!',
+                'La orden de instalación ha sido completada y el suministro activado.',
+                'success',
+              );
               this.loadWorkOrders(this.currentPage);
             },
             error: (err) => {
-              Swal.fire('Error', err.error?.message || 'No se pudo completar la orden.', 'error');
-            }
+              Swal.fire(
+                'Error',
+                err.error?.message || 'No se pudo completar la orden.',
+                'error',
+              );
+            },
           });
         }
       });
@@ -268,15 +326,25 @@ export class ComponentDashboardWorkOrdersList implements OnInit {
       }).then((result) => {
         if (result.isConfirmed) {
           const obs = result.value;
-          this.workOrdersService.complete(order.id, { observations: obs }).subscribe({
-            next: () => {
-              Swal.fire('¡Completada!', 'La orden de trabajo ha sido completada con éxito.', 'success');
-              this.loadWorkOrders(this.currentPage);
-            },
-            error: (err) => {
-              Swal.fire('Error', err.error?.message || 'No se pudo completar la orden.', 'error');
-            }
-          });
+          this.workOrdersService
+            .complete(order.id, { observations: obs })
+            .subscribe({
+              next: () => {
+                Swal.fire(
+                  '¡Completada!',
+                  'La orden de trabajo ha sido completada con éxito.',
+                  'success',
+                );
+                this.loadWorkOrders(this.currentPage);
+              },
+              error: (err) => {
+                Swal.fire(
+                  'Error',
+                  err.error?.message || 'No se pudo completar la orden.',
+                  'error',
+                );
+              },
+            });
         }
       });
     }
@@ -302,15 +370,25 @@ export class ComponentDashboardWorkOrdersList implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         const obs = result.value;
-        this.workOrdersService.cancel(order.id, { observations: obs }).subscribe({
-          next: () => {
-            Swal.fire('¡Cancelada!', 'La orden de trabajo ha sido cancelada.', 'success');
-            this.loadWorkOrders(this.currentPage);
-          },
-          error: (err) => {
-            Swal.fire('Error', err.error?.message || 'No se pudo cancelar la orden.', 'error');
-          }
-        });
+        this.workOrdersService
+          .cancel(order.id, { observations: obs })
+          .subscribe({
+            next: () => {
+              Swal.fire(
+                '¡Cancelada!',
+                'La orden de trabajo ha sido cancelada.',
+                'success',
+              );
+              this.loadWorkOrders(this.currentPage);
+            },
+            error: (err) => {
+              Swal.fire(
+                'Error',
+                err.error?.message || 'No se pudo cancelar la orden.',
+                'error',
+              );
+            },
+          });
       }
     });
   }

@@ -62,11 +62,15 @@
           </td>
           <td class="py-4 px-6 text-right">
             <div class="flex items-center justify-end gap-x-1.5">
-              <button (click)="viewInvoice(bill)" title="Ver detalle"
+              <button (click)="$event.stopPropagation(); viewInvoice(bill)" title="Ver detalle"
                 class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
                 <svg lucideInfo class="size-4" />
               </button>
-              <button title="Imprimir/PDF"
+              <button (click)="$event.stopPropagation(); invoicePrinter.download(bill)" title="Descargar"
+                class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
+                <svg lucideDownload class="size-4" />
+              </button>
+              <button (click)="$event.stopPropagation(); invoicePrinter.print(bill)" title="Imprimir"
                 class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
                 <svg lucidePrinter class="size-4" />
               </button>
@@ -79,5 +83,8 @@
 
   <component-shared-paginator *ngIf="!isLoading && totalPages > 1" [page]="currentPage" [totalPages]="totalPages"
     [totalElements]="totalElements" (pageChange)="onPageChange($event)" />
+
+  <!-- Componente Reutilizable de Impresión de Facturas -->
+  <component-dashboard-billing-invoice #invoicePrinter />
 
 </section>

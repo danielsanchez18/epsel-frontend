@@ -3,7 +3,11 @@ import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
 
 import { PaymentService } from '@core/services/payments/payment.service';
-import { PaymentResponseDTO, PaymentMethod, PaymentStatus } from '@interfaces/payments/payment.interface';
+import {
+  PaymentResponseDTO,
+  PaymentMethod,
+  PaymentStatus,
+} from '@interfaces/payments/payment.interface';
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
 import { ComponentDashboardPaymentsTable } from '../table/table';
@@ -31,6 +35,7 @@ export class ComponentDashboardPaymentsList implements OnInit {
 
   currentPage = 0;
   pageSize = 10;
+  sort = 'createdAt,desc';
   totalPages = 0;
   totalElements = 0;
 
@@ -69,32 +74,35 @@ export class ComponentDashboardPaymentsList implements OnInit {
       paymentMethod = this.selectedMethod as PaymentMethod;
     }
 
-    this.paymentService.search(
-      page,
-      this.pageSize,
-      receiptNumber,
-      billingNumber,
-      supplyNumber,
-      customerName,
-      paymentMethod,
-      status
-    ).subscribe({
-      next: (res) => {
-        if (res.success && res.data) {
-          this.payments = res.data.content ?? [];
-          this.totalPages = res.data.totalPages ?? 0;
-          this.totalElements = res.data.totalElements ?? 0;
-          this.currentPage = page;
-        } else {
+    this.paymentService
+      .search(
+        page,
+        this.pageSize,
+        this.sort,
+        receiptNumber,
+        billingNumber,
+        supplyNumber,
+        customerName,
+        paymentMethod,
+        status,
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.success && res.data) {
+            this.payments = res.data.content ?? [];
+            this.totalPages = res.data.totalPages ?? 0;
+            this.totalElements = res.data.totalElements ?? 0;
+            this.currentPage = page;
+          } else {
+            this.resetList();
+          }
+          this.isLoading = false;
+        },
+        error: () => {
           this.resetList();
-        }
-        this.isLoading = false;
-      },
-      error: () => {
-        this.resetList();
-        this.isLoading = false;
-      }
-    });
+          this.isLoading = false;
+        },
+      });
   }
 
   private resetList(): void {
@@ -142,7 +150,7 @@ export class ComponentDashboardPaymentsList implements OnInit {
       confirmButtonColor: '#ef4444',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Sí, anular',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         // Since there is no cancel payment API in backend, we simulate it
@@ -151,7 +159,7 @@ export class ComponentDashboardPaymentsList implements OnInit {
           title: 'Pago Anulado',
           text: `El pago ${payment.receiptNumber} ha sido anulado exitosamente.`,
           icon: 'success',
-          confirmButtonColor: '#2563eb'
+          confirmButtonColor: '#2563eb',
         });
       }
     });

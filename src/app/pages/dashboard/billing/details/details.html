@@ -29,11 +29,11 @@
 
       <div class="flex items-center gap-2">
         <!-- Active Buttons (Ahora) -->
-        <button (click)="generatePDF()"
+        <button (click)="invoicePrinter.download(billing)"
           class="py-2 px-3.5 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-sm font-medium transition-colors flex items-center gap-x-2 cursor-pointer">
           <svg lucideDownload class="size-4"></svg> Generar PDF
         </button>
-        <button (click)="printInvoice()"
+        <button (click)="invoicePrinter.print(billing)"
           class="py-2 px-3.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm font-medium transition-colors flex items-center gap-x-2 cursor-pointer shadow-xs">
           <svg lucidePrinter class="size-4"></svg> Imprimir
         </button>
@@ -246,20 +246,19 @@
           </div>
           <div class="p-5 flex flex-col gap-3">
             <!-- Button: Generar PDF (Ahora) -->
-            <button (click)="generatePDF()"
+            <button (click)="invoicePrinter.download(billing)"
               class="w-full py-2.5 px-4 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium transition-colors flex items-center justify-center gap-x-2 text-sm cursor-pointer border border-gray-200">
               <svg lucideDownload class="size-4"></svg> Generar PDF
             </button>
 
             <!-- Button: Imprimir (Ahora) -->
-            <button (click)="printInvoice()"
+            <button (click)="invoicePrinter.print(billing)"
               class="w-full py-2.5 px-4 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-x-2 text-sm cursor-pointer shadow-xs">
               <svg lucidePrinter class="size-4"></svg> Imprimir Factura
             </button>
 
             <!-- Button: Registrar Pago (Active when there is a remaining balance) -->
-            <button (click)="registerPayment()"
-              *ngIf="billing.status !== 'PAID' && billing.status !== 'CANCELLED'"
+            <button (click)="registerPayment()" *ngIf="billing.status !== 'PAID' && billing.status !== 'CANCELLED'"
               class="w-full py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors flex items-center justify-center gap-x-2 text-sm cursor-pointer shadow-xs">
               <svg lucideCreditCard class="size-4"></svg> Registrar Pago
             </button>
@@ -271,14 +270,8 @@
               <svg lucideAlertTriangle class="size-4"></svg> Reclamar Factura
             </button>
 
-            <!-- Button: Anular Factura (Después - Labeled) -->
-            <button (click)="cancelInvoice()"
-              class="w-full py-2.5 px-4 rounded-lg bg-red-50 text-red-600 font-medium border border-red-100 flex items-center justify-center gap-x-2 text-sm cursor-pointer hover:bg-red-100 transition-colors">
-              <svg lucideBan class="size-4"></svg> Anular Factura <span
-                class="text-[10px] bg-red-200 text-red-800 px-1.5 py-0.5 rounded-md font-normal">Próximamente</span>
-            </button>
-
-            <p class="text-xs text-gray-400 text-center mt-1">Gestione y controle el flujo de caja e impresiones de esta factura.</p>
+            <p class="text-xs text-gray-400 text-center mt-1">Gestione y controle el flujo de caja e impresiones de esta
+              factura.</p>
           </div>
         </section>
 
@@ -289,14 +282,15 @@
   </div>
 
   <!-- Modal de Registro de Pago -->
-  <div *ngIf="showPaymentModal && billing" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 transition-opacity">
+  <div *ngIf="showPaymentModal && billing"
+    class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 transition-opacity">
     <div class="bg-white rounded-2xl border border-gray-200 shadow-xl max-w-lg w-full overflow-hidden flex flex-col">
       <!-- Header -->
       <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
         <h3 class="font-bold text-gray-800 text-base">Registrar Pago</h3>
         <button (click)="closePaymentModal()" class="text-gray-400 hover:text-gray-600 cursor-pointer">
           <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
@@ -335,8 +329,8 @@
           <!-- Monto -->
           <div class="flex flex-col gap-y-1">
             <label for="payment-amount" class="text-sm font-semibold text-gray-700">Monto a Pagar (S/.)</label>
-            <input type="number" id="payment-amount" [(ngModel)]="paymentAmount" name="paymentAmount"
-              min="0.01" [max]="getRemainingBalance()" step="0.01"
+            <input type="number" id="payment-amount" [(ngModel)]="paymentAmount" name="paymentAmount" min="0.01"
+              [max]="getRemainingBalance()" step="0.01"
               class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-hidden focus:border-blue-500 bg-white"
               placeholder="0.00" />
           </div>
@@ -380,11 +374,15 @@
         </button>
         <button (click)="submitPayment()" [disabled]="isSavingPayment"
           class="py-2.5 px-4 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition-colors flex items-center gap-x-2 cursor-pointer shadow-xs disabled:opacity-70 disabled:cursor-not-allowed">
-          <span *ngIf="isSavingPayment" class="animate-spin inline-block size-4 border-2 border-current border-t-transparent text-white rounded-full mr-1"></span>
+          <span *ngIf="isSavingPayment"
+            class="animate-spin inline-block size-4 border-2 border-current border-t-transparent text-white rounded-full mr-1"></span>
           Registrar Pago
         </button>
       </div>
     </div>
   </div>
+
+  <!-- Componente Reutilizable de Impresión de Facturas -->
+  <component-dashboard-billing-invoice #invoicePrinter />
 
 </main>

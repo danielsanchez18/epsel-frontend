@@ -136,8 +136,14 @@
             <h2 class="font-semibold text-gray-800 text-sm uppercase tracking-wide">Acciones de Gestión</h2>
           </div>
           <div class="p-5 flex flex-col gap-3">
+            <!-- Descargar -->
+            <button (click)="receiptPrinter.download(payment)"
+              class="w-full py-2.5 px-4 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium transition-colors flex items-center justify-center gap-x-2 text-sm cursor-pointer border border-gray-200">
+              <svg lucideDownload class="size-4"></svg> Descargar Recibo
+            </button>
+
             <!-- Imprimir -->
-            <button (click)="printReceipt()"
+            <button (click)="receiptPrinter.print(payment)"
               class="w-full py-2.5 px-4 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-x-2 text-sm cursor-pointer shadow-xs">
               <svg lucidePrinter class="size-4"></svg> Imprimir Recibo
             </button>
@@ -158,5 +164,8 @@
     </div>
 
   </div>
+
+  <!-- Componente Reutilizable de Impresión de Recibos -->
+  <component-dashboard-payments-receipt #receiptPrinter />
 
 </main>

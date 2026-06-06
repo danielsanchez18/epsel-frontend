@@ -9,6 +9,10 @@ export interface CustomerResponse {
   email?: string;
   createdAt: string;
   updatedAt: string;
+  createdBy?: string;
+  updatedBy?: string;
+  createdByName?: string;
+  updatedByName?: string;
 }
 
 export interface CreateCustomerRequest {

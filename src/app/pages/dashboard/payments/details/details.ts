@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import {
   LucideDollarSign,
   LucidePrinter,
+  LucideDownload,
   LucideBan,
   LucideFileText,
   LucideCreditCard,
@@ -15,6 +16,7 @@ import { PaymentService } from '@core/services/payments/payment.service';
 import { BillingService } from '@core/services/billings/billing.service';
 import { PaymentResponseDTO } from '@interfaces/payments/payment.interface';
 import { BillingResponseDTO } from '@interfaces/billings/billing.interface';
+import { ComponentDashboardPaymentsReceipt } from '@components/dashboard/payments/receipt/receipt';
 
 @Component({
   selector: 'page-dashboard-payments-details',
@@ -23,9 +25,11 @@ import { BillingResponseDTO } from '@interfaces/billings/billing.interface';
     RouterLink,
     LucideDollarSign,
     LucidePrinter,
+    LucideDownload,
     LucideBan,
     LucideFileText,
     LucideCreditCard,
+    ComponentDashboardPaymentsReceipt,
   ],
   templateUrl: './details.html',
 })
@@ -150,18 +154,6 @@ export class PageDashboardPaymentsDetails implements OnInit, OnDestroy {
       'Diciembre',
     ];
     return `${months[month - 1]} ${year}`;
-  }
-
-  printReceipt(): void {
-    if (!this.payment) return;
-    Swal.fire({
-      title: 'Imprimir Recibo',
-      text: `Enviando recibo ${this.payment.receiptNumber} a la cola de impresión...`,
-      icon: 'info',
-      confirmButtonColor: '#2563eb',
-      timer: 2000,
-      showConfirmButton: false,
-    });
   }
 
   cancelPayment(): void {

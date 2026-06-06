@@ -36,7 +36,7 @@ export class ComponentDashboardPaymentsKpis implements OnInit {
   }
 
   loadKPIs(): void {
-    this.paymentService.search(0, 1000).subscribe({
+    this.paymentService.search(0, 1000, 'createdAt,desc').subscribe({
       next: (res) => {
         if (res.success && res.data && res.data.content) {
           this.calculate(res.data.content);

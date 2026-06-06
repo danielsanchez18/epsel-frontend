@@ -12,7 +12,6 @@ import {
   LucideHistory,
   LucidePrinter,
   LucideDownload,
-  LucideBan,
   LucideCreditCard,
   LucideAlertTriangle,
 } from '@lucide/angular';
@@ -27,6 +26,7 @@ import { BillingResponseDTO } from '@interfaces/billings/billing.interface';
 import { SupplyDetailsDTO } from '@interfaces/supplies/supply.interface';
 import { MeterReadingResponseDTO } from '@interfaces/readings/meter-reading.interface';
 import { PaymentMethod } from '@interfaces/payments/payment.interface';
+import { ComponentDashboardBillingInvoice } from '@components/dashboard/billing/invoice/invoice';
 
 @Component({
   selector: 'page-dashboard-billing-details',
@@ -40,9 +40,9 @@ import { PaymentMethod } from '@interfaces/payments/payment.interface';
     LucideHistory,
     LucidePrinter,
     LucideDownload,
-    LucideBan,
     LucideCreditCard,
     LucideAlertTriangle,
+    ComponentDashboardBillingInvoice,
   ],
   templateUrl: './details.html',
 })
@@ -189,24 +189,6 @@ export class PageDashboardBillingDetails implements OnInit, OnDestroy {
   }
 
   // Action placeholders
-  generatePDF(): void {
-    Swal.fire({
-      title: 'Generar PDF',
-      text: 'Se procederá a generar el archivo PDF de la factura.',
-      icon: 'success',
-      confirmButtonColor: '#2563eb',
-    });
-  }
-
-  printInvoice(): void {
-    Swal.fire({
-      title: 'Imprimir Factura',
-      text: 'Enviando documento a la cola de impresión...',
-      icon: 'info',
-      confirmButtonColor: '#2563eb',
-    });
-  }
-
   registerPayment(): void {
     if (!this.billing) return;
     this.paymentAmount = this.getRemainingBalance();
