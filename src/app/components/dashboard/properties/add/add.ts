@@ -22,11 +22,12 @@ import { ServiceZoneService } from '@services/settings/service-zone.service';
 
 import { CustomerResponse } from '@interfaces/customers/customer.interface';
 import { ServiceZoneResponse } from '@interfaces/settings/settings.interface';
-import { LucideLoader } from '@lucide/angular';
+import { LucideLoader, LucideMapPin, LucideKeyboard, LucideSearch } from '@lucide/angular';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'component-dashboard-properties-add',
-  imports: [CommonModule, ReactiveFormsModule, LucideLoader],
+  imports: [CommonModule, ReactiveFormsModule, LucideLoader, LucideMapPin, LucideKeyboard, LucideSearch],
   templateUrl: './add.html',
 })
 export class ComponentDashboardPropertiesAdd implements OnInit {
@@ -46,6 +47,11 @@ export class ComponentDashboardPropertiesAdd implements OnInit {
 
   isSearching = false;
   isLoading = false;
+  isSearchingAddress = false;
+
+  mapMode = false;
+  private map: L.Map | undefined;
+  private marker: L.Marker | undefined;
 
   constructor() {
     this.searchCustomerForm = this.fb.group({
@@ -67,6 +73,125 @@ export class ComponentDashboardPropertiesAdd implements OnInit {
   ngOnInit() {
     this.loadZones();
     this.onCustomerSearch();
+    this.fixLeafletIcons();
+  }
+
+  fixLeafletIcons() {
+    const iconDefault = L.icon({
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      tooltipAnchor: [16, -28],
+      shadowSize: [41, 41]
+    });
+    L.Marker.prototype.options.icon = iconDefault;
+  }
+
+  toggleMapMode() {
+    this.mapMode = !this.mapMode;
+    if (this.mapMode) {
+      setTimeout(() => {
+        this.initMap();
+      }, 100);
+    }
+  }
+
+  initMap() {
+    if (this.map) {
+      this.map.invalidateSize();
+      return;
+    }
+
+    // Default to Chiclayo
+    const defaultLat = -6.77137;
+    const defaultLng = -79.84088;
+
+    const lat = this.propertyForm.get('latitude')?.value || defaultLat;
+    const lng = this.propertyForm.get('longitude')?.value || defaultLng;
+
+    this.map = L.map('property-map').setView([lat, lng], 14);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+    }).addTo(this.map);
+
+    if (this.propertyForm.get('latitude')?.value && this.propertyForm.get('longitude')?.value) {
+      this.marker = L.marker([lat, lng]).addTo(this.map);
+    }
+
+    this.map.on('click', (e: L.LeafletMouseEvent) => {
+      const { lat, lng } = e.latlng;
+      
+      if (this.marker) {
+        this.marker.setLatLng([lat, lng]);
+      } else {
+        this.marker = L.marker([lat, lng]).addTo(this.map!);
+      }
+
+      this.propertyForm.patchValue({
+        latitude: parseFloat(lat.toFixed(6)),
+        longitude: parseFloat(lng.toFixed(6))
+      });
+    });
+  }
+
+  searchAddressOnMap() {
+    const address = this.propertyForm.get('address')?.value;
+    if (!address) return;
+
+    this.isSearchingAddress = true;
+    
+    // Agregamos "Peru" para mejorar la precisión para Epsel
+    const query = encodeURIComponent(`${address}, Peru`);
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+      .then(res => res.json())
+      .then(data => {
+        this.isSearchingAddress = false;
+        if (data && data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lng = parseFloat(data[0].lon);
+          
+          this.propertyForm.patchValue({ latitude: lat, longitude: lng });
+          
+          if (!this.mapMode) {
+            this.mapMode = true;
+            setTimeout(() => {
+              this.initMap();
+              if (this.map) {
+                this.map.setView([lat, lng], 16);
+              }
+            }, 100);
+          } else {
+            if (this.map) {
+              this.map.setView([lat, lng], 16);
+              if (this.marker) {
+                this.marker.setLatLng([lat, lng]);
+              } else {
+                this.marker = L.marker([lat, lng]).addTo(this.map);
+              }
+            }
+          }
+        } else {
+          Swal.fire({
+            icon: 'info',
+            title: 'Sin resultados',
+            text: 'No se pudo ubicar la dirección ingresada en el mapa.',
+            confirmButtonColor: '#2563eb',
+          });
+        }
+      })
+      .catch(err => {
+        this.isSearchingAddress = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un error al buscar la dirección.',
+          confirmButtonColor: '#d33',
+        });
+      });
   }
 
   loadZones() {

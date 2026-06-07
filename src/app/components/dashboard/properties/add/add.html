@@ -1,6 +1,7 @@
 <div
-  class="hs-overlay-animation-target hs-overlay-open:scale-100 hs-overlay-open:opacity-100 scale-95 opacity-0 ease-in-out transition-all duration-200 sm:max-w-4xl sm:w-full m-3 sm:mx-auto min-h-[calc(100%-56px)] flex items-center">
-  <form [formGroup]="propertyForm" (ngSubmit)="onSubmit()" class="w-full flex flex-col bg-white border border-gray-300 shadow-2xs rounded-xl pointer-events-auto">
+  class="hs-overlay-animation-target hs-overlay-open:scale-100 hs-overlay-open:opacity-100 scale-95 opacity-0 ease-in-out transition-all duration-200 sm:max-w-4xl sm:w-full m-3 sm:mx-auto min-h-[calc(100%-56px)] overflow-y-auto flex items-center">
+  <form [formGroup]="propertyForm" (ngSubmit)="onSubmit()"
+    class="w-full flex flex-col bg-white border border-gray-300 shadow-2xs rounded-xl pointer-events-auto">
 
     <!-- Header del modal -->
     <div class="flex justify-between items-center py-3 px-5 border-b border-gray-200">
@@ -18,7 +19,7 @@
     </div>
 
     <!-- Contenido del modal -->
-    <div class="overflow-y-auto grid sm:grid-cols-2">
+    <div class="overflow-y-auto grid sm:grid-cols-2 max-h-[calc(100vh-200px)]">
 
       <!-- Buscar cliente -->
       <div class="flex flex-col gap-y-5 h-full border-r border-gray-200 p-5">
@@ -44,7 +45,11 @@
           </div>
           <button type="button" (click)="resetCustomerSelection()"
             class="ml-auto size-7 flex justify-center items-center rounded-full bg-gray-100  hover:bg-gray-200">
-            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
           </button>
         </div>
 
@@ -59,7 +64,8 @@
               Asignar
             </button>
           </div>
-           <div *ngIf="customers.length === 0 && !isSearching && searchCustomerForm.get('documentNumber')?.value" class="text-center py-4 text-sm text-gray-500">
+          <div *ngIf="customers.length === 0 && !isSearching && searchCustomerForm.get('documentNumber')?.value"
+            class="text-center py-4 text-sm text-gray-500">
             No se encontraron clientes.
           </div>
         </div>
@@ -70,52 +76,105 @@
         <div class="grid grid-cols-2 gap-5">
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium">Tipo de Propiedad <span class="text-red-500">*</span></label>
-            <select formControlName="type" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select formControlName="type"
+              class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="" disabled>Selecciona un tipo</option>
               <option value="HOUSE">Casa</option>
               <option value="BUSINESS">Comercial</option>
               <option value="INDUSTRIAL">Industrial</option>
             </select>
-            <span *ngIf="propertyForm.get('type')?.invalid && propertyForm.get('type')?.touched" class="text-xs text-red-500">Tipo es requerido.</span>
+            <span *ngIf="propertyForm.get('type')?.invalid && propertyForm.get('type')?.touched"
+              class="text-xs text-red-500">Tipo es requerido.</span>
           </div>
 
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium">Zona <span class="text-red-500">*</span></label>
-            <select formControlName="zoneId" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select formControlName="zoneId"
+              class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="" disabled>Selecciona una zona</option>
               <option *ngFor="let zone of zones" [value]="zone.id">{{ zone.name }}</option>
             </select>
-            <span *ngIf="propertyForm.get('zoneId')?.invalid && propertyForm.get('zoneId')?.touched" class="text-xs text-red-500">Zona es requerida.</span>
+            <span *ngIf="propertyForm.get('zoneId')?.invalid && propertyForm.get('zoneId')?.touched"
+              class="text-xs text-red-500">Zona es requerida.</span>
           </div>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium">Dirección <span class="text-red-500">*</span></label>
-          <input type="text" formControlName="address" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm" placeholder="Ej: Av. Principal 123, Lima" />
-          <span *ngIf="propertyForm.get('address')?.invalid && propertyForm.get('address')?.touched" class="text-xs text-red-500">Dirección es requerida.</span>
         </div>
 
         <div class="flex flex-col gap-2">
           <label class="text-sm font-medium">Código Catastral <span class="text-red-500">*</span></label>
-          <input type="text" formControlName="cadastralCode" maxlength="50" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm" placeholder="Ej: P0123456" />
-          <span *ngIf="propertyForm.get('cadastralCode')?.hasError('required') && propertyForm.get('cadastralCode')?.touched" class="text-xs text-red-500">Código es requerido.</span>
-          <span *ngIf="propertyForm.get('cadastralCode')?.hasError('maxlength') && propertyForm.get('cadastralCode')?.touched" class="text-xs text-red-500">Máximo 50 caracteres.</span>
+          <input type="text" formControlName="cadastralCode" maxlength="50"
+            class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: P0123456" />
+          <span
+            *ngIf="propertyForm.get('cadastralCode')?.hasError('required') && propertyForm.get('cadastralCode')?.touched"
+            class="text-xs text-red-500">Código es requerido.</span>
+          <span
+            *ngIf="propertyForm.get('cadastralCode')?.hasError('maxlength') && propertyForm.get('cadastralCode')?.touched"
+            class="text-xs text-red-500">Máximo 50 caracteres.</span>
         </div>
 
-        <div class="grid grid-cols-2 gap-5">
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-medium">Latitud</label>
-            <input type="number" formControlName="latitude" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm" placeholder="Ej: -12.046374" />
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium">Dirección <span class="text-red-500">*</span></label>
+          <div class="flex w-full">
+            <input type="text" formControlName="address"
+              class="w-full border border-gray-200 rounded-l-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 z-10 focus:z-20"
+              placeholder="Ej: Av. Principal 123, Chiclayo" />
+            <button type="button" (click)="searchAddressOnMap()" [disabled]="isSearchingAddress || !propertyForm.get('address')?.value"
+              class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 border border-gray-200 border-l-0 rounded-r-lg flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-0 focus:z-20 focus:outline-none focus:ring-2 focus:ring-blue-500" title="Buscar en mapa">
+              <svg lucideSearch *ngIf="!isSearchingAddress" class="size-4"></svg>
+              <svg lucideLoader *ngIf="isSearchingAddress" class="animate-spin size-4"></svg>
+            </button>
           </div>
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-medium">Longitud</label>
-            <input type="number" formControlName="longitude" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm" placeholder="Ej: -77.042793" />
+          <span *ngIf="propertyForm.get('address')?.invalid && propertyForm.get('address')?.touched"
+            class="text-xs text-red-500">Dirección es requerida.</span>
+        </div>
+
+        <div class="border-t border-gray-100 pt-4 mt-2">
+          <div class="flex items-center justify-between mb-3">
+            <label class="text-sm font-semibold text-gray-800">Coordenadas de Ubicación</label>
+            <div class="flex bg-gray-100 rounded-lg p-0.5">
+              <button type="button" (click)="mapMode = false"
+                [ngClass]="{'bg-white shadow-xs text-blue-600': !mapMode, 'text-gray-500 hover:text-gray-700': mapMode}"
+                class="flex items-center gap-x-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors">
+                <svg lucideKeyboard class="size-3.5"></svg> Manual
+              </button>
+              <button type="button" (click)="toggleMapMode()"
+                [ngClass]="{'bg-white shadow-xs text-blue-600': mapMode, 'text-gray-500 hover:text-gray-700': !mapMode}"
+                class="flex items-center gap-x-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors">
+                <svg lucideMapPin class="size-3.5"></svg> Mapa
+              </button>
+            </div>
+          </div>
+
+          <!-- Mapa -->
+          <div [ngClass]="{'hidden': !mapMode}"
+            class="w-full h-[220px] bg-gray-100 rounded-xl border border-gray-200 overflow-hidden mb-3 relative">
+            <div id="property-map" class="w-full h-full z-0"></div>
+            <div
+              class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full text-[11px] font-medium text-gray-700 z-10 pointer-events-none shadow-sm border border-gray-100 flex items-center gap-x-1.5">
+              <svg lucideMapPin class="size-3 text-blue-600"></svg>
+              Haz clic en el mapa para ubicar el predio
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-5">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[13px] font-medium text-gray-600">Latitud</label>
+              <input type="number" formControlName="latitude"
+                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [ngClass]="{'bg-gray-50': mapMode}" [readonly]="mapMode" placeholder="Ej: -12.046374" />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[13px] font-medium text-gray-600">Longitud</label>
+              <input type="number" formControlName="longitude"
+                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [ngClass]="{'bg-gray-50': mapMode}" [readonly]="mapMode" placeholder="Ej: -77.042793" />
+            </div>
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
           <label class="text-sm font-medium">Referencia</label>
-          <textarea formControlName="reference" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm" placeholder="Ej: Cerca al parque, frente a la iglesia, etc." rows="2"></textarea>
+          <textarea formControlName="reference" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm"
+            placeholder="Ej: Cerca al parque, frente a la iglesia, etc." rows="2"></textarea>
         </div>
 
         <div class="flex justify-end items-center gap-x-2 mt-auto">
