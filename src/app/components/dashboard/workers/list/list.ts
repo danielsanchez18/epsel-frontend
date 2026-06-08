@@ -4,11 +4,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
 import { ComponentSharedFilters } from '@components/shared/filters/filters';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
-import { ComponentSharedImport } from '@components/shared/import/import';
+import { ComponentSharedExport, ExportOptions } from '@components/shared/export/export';
 import { ComponentDashboardWorkersTable } from '../table/table';
 import { UserService } from '@services/users/user.service';
 import { UserResponse } from '@interfaces/users/user.interface';
 import { ComponentDashboardWorkersEmpty } from '../empty/empty';
+import { ExportService } from '@core/services/utils/export.service';
 
 @Component({
   selector: 'component-dashboard-workers-list',
@@ -18,15 +19,15 @@ import { ComponentDashboardWorkersEmpty } from '../empty/empty';
     ComponentDashboardWorkersTable,
     ComponentSharedSearchBox,
     ComponentSharedFilters,
-    ComponentSharedImport,
+    ComponentSharedExport,
     ComponentSharedPaginator,
     ComponentDashboardWorkersEmpty,
-    ComponentDashboardWorkersTable,
   ],
   templateUrl: './list.html',
 })
 export class ComponentDashboardWorkersList implements OnInit {
   private userService = inject(UserService);
+  private exportService = inject(ExportService);
   private fb = inject(FormBuilder);
 
   users: UserResponse[] = [];
@@ -126,5 +127,53 @@ export class ComponentDashboardWorkersList implements OnInit {
     this.activeFiltersCount = 0;
     this.currentPage = 0;
     this.loadUsers(0);
+  }
+
+  handleExport(options: ExportOptions): void {
+    const filename = `trabajadores_export_${new Date().getTime()}`;
+
+    if (options.scope === 'CURRENT_PAGE') {
+      this.doExport(this.users, options.format, filename);
+    } else {
+      // Export all records
+      const formValues = this.filterForm.value;
+      const activeFilters: any = {};
+      Object.keys(formValues).forEach(key => {
+        if (formValues[key]) activeFilters[key] = formValues[key];
+      });
+
+      const searchParams = { ...activeFilters };
+      if (this.searchQuery.trim()) searchParams.search = this.searchQuery;
+      
+      this.userService.getAll(searchParams, 0, 10000, 'createdAt,desc')
+        .subscribe({
+          next: (res: any) => {
+            this.doExport(res.data.content, options.format, filename);
+          },
+          error: (err) => {
+            console.error('Error fetching all workers for export', err);
+          }
+        });
+    }
+  }
+
+  private doExport(data: any[], format: 'CSV' | 'EXCEL', filename: string): void {
+    const exportData = data.map(w => {
+      return {
+        'Documento': w.documentNumber || '',
+        'Nombre Completo': `${w.name} ${w.lastName}`,
+        'Email': w.email || '',
+        'Teléfono': w.phone || '',
+        'Rol': w.role?.name || '',
+        'Estado': w.isActive ? 'Activo' : 'Inactivo',
+        'Fecha Registro': w.createdAt ? new Date(w.createdAt).toLocaleDateString() : ''
+      };
+    });
+
+    if (format === 'CSV') {
+      this.exportService.exportToCsv(exportData, filename);
+    } else {
+      this.exportService.exportToExcel(exportData, filename);
+    }
   }
 }

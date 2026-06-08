@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
 import { ComponentSharedFilters } from '@components/shared/filters/filters';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
-import { ComponentSharedImport } from '@components/shared/import/import';
+import { ComponentSharedExport, ExportOptions } from '@components/shared/export/export';
 import { ComponentDashboardSuppliesEmpty } from '@components/dashboard/supplies/empty/empty';
 
 import { SupplyService } from '@core/services/supplies/supply.service';
@@ -16,6 +16,7 @@ import {
 import { ServiceZoneService } from '@core/services/settings/service-zone.service';
 import { ComponentDashboardSuppliesTable } from '../table/table';
 import { ServiceZoneResponse } from '@interfaces/settings/settings.interface';
+import { ExportService } from '@core/services/utils/export.service';
 
 @Component({
   selector: 'component-dashboard-supplies-list',
@@ -24,7 +25,7 @@ import { ServiceZoneResponse } from '@interfaces/settings/settings.interface';
     ReactiveFormsModule,
     ComponentSharedSearchBox,
     ComponentSharedFilters,
-    ComponentSharedImport,
+    ComponentSharedExport,
     ComponentSharedPaginator,
     ComponentDashboardSuppliesTable,
     ComponentDashboardSuppliesEmpty,
@@ -34,6 +35,7 @@ import { ServiceZoneResponse } from '@interfaces/settings/settings.interface';
 export class ComponentDashboardSuppliesList implements OnInit {
   private supplyService = inject(SupplyService);
   private zoneService = inject(ServiceZoneService);
+  private exportService = inject(ExportService);
   private fb = inject(FormBuilder);
 
   supplies: SupplyResponseDTO[] = [];
@@ -133,5 +135,57 @@ export class ComponentDashboardSuppliesList implements OnInit {
     this.activeFiltersCount = 0;
     this.currentPage = 0;
     this.loadSupplies(0);
+  }
+
+  handleExport(options: ExportOptions): void {
+    const filename = `suministros_export_${new Date().getTime()}`;
+
+    if (options.scope === 'CURRENT_PAGE') {
+      this.doExport(this.supplies, options.format, filename);
+    } else {
+      // Export all records
+      const statusFilter = this.filterForm.value.status || undefined;
+      const zoneIdFilter = this.filterForm.value.zoneId || undefined;
+      
+      this.supplyService.findAll(0, 10000, this.searchQuery.trim() || undefined, statusFilter as SupplyStatus, zoneIdFilter)
+        .subscribe({
+          next: (res) => {
+            if (res.success && res.data) {
+              this.doExport(res.data.content ?? [], options.format, filename);
+            }
+          },
+          error: (err) => {
+            console.error('Error fetching all supplies for export', err);
+          }
+        });
+    }
+  }
+
+  private doExport(data: any[], format: 'CSV' | 'EXCEL', filename: string): void {
+    const exportData = data.map(s => {
+      let estado = s.status;
+      if (estado === 'ACTIVE') estado = 'Activo';
+      else if (estado === 'INACTIVE') estado = 'Inactivo';
+      else if (estado === 'SUSPENDED') estado = 'Suspendido';
+      else if (estado === 'CUT') estado = 'Cortado';
+
+      return {
+        'Código Suministro': s.supplyCode || '',
+        'Cliente': s.customerName || '',
+        'Documento Cliente': s.customerDocumentNumber || '',
+        'Predio': s.propertyCode || '',
+        'Zona': s.zoneName || '',
+        'Estado': estado,
+        'Tarifa Base': s.baseTariff || 0,
+        'Fecha Alta': s.connectionDate ? new Date(s.connectionDate).toLocaleDateString() : '',
+        'Última Lectura': s.lastReading || '-'
+      };
+    });
+
+    if (format === 'CSV') {
+      this.exportService.exportToCsv(exportData, filename);
+    } else {
+      this.exportService.exportToExcel(exportData, filename);
+    }
   }
 }

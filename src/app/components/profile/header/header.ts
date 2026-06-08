@@ -11,7 +11,6 @@ import {
   LucideUserCircle,
   LucideLogOut,
   LucideUser,
-  LucideSettings,
   LucideLock,
 } from '@lucide/angular';
 
@@ -23,7 +22,6 @@ import {
     LucideCircleQuestionMark,
     LucideUserCircle,
     LucideUser,
-    LucideSettings,
     LucideLock,
     PublicUrlPipe,
     LucideLogOut,

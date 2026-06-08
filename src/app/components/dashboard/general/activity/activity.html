@@ -31,13 +31,7 @@
                         class="relative group flex gap-x-3 rounded-md bg-gray-100 px-4 py-2">
 
                         <!-- Timeline Badge/Dot -->
-                        <span class="mt-0.5 text-gray-500" [ngClass]="{
-                                '': act.action === 'Pago',
-                                '': act.action === 'Factura',
-                                '': act.action === 'Lectura',
-                                '': act.action === 'Orden',
-                                '': act.action !== 'Pago' && act.action !== 'Factura' && act.action !== 'Lectura' && act.action !== 'Orden'
-                            }">
+                        <span class="mt-0.5 text-gray-500">
                             <svg *ngIf="act.action === 'Pago'" lucideCreditCard class="size-4.5" />
                             <svg *ngIf="act.action === 'Factura'" lucideFileText class="size-4.5" />
                             <svg *ngIf="act.action === 'Lectura'" lucideDroplets class="size-4.5" />
@@ -49,13 +43,7 @@
                         <!-- Activity Text -->
                         <div class="">
                             <div class="flex items-center gap-x-3">
-                                <span class="text-sm font-medium" [ngClass]="{
-                                    '': act.action === 'Pago',
-                                    '': act.action === 'Factura',
-                                    '': act.action === 'Lectura',
-                                    '': act.action === 'Orden',
-                                    '': act.action !== 'Pago' && act.action !== 'Factura' && act.action !== 'Lectura' && act.action !== 'Orden'
-                                }">
+                                <span class="text-sm font-medium">
                                     {{ act.action }}
                                 </span>
 

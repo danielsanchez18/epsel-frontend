@@ -4,11 +4,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
 import { ComponentSharedFilters } from '@components/shared/filters/filters';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
-import { ComponentSharedImport } from '@components/shared/import/import';
+import { ComponentSharedExport, ExportOptions } from '@components/shared/export/export';
 import { ComponentDashboardPropertiesTable } from '../table/table';
 import { ComponentDashboardPropertiesEmpty } from '../empty/empty';
 import { PropertyService } from '@services/properties/property.service';
 import { PropertyResponse, PropertyType } from '@interfaces/properties/properties.interface';
+import { ExportService } from '@core/services/utils/export.service';
 
 @Component({
   selector: 'component-dashboard-properties-list',
@@ -17,7 +18,7 @@ import { PropertyResponse, PropertyType } from '@interfaces/properties/propertie
     ReactiveFormsModule,
     ComponentSharedSearchBox,
     ComponentSharedFilters,
-    ComponentSharedImport,
+    ComponentSharedExport,
     ComponentSharedPaginator,
     ComponentDashboardPropertiesTable,
     ComponentDashboardPropertiesEmpty,
@@ -26,6 +27,7 @@ import { PropertyResponse, PropertyType } from '@interfaces/properties/propertie
 })
 export class ComponentDashboardPropertiesList implements OnInit {
   private propertyService = inject(PropertyService);
+  private exportService = inject(ExportService);
   private fb = inject(FormBuilder);
 
   properties: PropertyResponse[] = [];
@@ -103,5 +105,52 @@ export class ComponentDashboardPropertiesList implements OnInit {
     this.activeFiltersCount = 0;
     this.currentPage = 0;
     this.loadProperties(0);
+  }
+
+  handleExport(options: ExportOptions): void {
+    const filename = `predios_export_${new Date().getTime()}`;
+
+    if (options.scope === 'CURRENT_PAGE') {
+      this.doExport(this.properties, options.format, filename);
+    } else {
+      // Export all records
+      const typeFilter = this.filterForm.value.type || undefined;
+      
+      this.propertyService.getAll(0, 10000, this.sort, this.searchQuery || undefined, typeFilter)
+        .subscribe({
+          next: (res: any) => {
+            this.doExport(res.data.content, options.format, filename);
+          },
+          error: (err) => {
+            console.error('Error fetching all properties for export', err);
+          }
+        });
+    }
+  }
+
+  private doExport(data: any[], format: 'CSV' | 'EXCEL', filename: string): void {
+    const exportData = data.map(p => {
+      let tipo = p.type;
+      if (tipo === 'RESIDENTIAL') tipo = 'Residencial';
+      else if (tipo === 'COMMERCIAL') tipo = 'Comercial';
+      else if (tipo === 'INDUSTRIAL') tipo = 'Industrial';
+      else if (tipo === 'STATE') tipo = 'Estatal';
+
+      return {
+        'Código de Predio': p.propertyCode || '',
+        'Tipo': tipo,
+        'Dirección': p.address || '',
+        'Cliente': p.customer?.name || p.customer?.businessName || '',
+        'Documento Cliente': p.customer?.documentNumber || '',
+        'Estado': p.isActive ? 'Activo' : 'Inactivo',
+        'Fecha Creación': p.createdAt ? new Date(p.createdAt).toLocaleDateString() : ''
+      };
+    });
+
+    if (format === 'CSV') {
+      this.exportService.exportToCsv(exportData, filename);
+    } else {
+      this.exportService.exportToExcel(exportData, filename);
+    }
   }
 }

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { DashboardActivity } from '@interfaces/dashboard/dashboard.interface';
 import {
-  LucideClock,
   LucideCreditCard,
   LucideFileText,
   LucideDroplets,
@@ -16,7 +15,6 @@ import {
   selector: 'component-dashboard-general-activity',
   imports: [
     CommonModule,
-    LucideClock,
     LucideCreditCard,
     LucideFileText,
     LucideDroplets,

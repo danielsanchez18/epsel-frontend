@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 
 import { PaymentService } from '@core/services/payments/payment.service';
@@ -10,15 +11,21 @@ import {
 } from '@interfaces/payments/payment.interface';
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
+import { ComponentSharedFilters } from '@components/shared/filters/filters';
+import { ComponentSharedExport, ExportOptions } from '@components/shared/export/export';
 import { ComponentDashboardPaymentsTable } from '../table/table';
 import { ComponentDashboardPaymentsEmpty } from '../empty/empty';
+import { ExportService } from '@core/services/utils/export.service';
 
 @Component({
   selector: 'component-dashboard-payments-list',
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     ComponentSharedSearchBox,
     ComponentSharedPaginator,
+    ComponentSharedFilters,
+    ComponentSharedExport,
     ComponentDashboardPaymentsTable,
     ComponentDashboardPaymentsEmpty,
   ],
@@ -26,18 +33,30 @@ import { ComponentDashboardPaymentsEmpty } from '../empty/empty';
 })
 export class ComponentDashboardPaymentsList implements OnInit {
   private paymentService = inject(PaymentService);
+  private exportService = inject(ExportService);
+  private fb = inject(FormBuilder);
 
   payments: PaymentResponseDTO[] = [];
   isLoading = false;
   searchQuery = '';
-  selectedStatus = '';
-  selectedMethod = '';
 
   currentPage = 0;
   pageSize = 10;
   sort = 'createdAt,desc';
   totalPages = 0;
   totalElements = 0;
+
+  filterForm: FormGroup;
+  activeFiltersCount = 0;
+
+  constructor() {
+    this.filterForm = this.fb.group({
+      status: [''],
+      method: [''],
+      startDate: [''],
+      endDate: ['']
+    });
+  }
 
   ngOnInit(): void {
     this.loadData();
@@ -50,8 +69,6 @@ export class ComponentDashboardPaymentsList implements OnInit {
     let billingNumber: string | undefined;
     let supplyNumber: string | undefined;
     let customerName: string | undefined;
-    let status: PaymentStatus | undefined;
-    let paymentMethod: PaymentMethod | undefined;
 
     if (this.searchQuery) {
       const q = this.searchQuery.toUpperCase();
@@ -66,13 +83,11 @@ export class ComponentDashboardPaymentsList implements OnInit {
       }
     }
 
-    if (this.selectedStatus) {
-      status = this.selectedStatus as PaymentStatus;
-    }
-
-    if (this.selectedMethod) {
-      paymentMethod = this.selectedMethod as PaymentMethod;
-    }
+    const values = this.filterForm.value;
+    const status = values.status ? values.status as PaymentStatus : undefined;
+    const paymentMethod = values.method ? values.method as PaymentMethod : undefined;
+    const startDate = values.startDate || undefined;
+    const endDate = values.endDate || undefined;
 
     this.paymentService
       .search(
@@ -85,6 +100,8 @@ export class ComponentDashboardPaymentsList implements OnInit {
         customerName,
         paymentMethod,
         status,
+        startDate,
+        endDate
       )
       .subscribe({
         next: (res) => {
@@ -116,18 +133,118 @@ export class ComponentDashboardPaymentsList implements OnInit {
     this.loadData(0);
   }
 
-  onStatusFilter(status: string): void {
-    this.selectedStatus = status;
+  applyFilters(): void {
+    const values = this.filterForm.value;
+    let count = 0;
+    Object.keys(values).forEach(key => {
+      if (values[key]) count++;
+    });
+    this.activeFiltersCount = count;
+    this.currentPage = 0;
     this.loadData(0);
   }
 
-  onMethodFilter(method: string): void {
-    this.selectedMethod = method;
+  clearFilters(): void {
+    this.filterForm.reset({
+      status: '',
+      method: '',
+      startDate: '',
+      endDate: ''
+    });
+    this.activeFiltersCount = 0;
+    this.currentPage = 0;
     this.loadData(0);
   }
 
   onPageChange(page: number): void {
     this.loadData(page);
+  }
+
+  handleExport(options: ExportOptions): void {
+    const filename = `pagos_export_${new Date().getTime()}`;
+
+    if (options.scope === 'CURRENT_PAGE') {
+      this.doExport(this.payments, options.format, filename);
+    } else {
+      let receiptNumber: string | undefined;
+      let billingNumber: string | undefined;
+      let supplyNumber: string | undefined;
+      let customerName: string | undefined;
+
+      if (this.searchQuery) {
+        const q = this.searchQuery.toUpperCase();
+        if (q.startsWith('REC')) {
+          receiptNumber = this.searchQuery;
+        } else if (q.startsWith('FAC')) {
+          billingNumber = this.searchQuery;
+        } else if (/^\d+$/.test(this.searchQuery)) {
+          supplyNumber = this.searchQuery;
+        } else {
+          customerName = this.searchQuery;
+        }
+      }
+
+      const values = this.filterForm.value;
+      const status = values.status ? values.status as PaymentStatus : undefined;
+      const paymentMethod = values.method ? values.method as PaymentMethod : undefined;
+      const startDate = values.startDate || undefined;
+      const endDate = values.endDate || undefined;
+      
+      this.paymentService.search(
+        0,
+        10000,
+        this.sort,
+        receiptNumber,
+        billingNumber,
+        supplyNumber,
+        customerName,
+        paymentMethod,
+        status,
+        startDate,
+        endDate
+      ).subscribe({
+        next: (res) => {
+          if (res.success && res.data) {
+            this.doExport(res.data.content ?? [], options.format, filename);
+          }
+        },
+        error: (err) => {
+          console.error('Error fetching all payments for export', err);
+        }
+      });
+    }
+  }
+
+  private doExport(data: PaymentResponseDTO[], format: 'CSV' | 'EXCEL', filename: string): void {
+    const exportData = data.map(p => {
+      let estado: string = p.status;
+      if (estado === 'COMPLETED') estado = 'Completado';
+      else if (estado === 'PENDING') estado = 'Pendiente';
+      else if (estado === 'FAILED') estado = 'Fallido';
+      else if (estado === 'CANCELLED') estado = 'Anulado';
+
+      let metodo: string = p.paymentMethod;
+      if (metodo === 'CASH') metodo = 'Efectivo';
+      else if (metodo === 'CARD') metodo = 'Tarjeta';
+      else if (metodo === 'BANK_TRANSFER') metodo = 'Transferencia';
+
+      return {
+        'Número Recibo': p.receiptNumber || '',
+        'Factura Asociada': p.billingNumber || '',
+        'Suministro': p.supplyNumber || '',
+        'Cliente': p.customerFullName || '',
+        'Monto': p.amount || 0,
+        'Método Pago': metodo,
+        'Estado': estado,
+        'Fecha Pago': p.paymentDate ? new Date(p.paymentDate).toLocaleString() : ''
+      };
+    });
+
+    if (format === 'CSV') {
+      this.exportService.exportToCsv(exportData, filename);
+    } else {
+      this.exportService.exportToExcel(exportData, filename);
+    }
   }
 
   printReceipt(payment: PaymentResponseDTO): void {

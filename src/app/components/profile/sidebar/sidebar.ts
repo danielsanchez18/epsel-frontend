@@ -4,7 +4,6 @@ import {
   LucideLayout,
   LucideLock,
   LucideLogOut,
-  LucideSettings,
   LucideUser,
 } from '@lucide/angular';
 import { AuthService } from '@services/auth/auth.service';
@@ -15,7 +14,6 @@ import { AuthService } from '@services/auth/auth.service';
     RouterModule,
     LucideUser,
     LucideLock,
-    LucideSettings,
     LucideLayout,
     LucideLogOut,
   ],

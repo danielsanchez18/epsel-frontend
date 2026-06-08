@@ -4,11 +4,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
 import { ComponentSharedFilters } from '@components/shared/filters/filters';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
-import { ComponentSharedImport } from '@components/shared/import/import';
+import { ComponentSharedExport, ExportOptions } from '@components/shared/export/export';
 import { CustomerService } from '@services/customers/customer.service';
 import { CustomerResponse, CustomerType } from '@interfaces/customers/customer.interface';
 import { ComponentDashboardCustomersTable } from '../table/table';
 import { ComponentDashboardCustomersEmpty } from '../empty/empty';
+import { ExportService } from '@core/services/utils/export.service';
 
 @Component({
   selector: 'component-dashboard-customers-list',
@@ -18,7 +19,7 @@ import { ComponentDashboardCustomersEmpty } from '../empty/empty';
     ComponentDashboardCustomersTable,
     ComponentSharedSearchBox,
     ComponentSharedFilters,
-    ComponentSharedImport,
+    ComponentSharedExport,
     ComponentSharedPaginator,
     ComponentDashboardCustomersEmpty,
   ],
@@ -26,6 +27,7 @@ import { ComponentDashboardCustomersEmpty } from '../empty/empty';
 })
 export class ComponentDashboardCustomersList implements OnInit {
   private customerService = inject(CustomerService);
+  private exportService = inject(ExportService);
   private fb = inject(FormBuilder);
 
   customers: CustomerResponse[] = [];
@@ -103,5 +105,47 @@ export class ComponentDashboardCustomersList implements OnInit {
     this.activeFiltersCount = 0;
     this.currentPage = 0;
     this.loadCustomers(0);
+  }
+
+  handleExport(options: ExportOptions): void {
+    const filename = `clientes_export_${new Date().getTime()}`;
+
+    if (options.scope === 'CURRENT_PAGE') {
+      this.doExport(this.customers, options.format, filename);
+    } else {
+      // Export all records
+      const typeFilter = this.filterForm.value.type || undefined;
+      
+      this.customerService.search(0, 10000, this.sort, this.searchQuery || undefined, typeFilter as CustomerType)
+        .subscribe({
+          next: (res: any) => {
+            this.doExport(res.data.content, options.format, filename);
+          },
+          error: (err) => {
+            console.error('Error fetching all customers for export', err);
+          }
+        });
+    }
+  }
+
+  private doExport(data: any[], format: 'CSV' | 'EXCEL', filename: string): void {
+    // Transform data for export to make it cleaner
+    const exportData = data.map(c => ({
+      'Tipo de Cliente': c.type === 'NATURAL' ? 'Persona Natural' : 'Persona Jurídica',
+      'Documento': c.documentNumber || '',
+      'Nombre': c.name || '',
+      'Razón Social': c.businessName || '',
+      'Email': c.email || '',
+      'Teléfono': c.phone || '',
+      'Dirección': c.address || '',
+      'Estado': c.isActive ? 'Activo' : 'Inactivo',
+      'Fecha Creación': c.createdAt ? new Date(c.createdAt).toLocaleDateString() : ''
+    }));
+
+    if (format === 'CSV') {
+      this.exportService.exportToCsv(exportData, filename);
+    } else {
+      this.exportService.exportToExcel(exportData, filename);
+    }
   }
 }

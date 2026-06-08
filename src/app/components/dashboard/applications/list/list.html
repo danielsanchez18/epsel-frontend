@@ -10,7 +10,7 @@
     />
 
     <div class="flex items-center gap-x-1">
-      <component-shared-import />
+      <component-shared-export (onExport)="handleExport($event)" />
       <component-shared-filters [activeFiltersCount]="activeFiltersCount" offcanvasId="applications-filter-offcanvas">
         
         <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="flex flex-col gap-y-5">
