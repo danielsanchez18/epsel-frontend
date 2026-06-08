@@ -72,15 +72,19 @@ export class PageDashboardPropertiesDetailsWorkOrders implements OnInit {
         ) {
           const supplyIds = suppliesRes.data.content.map((s) => s.id);
           const woRequests = supplyIds.map((id) =>
-            (this.workOrderService.search as Function)(page, this.pageSize, id)
-              .pipe(
-                catchError(() =>
-                  of({
-                    success: true,
-                    data: { content: [], totalPages: 0, totalElements: 0 },
-                  }),
-                ),
+            (this.workOrderService.search as Function)(
+              page,
+              this.pageSize,
+              '',
+              id,
+            ).pipe(
+              catchError(() =>
+                of({
+                  success: true,
+                  data: { content: [], totalPages: 0, totalElements: 0 },
+                }),
               ),
+            ),
           );
 
           forkJoin(woRequests).subscribe({

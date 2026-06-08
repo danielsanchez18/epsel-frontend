@@ -8,12 +8,22 @@
             <p class="text-sm text-gray-700">Administra las lecturas de medidores y consumos del sistema.</p>
         </div>
 
-        <!-- Botón para abrir modal -->
-        <button type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-scale-animation-modal"
-            data-hs-overlay="#hs-scale-animation-modal"
-            class="ml-auto rounded-lg font-medium bg-blue-500 text-white text-sm hover:bg-blue-600 px-3 py-2 transition-colors duration-200">
-            Registrar lectura
-        </button>
+        <div class="ml-auto flex items-center gap-x-2">
+            <!-- Botón para abrir modal OCR -->
+            <button type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-scale-animation-modal-ocr"
+                data-hs-overlay="#hs-scale-animation-modal-ocr"
+                class="rounded-lg font-medium bg-indigo-500 text-white text-sm hover:bg-indigo-600 px-3 py-2 transition-colors duration-200 inline-flex items-center gap-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scan-text"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8h8"/><path d="M7 12h10"/><path d="M7 16h6"/></svg>
+                Leer con OCR
+            </button>
+
+            <!-- Botón para abrir modal Normal -->
+            <button type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-scale-animation-modal"
+                data-hs-overlay="#hs-scale-animation-modal"
+                class="rounded-lg font-medium bg-blue-500 text-white text-sm hover:bg-blue-600 px-3 py-2 transition-colors duration-200">
+                Registrar lectura
+            </button>
+        </div>
 
     </div>
 
@@ -22,9 +32,16 @@
 
 </main>
 
-<!-- Modal de Registrar Lectura -->
+<!-- Modal de Registrar Lectura Normal -->
 <div id="hs-scale-animation-modal"
     class="hs-overlay hidden size-full fixed top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none [--overlay-backdrop:static]"
     role="dialog" tabindex="-1" aria-labelledby="hs-scale-animation-modal-label">
     <component-dashboard-readings-add />
+</div>
+
+<!-- Modal de Registrar Lectura OCR -->
+<div id="hs-scale-animation-modal-ocr"
+    class="hs-overlay hidden size-full fixed top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none [--overlay-backdrop:static]"
+    role="dialog" tabindex="-1" aria-labelledby="hs-scale-animation-modal-ocr-label">
+    <component-dashboard-readings-ocr />
 </div>
