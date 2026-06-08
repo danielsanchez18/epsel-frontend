@@ -11,7 +11,35 @@
 
     <div class="flex items-center gap-x-1">
       <component-shared-import />
-      <component-shared-filters />
+      <component-shared-filters [activeFiltersCount]="activeFiltersCount" offcanvasId="customers-filter-offcanvas">
+        
+        <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="flex flex-col gap-y-5">
+          
+          <!-- Tipo de Cliente -->
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-gray-800">Tipo de Cliente</label>
+            <select formControlName="type" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700">
+              <option value="">Todos los tipos</option>
+              <option value="NATURAL">Persona Natural</option>
+              <option value="JURIDICA">Persona Jurídica</option>
+            </select>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="flex items-center gap-x-2 pt-4 border-t border-gray-100 mt-2">
+            <button type="button" (click)="clearFilters()" data-hs-overlay="#customers-filter-offcanvas"
+              class="w-full py-2 px-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+              Limpiar
+            </button>
+            <button type="submit" data-hs-overlay="#customers-filter-offcanvas"
+              class="w-full py-2 px-3 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+              Aplicar
+            </button>
+          </div>
+
+        </form>
+
+      </component-shared-filters>
     </div>
 
   </div>

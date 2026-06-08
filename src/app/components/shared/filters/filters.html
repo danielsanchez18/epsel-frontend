@@ -1,7 +1,33 @@
-<button class="flex items-center gap-x-1 hover:shadow hover:bg-gray-50 rounded-lg px-2 py-2 border border-gray-200 bg-white transition-colors focus:outline-0">
-
+<!-- Botón que abre el Offcanvas -->
+<button type="button" 
+  [attr.data-hs-overlay]="'#' + offcanvasId"
+  class="flex items-center gap-x-1 hover:shadow hover:bg-gray-50 rounded-lg px-2 py-2 border border-gray-200 bg-white transition-colors focus:outline-0">
   <svg lucideSlidersHorizontal class="w-3.5 h-3.5" />
-
   <span class="text-[13px] font-medium">Filtros</span>
-  <span class="text-[13px] font-medium">(0)</span>
+  <span class="text-[13px] font-medium" [class.text-blue-600]="activeFiltersCount > 0">({{ activeFiltersCount }})</span>
 </button>
+
+<!-- Estructura del Offcanvas -->
+<div [id]="offcanvasId" class="hs-overlay hs-overlay-open:translate-x-0 hidden translate-x-full fixed top-0 end-0 transition-all duration-300 transform h-full max-w-xs w-full z-[80] bg-white border-s border-gray-200 shadow-2xl" role="dialog" tabindex="-1">
+  
+  <!-- Header del Offcanvas -->
+  <div class="flex justify-between items-center py-3 px-4 border-b border-gray-200 bg-gray-50/50">
+    <div class="flex items-center gap-x-2">
+      <svg lucideSlidersHorizontal class="w-4 h-4 text-gray-600" />
+      <h3 class="font-semibold text-gray-800">Filtros Avanzados</h3>
+    </div>
+    <button type="button" class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-500 hover:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none transition-colors" [attr.data-hs-overlay]="'#' + offcanvasId">
+      <span class="sr-only">Cerrar filtros</span>
+      <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 6 18"></path>
+        <path d="m6 6 12 12"></path>
+      </svg>
+    </button>
+  </div>
+  
+  <!-- Contenido Dinámico del Offcanvas -->
+  <div class="p-4 overflow-y-auto h-[calc(100%-60px)]">
+    <ng-content></ng-content>
+  </div>
+
+</div>

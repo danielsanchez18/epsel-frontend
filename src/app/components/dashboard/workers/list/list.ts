@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
 import { ComponentSharedFilters } from '@components/shared/filters/filters';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
@@ -13,6 +14,7 @@ import { ComponentDashboardWorkersEmpty } from '../empty/empty';
   selector: 'component-dashboard-workers-list',
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     ComponentDashboardWorkersTable,
     ComponentSharedSearchBox,
     ComponentSharedFilters,
@@ -23,8 +25,9 @@ import { ComponentDashboardWorkersEmpty } from '../empty/empty';
   ],
   templateUrl: './list.html',
 })
-export class ComponentDashboardWorkersList {
+export class ComponentDashboardWorkersList implements OnInit {
   private userService = inject(UserService);
+  private fb = inject(FormBuilder);
 
   users: UserResponse[] = [];
   currentPage = 0;
@@ -34,6 +37,18 @@ export class ComponentDashboardWorkersList {
   searchQuery = '';
   isLoading = false;
 
+  filterForm: FormGroup;
+  activeFiltersCount = 0;
+
+  constructor() {
+    this.filterForm = this.fb.group({
+      status: [''],
+      role: [''],
+      startDate: [''],
+      endDate: ['']
+    });
+  }
+
   ngOnInit(): void {
     this.loadUsers();
   }
@@ -41,53 +56,42 @@ export class ComponentDashboardWorkersList {
   loadUsers(page: number = 0): void {
     this.isLoading = true;
 
+    // Remove empty properties from the filter form
+    const formValues = this.filterForm.value;
+    const activeFilters: any = {};
+    Object.keys(formValues).forEach(key => {
+      if (formValues[key]) {
+        activeFilters[key] = formValues[key];
+      }
+    });
+
+    const searchParams = { ...activeFilters };
     if (this.searchQuery.trim()) {
-      this.userService
-        .getAll(
-          { search: this.searchQuery },
-          this.currentPage,
-          this.pageSize,
-          'createdAt,desc',
-        )
-        .subscribe({
-          next: (res: any) => {
-            this.users = res.data.content;
-            this.totalPages = res.data.totalPages;
-            this.totalElements = res.data.totalElements;
-            this.isLoading = false;
-          },
-          error: (err) => {
-            console.error(
-              '[ComponentWorkersOverviewList] Error loading trabajadores',
-              err.message,
-            );
-            this.isLoading = false;
-          },
-        });
-    } else {
-      this.userService
-        .getAll(
-          { search: this.searchQuery },
-          page,
-          this.pageSize,
-          'createdAt,desc',
-        )
-        .subscribe({
-          next: (res: any) => {
-            this.users = res.data.content;
-            this.totalPages = res.data.totalPages;
-            this.totalElements = res.data.totalElements;
-            this.isLoading = false;
-          },
-          error: (err) => {
-            console.error(
-              '[ComponentWorkersOverviewList] Error loading trabajadores',
-              err.message,
-            );
-            this.isLoading = false;
-          },
-        });
+      searchParams.search = this.searchQuery;
     }
+
+    this.userService
+      .getAll(
+        searchParams,
+        page,
+        this.pageSize,
+        'createdAt,desc',
+      )
+      .subscribe({
+        next: (res: any) => {
+          this.users = res.data.content;
+          this.totalPages = res.data.totalPages;
+          this.totalElements = res.data.totalElements;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error(
+            '[ComponentWorkersOverviewList] Error loading trabajadores',
+            err.message,
+          );
+          this.isLoading = false;
+        },
+      });
   }
 
   onPageChange(page: number): void {
@@ -97,6 +101,29 @@ export class ComponentDashboardWorkersList {
 
   onSearchQuery(query: string): void {
     this.searchQuery = query;
+    this.currentPage = 0;
+    this.loadUsers(0);
+  }
+
+  applyFilters(): void {
+    const values = this.filterForm.value;
+    let count = 0;
+    Object.keys(values).forEach(key => {
+      if (values[key]) count++;
+    });
+    this.activeFiltersCount = count;
+    this.currentPage = 0;
+    this.loadUsers(0);
+  }
+
+  clearFilters(): void {
+    this.filterForm.reset({
+      status: '',
+      role: '',
+      startDate: '',
+      endDate: ''
+    });
+    this.activeFiltersCount = 0;
     this.currentPage = 0;
     this.loadUsers(0);
   }
