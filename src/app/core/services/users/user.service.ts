@@ -4,7 +4,7 @@ import { API_URL } from '@core/utils/api';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '@core/interfaces/shared/api-response.interface';
 import { PaginatedResponse } from '@core/interfaces/shared/paginated-response.interface';
-import { CreateUser, UpdateUser, UserResponse, UserStatus, UserSearch } from '@core/interfaces/users/user.interface';
+import { CreateUser, UpdateUser, UserResponse, UserStatus, UserSearch, ImportPreviewResponse } from '@core/interfaces/users/user.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -79,14 +79,21 @@ export class UserService {
 
 
   delete(id: string): Observable<ApiResponse<void>> {
-
     return this.http.patch<ApiResponse<void>>(`${this.apiUrl}/${id}`, null);
-
   }
 
   getKpis(): Observable<ApiResponse<any>> {
     return this.http.get<ApiResponse<any>>(`${this.apiUrl}/kpis`);
   }
 
+  previewImport(file: File): Observable<ApiResponse<ImportPreviewResponse<CreateUser>>> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<ApiResponse<ImportPreviewResponse<CreateUser>>>(`${this.apiUrl}/import/preview`, form);
+  }
+
+  createBulk(dtos: CreateUser[]): Observable<ApiResponse<void>> {
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/bulk`, dtos);
+  }
 
 }

@@ -1,6 +1,133 @@
-<button class="flex items-center gap-x-1 hover:shadow hover:bg-gray-50 rounded-lg px-2 py-2 border border-gray-200 bg-white transition-colors focus:outline-0">
-
-  <svg lucideArrowUpDown class="w-3.5 h-3.5" />
-
-  <span class="text-[13px] font-medium">Importar / Exportar</span>
+<button (click)="openModal()" class="flex items-center gap-x-1 hover:shadow hover:bg-gray-50 rounded-lg px-2 py-2 border border-gray-200 bg-white transition-colors focus:outline-0">
+  <svg lucideUploadCloud class="w-3.5 h-3.5 text-gray-700" />
+  <span class="text-[13px] font-medium text-gray-700">Importar</span>
 </button>
+
+<!-- Modal -->
+<div *ngIf="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+  <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+    
+    <!-- Header -->
+    <div class="flex justify-between items-center p-4 border-b border-gray-100">
+      <h3 class="font-semibold text-lg text-gray-800">Importar Datos</h3>
+      <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+        <svg lucideX class="size-5" />
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6 overflow-y-auto flex-1">
+      
+      <!-- Paso 1: Subida o Estado -->
+      <ng-container *ngIf="!previewData && !isLoading">
+        
+        <!-- Botón de Descarga Plantilla -->
+        <div class="mb-6 flex justify-end">
+          <button (click)="onDownloadTemplate.emit()" class="flex items-center gap-x-2 text-sm text-blue-600 hover:text-blue-700 font-medium bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">
+            <svg lucideDownload class="size-4" />
+            Descargar Plantilla
+          </button>
+        </div>
+
+        <!-- Zona Drag & Drop -->
+        <div 
+          class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop($event)"
+          (click)="fileInput.click()"
+        >
+          <input type="file" #fileInput (change)="onFileChange($event)" accept=".xlsx, .csv" class="hidden" />
+          <svg lucideFileSpreadsheet class="size-10 mx-auto text-gray-400 mb-3" />
+          <h4 class="text-base font-medium text-gray-700 mb-1">Arrastra tu archivo aquí</h4>
+          <p class="text-sm text-gray-500">o haz clic para buscar en tu computadora</p>
+          <p class="text-xs text-gray-400 mt-4">Solo archivos .xlsx o .csv</p>
+        </div>
+      </ng-container>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-10">
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
+        <p class="text-gray-600 font-medium">Validando archivo...</p>
+        <p class="text-sm text-gray-500 mt-1">Por favor espera un momento.</p>
+      </div>
+
+      <!-- Paso 2: Vista Previa y Errores -->
+      <ng-container *ngIf="previewData && !isLoading">
+        
+        <!-- Resumen -->
+        <div class="grid grid-cols-3 gap-4 mb-6">
+          <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 text-center">
+            <p class="text-xs text-gray-500 font-medium uppercase mb-1">Total Filas</p>
+            <p class="text-xl font-bold text-gray-800">{{ previewData.totalRows }}</p>
+          </div>
+          <div class="bg-green-50 p-3 rounded-lg border border-green-100 text-center">
+            <p class="text-xs text-green-600 font-medium uppercase mb-1">Listos</p>
+            <p class="text-xl font-bold text-green-700">{{ previewData.validCount }}</p>
+          </div>
+          <div class="bg-red-50 p-3 rounded-lg border border-red-100 text-center">
+            <p class="text-xs text-red-600 font-medium uppercase mb-1">Con Errores</p>
+            <p class="text-xl font-bold text-red-700">{{ previewData.invalidCount }}</p>
+          </div>
+        </div>
+
+        <!-- Tabla de Errores -->
+        <div *ngIf="previewData.invalidCount > 0" class="border border-red-100 rounded-lg overflow-hidden">
+          <div class="bg-red-50 p-3 border-b border-red-100 flex items-center gap-x-2">
+            <svg lucideAlertCircle class="size-4 text-red-600" />
+            <h4 class="text-sm font-semibold text-red-800">Detalle de Errores Encontrados</h4>
+          </div>
+          <div class="max-h-60 overflow-y-auto bg-white">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Fila</th>
+                  <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motivos del Error</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <tr *ngFor="let err of previewData.errors">
+                  <td class="px-4 py-2 text-sm text-gray-900 font-medium">#{{ err.rowNumber }}</td>
+                  <td class="px-4 py-2 text-sm text-red-600">
+                    <ul class="list-disc pl-4 space-y-0.5">
+                      <li *ngFor="let msg of err.errors">{{ msg }}</li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Estado Perfecto -->
+        <div *ngIf="previewData.invalidCount === 0" class="bg-green-50 border border-green-200 rounded-lg p-6 flex flex-col items-center text-center">
+          <div class="bg-green-100 p-2 rounded-full mb-3">
+            <svg lucideCheckCircle2 class="size-8 text-green-600" />
+          </div>
+          <h4 class="text-green-800 font-semibold text-lg mb-1">¡Archivo Perfecto!</h4>
+          <p class="text-green-700 text-sm">Todos los registros han sido validados correctamente y están listos para ser importados.</p>
+        </div>
+
+      </ng-container>
+
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="bg-gray-50 p-4 border-t border-gray-100 flex justify-end gap-x-3">
+      <button 
+        (click)="closeModal()" 
+        class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors">
+        Cancelar
+      </button>
+      
+      <button 
+        *ngIf="previewData && !isLoading"
+        (click)="confirm()"
+        [disabled]="previewData.validCount === 0"
+        class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-x-2">
+        <svg lucideUploadCloud class="size-4" />
+        Importar {{ previewData.validCount }} Válidos
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -84,6 +84,19 @@ export class InstallationRequestService {
     );
   }
 
+  previewImport(file: File): Observable<ApiResponse<any>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ApiResponse<any>>(
+      `${this.baseUrl}/import/preview`,
+      formData,
+    );
+  }
+
+  createBulk(dtos: any[]): Observable<ApiResponse<void>> {
+    return this.http.post<ApiResponse<void>>(`${this.baseUrl}/bulk`, dtos);
+  }
+
   getKpis(): Observable<ApiResponse<any>> {
     return this.http.get<ApiResponse<any>>(`${this.baseUrl}/kpis`);
   }

@@ -43,3 +43,16 @@ export interface UserSearch {
   startDate?: string;
   endDate?: string;
 }
+
+export interface ImportError {
+  rowNumber: number;
+  errors: string[];
+}
+
+export interface ImportPreviewResponse<T> {
+  totalRows: number;
+  validCount: number;
+  invalidCount: number;
+  validData: T[];
+  errors: ImportError[];
+}

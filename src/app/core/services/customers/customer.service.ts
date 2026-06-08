@@ -10,6 +10,7 @@ import {
   UpdateCustomerRequest,
   CustomerType,
 } from '@interfaces/customers/customer.interface';
+import { ImportPreviewResponse } from '@core/interfaces/users/user.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -72,5 +73,15 @@ export class CustomerService {
 
   getDetailKpis(id: string): Observable<ApiResponse<any>> {
     return this.http.get<ApiResponse<any>>(`${this.apiUrl}/${id}/kpis`);
+  }
+
+  previewImport(file: File): Observable<ApiResponse<ImportPreviewResponse<CreateCustomerRequest>>> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<ApiResponse<ImportPreviewResponse<CreateCustomerRequest>>>(`${this.apiUrl}/import/preview`, form);
+  }
+
+  createBulk(dtos: CreateCustomerRequest[]): Observable<ApiResponse<void>> {
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/bulk`, dtos);
   }
 }

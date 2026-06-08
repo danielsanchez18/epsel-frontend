@@ -1,15 +1,17 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
 import { ComponentSharedFilters } from '@components/shared/filters/filters';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
 import { ComponentSharedExport, ExportOptions } from '@components/shared/export/export';
+import { ComponentSharedImport } from '@components/shared/import/import';
 import { ComponentDashboardWorkersTable } from '../table/table';
 import { UserService } from '@services/users/user.service';
 import { UserResponse } from '@interfaces/users/user.interface';
 import { ComponentDashboardWorkersEmpty } from '../empty/empty';
 import { ExportService } from '@core/services/utils/export.service';
+import { ImportPreviewResponse } from '@core/interfaces/users/user.interface';
 
 @Component({
   selector: 'component-dashboard-workers-list',
@@ -22,6 +24,7 @@ import { ExportService } from '@core/services/utils/export.service';
     ComponentSharedExport,
     ComponentSharedPaginator,
     ComponentDashboardWorkersEmpty,
+    ComponentSharedImport,
   ],
   templateUrl: './list.html',
 })
@@ -175,5 +178,66 @@ export class ComponentDashboardWorkersList implements OnInit {
     } else {
       this.exportService.exportToExcel(exportData, filename);
     }
+  }
+
+  @ViewChild('importComponent') importComponent!: ComponentSharedImport;
+
+  isImportLoading = false;
+  importPreviewData: ImportPreviewResponse<any> | null = null;
+
+  handleFileSelect(file: File) {
+    this.isImportLoading = true;
+    this.userService.previewImport(file).subscribe({
+      next: (res) => {
+        this.importPreviewData = res.data;
+        this.isImportLoading = false;
+      },
+      error: (err) => {
+        console.error('Error en previsualización de importación', err);
+        this.isImportLoading = false;
+      }
+    });
+  }
+
+  handleImportConfirm(validData: any[]) {
+    this.isImportLoading = true;
+    this.userService.createBulk(validData).subscribe({
+      next: () => {
+        this.isImportLoading = false;
+        this.importPreviewData = null;
+        if (this.importComponent) {
+          this.importComponent.closeModal();
+        }
+        this.loadUsers(0);
+      },
+      error: (err) => {
+        console.error('Error importando registros', err);
+        this.isImportLoading = false;
+      }
+    });
+  }
+
+  handleDownloadTemplate() {
+    const data = [
+      {
+        'DNI': '72334455',
+        'Nombres': 'Juan Carlos',
+        'Apellidos': 'Ramirez',
+        'Teléfono': '998877665',
+        'Email': 'juan.ramirez@correo.com',
+        'Contraseña': 'Password123!',
+        'Rol': 'Lecturista'
+      },
+      {
+        'DNI': '44556677',
+        'Nombres': 'Maria',
+        'Apellidos': 'Gomez',
+        'Teléfono': '987654321',
+        'Email': 'maria.gomez@correo.com',
+        'Contraseña': 'Password123!',
+        'Rol': 'Atencion al Cliente'
+      }
+    ];
+    this.exportService.exportToCsv(data, 'trabajadores_plantilla');
   }
 }

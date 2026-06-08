@@ -1,10 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
 import { ComponentSharedFilters } from '@components/shared/filters/filters';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
 import { ComponentSharedExport, ExportOptions } from '@components/shared/export/export';
+import { ComponentSharedImport } from '@components/shared/import/import';
 import { CustomerService } from '@services/customers/customer.service';
 import { CustomerResponse, CustomerType } from '@interfaces/customers/customer.interface';
 import { ComponentDashboardCustomersTable } from '../table/table';
@@ -22,6 +23,7 @@ import { ExportService } from '@core/services/utils/export.service';
     ComponentSharedExport,
     ComponentSharedPaginator,
     ComponentDashboardCustomersEmpty,
+    ComponentSharedImport,
   ],
   templateUrl: './list.html',
 })
@@ -147,5 +149,62 @@ export class ComponentDashboardCustomersList implements OnInit {
     } else {
       this.exportService.exportToExcel(exportData, filename);
     }
+  }
+
+  @ViewChild('importComponent') importComponent!: ComponentSharedImport;
+
+  isImportLoading = false;
+  importPreviewData: import('@core/interfaces/users/user.interface').ImportPreviewResponse<any> | null = null;
+
+  handleFileSelect(file: File) {
+    this.isImportLoading = true;
+    this.customerService.previewImport(file).subscribe({
+      next: (res) => {
+        this.importPreviewData = res.data;
+        this.isImportLoading = false;
+      },
+      error: (err) => {
+        console.error('Error en previsualización de importación', err);
+        this.isImportLoading = false;
+      }
+    });
+  }
+
+  handleImportConfirm(validData: any[]) {
+    this.isImportLoading = true;
+    this.customerService.createBulk(validData).subscribe({
+      next: () => {
+        this.isImportLoading = false;
+        this.importPreviewData = null;
+        if (this.importComponent) {
+          this.importComponent.closeModal();
+        }
+        this.loadCustomers(0);
+      },
+      error: (err) => {
+        console.error('Error importando registros', err);
+        this.isImportLoading = false;
+      }
+    });
+  }
+
+  handleDownloadTemplate() {
+    const data = [
+      {
+        'Tipo (Persona/Empresa)': 'Persona',
+        'Documento (DNI/RUC)': '72334455',
+        'Nombre Completo o Razón Social': 'Juan Carlos Ramirez',
+        'Teléfono': '998877665',
+        'Email': 'juan.ramirez@correo.com'
+      },
+      {
+        'Tipo (Persona/Empresa)': 'Empresa',
+        'Documento (DNI/RUC)': '20123456789',
+        'Nombre Completo o Razón Social': 'Inversiones Los Pinos SAC',
+        'Teléfono': '987654321',
+        'Email': 'contacto@lospinos.com'
+      }
+    ];
+    this.exportService.exportToCsv(data, 'clientes_plantilla');
   }
 }

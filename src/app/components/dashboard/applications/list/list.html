@@ -10,6 +10,14 @@
     />
 
     <div class="flex items-center gap-x-1">
+      <component-shared-import 
+        #importComponent
+        [isLoading]="isImportLoading"
+        [previewData]="importPreviewData"
+        (onFileSelect)="handleFileSelect($event)"
+        (onConfirm)="handleImportConfirm($event)"
+        (onDownloadTemplate)="handleDownloadTemplate()"
+      />
       <component-shared-export (onExport)="handleExport($event)" />
       <component-shared-filters [activeFiltersCount]="activeFiltersCount" offcanvasId="applications-filter-offcanvas">
         

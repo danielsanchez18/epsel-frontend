@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
@@ -7,6 +7,7 @@ import { ComponentSharedFilters } from '@components/shared/filters/filters';
 import { ComponentDashboardApplicationsTable } from '../table/table';
 import { ComponentDashboardApplicationsEmpty } from '../empty/empty';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
+import { ComponentSharedImport } from '@components/shared/import/import';
 import { InstallationRequestService } from '@services/supplies/installation-request.service';
 import { InstallationRequestResponse, InstallationRequestStatus } from '@interfaces/supplies/installation-request.interface';
 import { ExportService } from '@core/services/utils/export.service';
@@ -22,10 +23,13 @@ import { ExportService } from '@core/services/utils/export.service';
     ComponentDashboardApplicationsTable,
     ComponentDashboardApplicationsEmpty,
     ComponentSharedPaginator,
+    ComponentSharedImport
   ],
   templateUrl: './list.html',
 })
 export class ComponentDashboardApplicationsList implements OnInit {
+  @ViewChild('importComponent') importComponent!: ComponentSharedImport;
+
   private requestService = inject(InstallationRequestService);
   private exportService = inject(ExportService);
   private fb = inject(FormBuilder);
@@ -38,6 +42,8 @@ export class ComponentDashboardApplicationsList implements OnInit {
   sort = 'createdAt,desc';
   searchQuery = '';
   isLoading = false;
+  isImportLoading = false;
+  importPreviewData: any = null;
 
   filterForm: FormGroup;
   activeFiltersCount = 0;
@@ -157,5 +163,57 @@ export class ComponentDashboardApplicationsList implements OnInit {
     } else {
       this.exportService.exportToExcel(exportData, filename);
     }
+  }
+
+  handleFileSelect(file: File) {
+    this.isImportLoading = true;
+    this.requestService.previewImport(file).subscribe({
+      next: (res: any) => {
+        this.importPreviewData = res.data;
+        this.isImportLoading = false;
+      },
+      error: (err) => {
+        console.error('Error en previsualización de importación', err);
+        this.isImportLoading = false;
+      }
+    });
+  }
+
+  handleImportConfirm(validData: any[]) {
+    this.isImportLoading = true;
+    this.requestService.createBulk(validData).subscribe({
+      next: () => {
+        this.isImportLoading = false;
+        this.importPreviewData = null;
+        if (this.importComponent) {
+          this.importComponent.closeModal();
+        }
+        this.loadRequests(0);
+      },
+      error: (err) => {
+        console.error('Error importando registros', err);
+        this.isImportLoading = false;
+      }
+    });
+  }
+
+  handleDownloadTemplate() {
+    const data = [
+      {
+        'Documento Cliente (DNI/RUC)': '73324545',
+        'Código Catastral': 'CAT-001-A',
+        'Referencia Interna': 'Solicitud de Juan',
+        'Fecha de Solicitud (YYYY-MM-DD)': '2026-06-08',
+        'Observaciones': 'Ninguna'
+      },
+      {
+        'Documento Cliente (DNI/RUC)': '42112121',
+        'Código Catastral': 'CAT-002-B',
+        'Referencia Interna': 'Instalacion local',
+        'Fecha de Solicitud (YYYY-MM-DD)': '2026-06-09',
+        'Observaciones': 'Urgente'
+      }
+    ];
+    this.exportService.exportToCsv(data, 'solicitudes_plantilla');
   }
 }

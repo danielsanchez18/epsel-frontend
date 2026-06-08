@@ -1,10 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
 import { ComponentSharedFilters } from '@components/shared/filters/filters';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
 import { ComponentSharedExport, ExportOptions } from '@components/shared/export/export';
+import { ComponentSharedImport } from '@components/shared/import/import';
 import { ComponentDashboardPropertiesTable } from '../table/table';
 import { ComponentDashboardPropertiesEmpty } from '../empty/empty';
 import { PropertyService } from '@services/properties/property.service';
@@ -22,6 +23,7 @@ import { ExportService } from '@core/services/utils/export.service';
     ComponentSharedPaginator,
     ComponentDashboardPropertiesTable,
     ComponentDashboardPropertiesEmpty,
+    ComponentSharedImport,
   ],
   templateUrl: './list.html',
 })
@@ -152,5 +154,64 @@ export class ComponentDashboardPropertiesList implements OnInit {
     } else {
       this.exportService.exportToExcel(exportData, filename);
     }
+  }
+
+  @ViewChild('importComponent') importComponent!: ComponentSharedImport;
+
+  isImportLoading = false;
+  importPreviewData: import('@core/interfaces/users/user.interface').ImportPreviewResponse<any> | null = null;
+
+  handleFileSelect(file: File) {
+    this.isImportLoading = true;
+    this.propertyService.previewImport(file).subscribe({
+      next: (res) => {
+        this.importPreviewData = res.data;
+        this.isImportLoading = false;
+      },
+      error: (err) => {
+        console.error('Error en previsualización de importación', err);
+        this.isImportLoading = false;
+      }
+    });
+  }
+
+  handleImportConfirm(validData: any[]) {
+    this.isImportLoading = true;
+    this.propertyService.createBulk(validData).subscribe({
+      next: () => {
+        this.isImportLoading = false;
+        this.importPreviewData = null;
+        if (this.importComponent) {
+          this.importComponent.closeModal();
+        }
+        this.loadProperties(0);
+      },
+      error: (err) => {
+        console.error('Error importando registros', err);
+        this.isImportLoading = false;
+      }
+    });
+  }
+
+  handleDownloadTemplate() {
+    const data = [
+      {
+        'Documento Cliente (DNI/RUC)': '73324545',
+        'Tipo Predio (Residencial/Comercial/Industrial/Estatal)': 'Residencial',
+        'Cod Catastral': 'CAT-001-A',
+        'Direccion': 'Av. Principal 123',
+        'Referencia': 'Frente al parque',
+        'Nombre de Zona': 'Comercial'
+      },
+      {
+        'Documento Cliente (DNI/RUC)': '42112121',
+        'Tipo Predio (Residencial/Comercial/Industrial/Estatal)': 'Comercial',
+        'Cod Catastral': 'CAT-002-B',
+        'Direccion': 'Calle Las Flores 456',
+        'Referencia': 'Esquina con Av. Central',
+        'Nombre de Zona': 'Gobierno'
+      }
+    ];
+    this.exportService.exportToCsv(data, 'predios_plantilla');
   }
 }

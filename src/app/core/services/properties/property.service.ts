@@ -9,6 +9,7 @@ import {
   CreatePropertyRequest,
   UpdatePropertyRequest,
 } from '@core/interfaces/properties/properties.interface';
+import { ImportPreviewResponse } from '@core/interfaces/users/user.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -66,5 +67,15 @@ export class PropertyService {
 
   getKpis(): Observable<ApiResponse<any>> {
     return this.http.get<ApiResponse<any>>(`${this.baseUrl}/kpis`);
+  }
+
+  previewImport(file: File): Observable<ApiResponse<ImportPreviewResponse<CreatePropertyRequest>>> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<ApiResponse<ImportPreviewResponse<CreatePropertyRequest>>>(`${this.baseUrl}/import/preview`, form);
+  }
+
+  createBulk(dtos: CreatePropertyRequest[]): Observable<ApiResponse<void>> {
+    return this.http.post<ApiResponse<void>>(`${this.baseUrl}/bulk`, dtos);
   }
 }

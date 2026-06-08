@@ -36,7 +36,7 @@
             <p class="text-sm">No hay notificaciones</p>
         </div>
         } @else {
-        @for (notif of filteredNotifications; track notif.id) {
+        @for (notif of filteredNotifications; track $index) {
         <div class="px-5 py-4 flex gap-x-3 hover:bg-gray-50 transition-colors group relative cursor-pointer"
             [ngClass]="{'bg-blue-50/30': !notif.read}" (click)="markAsRead(notif.id)">
 
