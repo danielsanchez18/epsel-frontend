@@ -1,1 +1,13 @@
-<p>profile works!</p>,
+<div>
+    <div class="max-w-300 mx-auto min-h-screen w-full">
+        <component-profile-header />
+
+        <div class="flex gap-x-10 h-full overflow-y-auto py-7 px-4 md:px-7 lg:px-10 w-full">
+            <component-profile-sidebar />
+
+            <div class="w-full">
+                <router-outlet />
+            </div>
+        </div>
+    </div>
+</div>

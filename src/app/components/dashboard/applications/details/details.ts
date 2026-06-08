@@ -20,8 +20,9 @@ import { SupplyDetailsDTO } from '@interfaces/supplies/supply.interface';
   imports: [CommonModule],
   templateUrl: './details.html',
 })
-export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy {
-
+export class ComponentDashboardApplicationsDetails
+  implements OnInit, OnDestroy
+{
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private requestService = inject(InstallationRequestService);
@@ -44,7 +45,7 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
   ngOnInit(): void {
     const parentRoute = this.route.parent;
     if (parentRoute) {
-      this.sub = parentRoute.paramMap.subscribe(params => {
+      this.sub = parentRoute.paramMap.subscribe((params) => {
         const id = params.get('id') || this.route.snapshot.paramMap.get('id');
         if (id) {
           this.loadRequest(id);
@@ -76,7 +77,7 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
       },
       error: () => {
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -96,7 +97,7 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
         },
         error: () => {
           this.isLoading = false;
-        }
+        },
       });
       return;
     }
@@ -119,27 +120,37 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
       },
       error: () => {
         this.isLoading = false;
-      }
+      },
     });
   }
 
   getStatusLabel(status?: string): string {
     switch (status) {
-      case 'PENDING': return 'Pendiente';
-      case 'APPROVED': return 'Aprobada';
-      case 'REJECTED': return 'Rechazada';
-      case 'INSTALLED': return 'Instalada';
-      default: return status || 'Sin estado';
+      case 'PENDING':
+        return 'Pendiente';
+      case 'APPROVED':
+        return 'Aprobada';
+      case 'REJECTED':
+        return 'Rechazada';
+      case 'INSTALLED':
+        return 'Instalada';
+      default:
+        return status || 'Sin estado';
     }
   }
 
   getStatusClass(status?: string): string {
     switch (status) {
-      case 'PENDING': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'APPROVED': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'REJECTED': return 'bg-red-100 text-red-700 border-red-200';
-      case 'INSTALLED': return 'bg-green-100 text-green-700 border-green-200';
-      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+      case 'PENDING':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'APPROVED':
+        return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'REJECTED':
+        return 'bg-red-100 text-red-700 border-red-200';
+      case 'INSTALLED':
+        return 'bg-green-100 text-green-700 border-green-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   }
 
@@ -150,7 +161,16 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
   }
 
   formatDate(value?: string | null): string {
-    return value ? new Date(value).toLocaleDateString('es-PE') : '-';
+    if (!value) return '-';
+    if (value.includes('T')) {
+      const [year, month, day] = value.split('T')[0].split('-');
+      return `${day}/${month}/${year}`;
+    }
+    const parts = value.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return new Date(value).toLocaleDateString('es-PE');
   }
 
   approveRequest(): void {
@@ -163,10 +183,13 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
       showCancelButton: true,
       confirmButtonText: 'Sí, aprobar',
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#2563eb'
-    }).then(result => {
+      confirmButtonColor: '#2563eb',
+    }).then((result) => {
       if (!result.isConfirmed) return;
-      this.executeAction(() => this.requestService.approve(this.request!.id), 'Solicitud aprobada correctamente.');
+      this.executeAction(
+        () => this.requestService.approve(this.request!.id),
+        'Solicitud aprobada correctamente.',
+      );
     });
   }
 
@@ -180,7 +203,7 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
       inputLabel: 'Observaciones',
       inputPlaceholder: 'Escribe el motivo del rechazo',
       inputAttributes: {
-        maxlength: '500'
+        maxlength: '500',
       },
       showCancelButton: true,
       confirmButtonText: 'Rechazar',
@@ -192,15 +215,22 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
           return;
         }
         return value.trim();
-      }
-    }).then(result => {
+      },
+    }).then((result) => {
       if (!result.isConfirmed || !result.value) return;
-      this.executeAction(() => this.requestService.reject(this.request!.id, result.value), 'Solicitud rechazada correctamente.');
+      this.executeAction(
+        () => this.requestService.reject(this.request!.id, result.value),
+        'Solicitud rechazada correctamente.',
+      );
     });
   }
 
   loadSupplyAndWorkOrders(requestId: string): void {
-    if (!this.request || (this.request.status !== 'APPROVED' && this.request.status !== 'INSTALLED')) {
+    if (
+      !this.request ||
+      (this.request.status !== 'APPROVED' &&
+        this.request.status !== 'INSTALLED')
+    ) {
       this.supply = null;
       this.activeInstallationOrder = null;
       return;
@@ -215,21 +245,26 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
       },
       error: (err) => {
         console.error('Error loading supply by installation request:', err);
-      }
+      },
     });
   }
 
   loadWorkOrders(supplyId: string): void {
-    this.supplyWorkOrdersService.search(0, 100, supplyId).subscribe({
+    this.supplyWorkOrdersService.search(0, 100, '', supplyId).subscribe({
       next: (res: any) => {
         const orders = res.data.content || [];
-        this.activeInstallationOrder = orders.find((o: any) => 
-          o.type === 'INSTALLATION' && (o.status === 'PENDING' || o.status === 'ASSIGNED' || o.status === 'IN_PROGRESS')
-        ) || null;
+        this.activeInstallationOrder =
+          orders.find(
+            (o: any) =>
+              o.type === 'INSTALLATION' &&
+              (o.status === 'PENDING' ||
+                o.status === 'ASSIGNED' ||
+                o.status === 'IN_PROGRESS'),
+          ) || null;
       },
       error: (err) => {
         console.error('Error loading work orders for supply:', err);
-      }
+      },
     });
   }
 
@@ -243,59 +278,71 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
       showCancelButton: true,
       confirmButtonText: 'Sí, generar',
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#2563eb'
-    }).then(result => {
+      confirmButtonColor: '#2563eb',
+    }).then((result) => {
       if (!result.isConfirmed) return;
 
       this.isActionLoading = true;
-      this.supplyWorkOrdersService.create({
-        supplyId: this.supply!.id,
-        type: 'INSTALLATION',
-        reason: 'Instalación de suministro'
-      }).subscribe({
-        next: (res) => {
-          this.isActionLoading = false;
-          if (res.success) {
-            Swal.fire({
-              icon: 'success',
-              title: '¡Generada!',
-              text: 'La orden de instalación ha sido creada correctamente.',
-              confirmButtonColor: '#2563eb'
-            });
-            if (this.request) {
-              this.loadRequest(this.request.id);
+      this.supplyWorkOrdersService
+        .create({
+          supplyId: this.supply!.id,
+          type: 'INSTALLATION',
+          reason: 'Instalación de suministro',
+        })
+        .subscribe({
+          next: (res) => {
+            this.isActionLoading = false;
+            if (res.success) {
+              Swal.fire({
+                icon: 'success',
+                title: '¡Generada!',
+                text: 'La orden de instalación ha sido creada correctamente.',
+                confirmButtonColor: '#2563eb',
+              });
+              if (this.request) {
+                this.loadRequest(this.request.id);
+              }
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text:
+                  res.message || 'No se pudo generar la orden de instalación.',
+                confirmButtonColor: '#d33',
+              });
             }
-          } else {
+          },
+          error: (err) => {
+            this.isActionLoading = false;
             Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: res.message || 'No se pudo generar la orden de instalación.',
-              confirmButtonColor: '#d33'
+              text:
+                err.error?.message ||
+                'Error al generar la orden de instalación.',
+              confirmButtonColor: '#d33',
             });
-          }
-        },
-        error: (err) => {
-          this.isActionLoading = false;
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: err.error?.message || 'Error al generar la orden de instalación.',
-            confirmButtonColor: '#d33'
-          });
-        }
-      });
+          },
+        });
     });
   }
 
   translateStatus(status?: string): string {
     switch (status) {
-      case 'PENDING': return 'Pendiente';
-      case 'ASSIGNED': return 'Asignada';
-      case 'IN_PROGRESS': return 'En progreso';
-      case 'COMPLETED': return 'Completada';
-      case 'CANCELLED': return 'Cancelada';
-      case 'FAILED': return 'Fallida';
-      default: return status || '';
+      case 'PENDING':
+        return 'Pendiente';
+      case 'ASSIGNED':
+        return 'Asignada';
+      case 'IN_PROGRESS':
+        return 'En progreso';
+      case 'COMPLETED':
+        return 'Completada';
+      case 'CANCELLED':
+        return 'Cancelada';
+      case 'FAILED':
+        return 'Fallida';
+      default:
+        return status || '';
     }
   }
 
@@ -309,7 +356,7 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
             icon: 'success',
             title: '¡Éxito!',
             text: res.message || successMessage,
-            confirmButtonColor: '#2563eb'
+            confirmButtonColor: '#2563eb',
           });
           if (this.request) {
             this.loadRequest(this.request.id);
@@ -319,7 +366,7 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
             icon: 'error',
             title: 'Error',
             text: res.message || 'No se pudo completar la acción.',
-            confirmButtonColor: '#d33'
+            confirmButtonColor: '#d33',
           });
         }
       },
@@ -329,9 +376,9 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
           icon: 'error',
           title: 'Error',
           text: err.error?.message || 'Error de conexión con el servidor.',
-          confirmButtonColor: '#d33'
+          confirmButtonColor: '#d33',
         });
-      }
+      },
     });
   }
 
@@ -363,8 +410,10 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: res.message || 'No se pudo encontrar el suministro asociado a la solicitud.',
-          confirmButtonColor: '#d33'
+          text:
+            res.message ||
+            'No se pudo encontrar el suministro asociado a la solicitud.',
+          confirmButtonColor: '#d33',
         });
       },
       error: (err: any) => {
@@ -373,19 +422,44 @@ export class ComponentDashboardApplicationsDetails implements OnInit, OnDestroy 
           icon: 'error',
           title: 'Error',
           text: err.error?.message || 'Error de conexión con el servidor.',
-          confirmButtonColor: '#d33'
+          confirmButtonColor: '#d33',
         });
-      }
+      },
     });
   }
 
-  getTimeline(): Array<{ label: string; date?: string | null; active: boolean; done: boolean }> {
+  getTimeline(): Array<{
+    label: string;
+    date?: string | null;
+    active: boolean;
+    done: boolean;
+  }> {
     const status = this.request?.status;
     return [
-      { label: 'Creada', date: this.request?.requestedDate, active: true, done: true },
-      { label: 'Aprobada', date: this.request?.approvedDate, active: status === 'APPROVED' || status === 'INSTALLED', done: !!this.request?.approvedDate },
-      { label: 'Realizada', date: this.request?.installationDate, active: status === 'INSTALLED', done: !!this.request?.installationDate },
-      { label: 'Rechazada', date: this.request?.rejectedDate, active: status === 'REJECTED', done: !!this.request?.rejectedDate },
+      {
+        label: 'Creada',
+        date: this.request?.requestedDate,
+        active: true,
+        done: true,
+      },
+      {
+        label: 'Aprobada',
+        date: this.request?.approvedDate,
+        active: status === 'APPROVED' || status === 'INSTALLED',
+        done: !!this.request?.approvedDate,
+      },
+      {
+        label: 'Realizada',
+        date: this.request?.installationDate,
+        active: status === 'INSTALLED',
+        done: !!this.request?.installationDate,
+      },
+      {
+        label: 'Rechazada',
+        date: this.request?.rejectedDate,
+        active: status === 'REJECTED',
+        done: !!this.request?.rejectedDate,
+      },
     ];
   }
 }

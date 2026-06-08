@@ -1,0 +1,8 @@
+export interface AppNotification {
+  id: string;
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  type?: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
+}

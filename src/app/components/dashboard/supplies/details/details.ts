@@ -150,7 +150,16 @@ export class ComponentDashboardSuppliesDetails implements OnInit, OnDestroy {
   }
 
   formatDate(value?: string | null): string {
-    return value ? new Date(value).toLocaleDateString('es-PE') : '-';
+    if (!value) return '-';
+    if (value.includes('T')) {
+      const [year, month, day] = value.split('T')[0].split('-');
+      return `${day}/${month}/${year}`;
+    }
+    const parts = value.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return new Date(value).toLocaleDateString('es-PE');
   }
 
   onSuspend(): void {

@@ -1,0 +1,87 @@
+<header class="w-full ">
+    <div class="flex items-center justify-between gap-x-2 w-full py-3 px-4 md:px-7 lg:px-10">
+
+        <!-- Logo -->
+        <a href="/dashboard" class="h-8 flex items-center gap-x-3">
+            <img src="/logos/Epsel_logo.png" alt="Logo Epsel" class="h-full object-cover">
+            <p class="font-bold  tracking-tighter">EPSEL S.A.</p>
+        </a>
+
+
+        <div class="flex items-center ml-auto gap-x-1">
+
+            <!-- Soporte -->
+            <button class="flex items-center justify-center gap-x-1 size-8 rounded-full hover:bg-gray-100">
+                <svg lucideCircleQuestionMark class="size-4.5 text-gray-800" />
+            </button>
+
+            <!-- Notificacions -->
+            <button class="flex items-center justify-center gap-x-1 size-8 rounded-full hover:bg-gray-100">
+                <svg lucideBell class="size-4.5 text-gray-800" />
+            </button>
+
+            <!-- Perfil -->
+            <div class="hs-dropdown [--auto-close:inside] [--placement:bottom-right] relative inline-flex">
+
+                <button id="hs-dropdown-default" type="button"
+                    class="hs-dropdown-toggle ml-2 pl-4 h-8 flex items-center border-l border-gray-200"
+                    aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
+                    <div class="h-10 w-10 bg-gray-300 rounded-full overflow-hidden flex items-center justify-center">
+                        <img *ngIf="usuario?.photoUrl" [src]="usuario?.photoUrl | publicUrl" alt="User Avatar"
+                            class="h-full w-full object-cover" />
+                        <svg *ngIf="!usuario?.photoUrl" lucideUserCircle class="size-8 text-gray-500"></svg>
+                    </div>
+                </button>
+
+                <!-- Contenido del dropdown -->
+                <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white border border-gray-300 shadow-md rounded-lg mt-2 after:h-4 after:absolute after:-bottom-4 after:inset-0 after:w-full before:h-4 before:absolute before:-top-4 before:inset-s-0 before:w-full z-50"
+                    role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-default">
+                    <div class="w-full divide-y divide-gray-200">
+                        <div class="p-1 w-full">
+                            <button routerLink="/perfil"
+                                class="text-start flex items-center gap-x-2 px-3 py-2 hover:bg-gray-100 rounded-lg w-full">
+                                <div
+                                    class="h-8 w-8 bg-gray-300 rounded-full overflow-hidden flex items-center justify-center">
+                                    <img *ngIf="usuario?.photoUrl" [src]="usuario?.photoUrl | publicUrl"
+                                        alt="User Avatar" class="h-full w-full object-cover" />
+                                    <svg *ngIf="!usuario?.photoUrl" lucideUserCircle class="size-8 text-gray-500"></svg>
+                                </div>
+                                <div>
+                                    <p class="truncate text-sm font-medium">{{ usuario?.names }} {{ usuario?.lastNames
+                                        }}
+                                    </p>
+                                    <p class="truncate text-xs text-gray-500">{{ usuario?.email }}</p>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="p-1">
+                            <a routerLink="/perfil"
+                                class="flex items-center gap-x-2 py-2.5 px-4 rounded-lg text-sm hover:bg-gray-100 focus:outline-hidden focus:bg-gray-200">
+                                <svg lucideUser class="size-4" />
+                                Mi perfil
+                            </a>
+                            <a routerLink="/perfil/seguridad"
+                                class="flex items-center gap-x-2 py-2.5 px-4 rounded-lg text-sm hover:bg-gray-100 focus:outline-hidden focus:bg-gray-200">
+                                <svg lucideLock class="size-4" />
+                                Seguridad
+                            </a>
+                            <!-- <a routerLink="/perfil/configuraciones"
+                                class="flex items-center gap-x-2 py-2.5 px-4 rounded-lg text-sm hover:bg-gray-100 focus:outline-hidden focus:bg-gray-200">
+                                <svg lucideSettings class="size-4" />
+                                Configuraciones
+                            </a> -->
+                        </div>
+                        <div class="p-1">
+                            <button type="button" (click)="onLogout()"
+                                class="w-full flex items-center gap-x-2.5 py-2 px-4 rounded-lg text-sm hover:bg-gray-100 focus:outline-hidden focus:bg-gray-200">
+                                <svg lucideLogOut class="size-4" />
+                                Cerrar sesión
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</header>

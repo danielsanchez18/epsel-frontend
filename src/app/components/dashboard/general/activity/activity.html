@@ -1,6 +1,6 @@
-<div class="bg-white rounded-2xl border border-gray-200 p-5 space-y-7 flex flex-col h-[400px]">
+<div class="bg-white rounded-2xl border border-gray-200 p-2 flex flex-col h-[400px]">
     <!-- Header -->
-    <div class="flex gap-x-3">
+    <div class="flex gap-x-3 p-3">
         <svg lucideHistory class="size-6 text-gray-500 mt-0.5" />
         <div>
             <h2 class="text-sm font-medium">Actividad Reciente</h2>
@@ -9,7 +9,7 @@
     </div>
 
     <!-- Content / Timeline -->
-    <div class="flex-1 overflow-y-auto pr-1 relative custom-scrollbar">
+    <div class="flex-1 overflow-y-auto pr-1 relative custom-scrollbar p-1">
         <ng-container *ngIf="isLoading; else activityTemplate">
             <!-- Loading Skeleton -->
             <div class="space-y-6 pl-4 border-l border-gray-100">
@@ -26,47 +26,47 @@
         <ng-template #activityTemplate>
             <ng-container *ngIf="activities.length > 0; else emptyState">
                 <!-- Timeline Container with line -->
-                <div class="relative space-y-5">
-                    <div *ngFor="let act of activities; let last = last" class="relative group">
+                <div class="relative space-y-1">
+                    <div *ngFor="let act of activities; let last = last"
+                        class="relative group flex gap-x-3 rounded-md bg-gray-100 px-4 py-2">
 
                         <!-- Timeline Badge/Dot -->
-                        <span
-                            class="flex items-center justify-center size-7 rounded-full border-2 border-white shadow-sm transition-transform duration-200 group-hover:scale-110"
-                            [ngClass]="{
-                    'bg-blue-50 text-blue-600 border-blue-200': act.action === 'Pago',
-                    'bg-purple-50 text-purple-600 border-purple-200': act.action === 'Factura',
-                    'bg-emerald-50 text-emerald-600 border-emerald-200': act.action === 'Lectura',
-                    'bg-orange-50 text-orange-600 border-orange-200': act.action === 'Orden',
-                    'bg-gray-50 text-gray-600 border-gray-200': act.action !== 'Pago' && act.action !== 'Factura' && act.action !== 'Lectura' && act.action !== 'Orden'
-                  }">
-                            <svg *ngIf="act.action === 'Pago'" lucideCreditCard class="size-3.5 stroke-[2.5]" />
-                            <svg *ngIf="act.action === 'Factura'" lucideFileText class="size-3.5 stroke-[2.5]" />
-                            <svg *ngIf="act.action === 'Lectura'" lucideDroplets class="size-3.5 stroke-[2.5]" />
-                            <svg *ngIf="act.action === 'Orden'" lucideWrench class="size-3.5 stroke-[2.5]" />
+                        <span class="mt-0.5 text-gray-500" [ngClass]="{
+                                '': act.action === 'Pago',
+                                '': act.action === 'Factura',
+                                '': act.action === 'Lectura',
+                                '': act.action === 'Orden',
+                                '': act.action !== 'Pago' && act.action !== 'Factura' && act.action !== 'Lectura' && act.action !== 'Orden'
+                            }">
+                            <svg *ngIf="act.action === 'Pago'" lucideCreditCard class="size-4.5" />
+                            <svg *ngIf="act.action === 'Factura'" lucideFileText class="size-4.5" />
+                            <svg *ngIf="act.action === 'Lectura'" lucideDroplets class="size-4.5" />
+                            <svg *ngIf="act.action === 'Orden'" lucideWrench class="size-4.5" />
                             <svg *ngIf="act.action !== 'Pago' && act.action !== 'Factura' && act.action !== 'Lectura' && act.action !== 'Orden'"
-                                lucideHelpCircle class="size-3.5 stroke-[2.5]" />
+                                lucideHelpCircle class="size-4.5" />
                         </span>
 
                         <!-- Activity Text -->
-                        <div class="space-y-1">
-                            <div class="flex items-center gap-x-2">
-                                <span class="text-xs font-semibold px-2 py-0.5 rounded-full" [ngClass]="{
-                        'bg-blue-100/70 text-blue-700': act.action === 'Pago',
-                        'bg-purple-100/70 text-purple-700': act.action === 'Factura',
-                        'bg-emerald-100/70 text-emerald-700': act.action === 'Lectura',
-                        'bg-orange-100/70 text-orange-700': act.action === 'Orden',
-                        'bg-gray-100 text-gray-700': act.action !== 'Pago' && act.action !== 'Factura' && act.action !== 'Lectura' && act.action !== 'Orden'
-                      }">
+                        <div class="">
+                            <div class="flex items-center gap-x-3">
+                                <span class="text-sm font-medium" [ngClass]="{
+                                    '': act.action === 'Pago',
+                                    '': act.action === 'Factura',
+                                    '': act.action === 'Lectura',
+                                    '': act.action === 'Orden',
+                                    '': act.action !== 'Pago' && act.action !== 'Factura' && act.action !== 'Lectura' && act.action !== 'Orden'
+                                }">
                                     {{ act.action }}
                                 </span>
 
                                 <!-- Date/Time Relative -->
-                                <span class="text-[11px] text-gray-400 flex items-center gap-x-1">
-                                    <svg lucideClock class="size-3" />
+                                <span class="text-xs text-gray-700 flex items-center gap-x-1">
+                                    <!-- <svg lucideClock class="size-3" /> -->
+                                    <div class="bg-blue-600 min-w-1 size-1 rounded-full"></div>
                                     {{ getRelativeTime(act.date) }}
                                 </span>
                             </div>
-                            <p class="text-xs text-gray-700 font-medium mt-1 leading-relaxed">{{ act.description }}</p>
+                            <p class="text-xs text-gray-700 leading-relaxed">{{ act.description }}</p>
                         </div>
 
                     </div>

@@ -1,47 +1,42 @@
-import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { PublicUrlPipe } from '@core/pipes/public-url.pipe';
+import { UserResponse } from '@interfaces/users/user.interface';
+import { AuthService } from '@services/auth/auth.service';
+import { UserService } from '@services/users/user.service';
 import {
   LucideBell,
-  LucideSearch,
   LucideCircleQuestionMark,
   LucideUserCircle,
   LucideLogOut,
   LucideUser,
+  LucideSettings,
   LucideLock,
 } from '@lucide/angular';
-import { AuthService } from '@services/auth/auth.service';
-import { UserService } from '@core/services/users/user.service';
-import { UserResponse } from '@core/interfaces/users/user.interface';
-import { PublicUrlPipe } from '@core/pipes/public-url.pipe';
-import { RouterLink } from '@angular/router';
-import { ComponentSharedNotifications } from '@components/shared/notifications/notifications';
-import { NotificationService } from '@core/services/notifications/notification.service';
 
 @Component({
-  selector: 'component-dashboard-shared-header',
+  selector: 'component-profile-header',
   imports: [
     CommonModule,
     LucideBell,
     LucideCircleQuestionMark,
-    LucideSearch,
     LucideUserCircle,
     LucideUser,
+    LucideSettings,
     LucideLock,
     PublicUrlPipe,
     LucideLogOut,
     RouterLink,
-    ComponentSharedNotifications,
   ],
   templateUrl: './header.html',
 })
-export class ComponentDashboardSharedHeader implements OnInit {
+export class ComponentProfileHeader {
   private auth = inject(AuthService);
   private userService = inject(UserService);
-  private notificationService = inject(NotificationService);
 
   sessionUser = this.auth.getUser();
   usuario: UserResponse | null = null;
-  unreadCount$ = this.notificationService.unreadCount$;
 
   ngOnInit() {
     if (this.sessionUser?.userId) {

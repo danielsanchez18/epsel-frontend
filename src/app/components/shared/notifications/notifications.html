@@ -1,0 +1,85 @@
+<section class="w-80">
+
+    <!-- Header -->
+    <div class="px-4 border-b border-gray-200 flex items-center gap-x-1">
+
+        <div class="py-2 border-b-2"
+            [ngClass]="{'border-black': filter === 'ALL', 'border-transparent': filter !== 'ALL'}">
+            <button (click)="setFilter('ALL')" class="px-2 py-1.5 text-sm rounded-md hover:bg-gray-100"
+                [ngClass]="{'text-black font-medium': filter === 'ALL', 'text-gray-600': filter !== 'ALL'}">
+                Todas
+            </button>
+        </div>
+
+        <div class="py-2 border-b-2"
+            [ngClass]="{'border-black': filter === 'UNREAD', 'border-transparent': filter !== 'UNREAD'}">
+            <button (click)="setFilter('UNREAD')" class="px-2 py-1.5 text-sm rounded-md hover:bg-gray-100"
+                [ngClass]="{'text-black font-medium': filter === 'UNREAD', 'text-gray-600': filter !== 'UNREAD'}">
+                No leídas
+            </button>
+        </div>
+
+        <div class="py-2 border-b-2"
+            [ngClass]="{'border-black': filter === 'READ', 'border-transparent': filter !== 'READ'}">
+            <button (click)="setFilter('READ')" class="px-2 py-1.5 text-sm rounded-md hover:bg-gray-100"
+                [ngClass]="{'text-black font-medium': filter === 'READ', 'text-gray-600': filter !== 'READ'}">
+                Leídas
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Contenido -->
+    <div class="max-h-80 overflow-y-auto divide-y divide-gray-100">
+        @if (filteredNotifications.length === 0) {
+        <div class="px-6 py-8 text-center text-gray-500">
+            <p class="text-sm">No hay notificaciones</p>
+        </div>
+        } @else {
+        @for (notif of filteredNotifications; track notif.id) {
+        <div class="px-5 py-4 flex gap-x-3 hover:bg-gray-50 transition-colors group relative cursor-pointer"
+            [ngClass]="{'bg-blue-50/30': !notif.read}" (click)="markAsRead(notif.id)">
+
+            <!-- Icon based on type -->
+            <div class="flex justify-center shrink-0 mt-0.5">
+                @if (notif.type === 'SUCCESS') {
+                <svg lucideCheckCircle class="size-4" />
+                } @else if (notif.type === 'WARNING') {
+                <svg lucideAlertTriangle class="size-4" />
+                } @else if (notif.type === 'ERROR') {
+                <svg lucideAlertCircle class="size-4" />
+                } @else {
+                <svg lucideInfo class="size-4" />
+                }
+            </div>
+
+            <!-- Content -->
+            <div class="space-y-1 flex-1 pr-6">
+                <div class="flex items-center justify-between">
+                    <p class="text-gray-700 text-xs">{{ getRelativeTime(notif.createdAt) }}</p>
+                    @if (!notif.read) {
+                    <span class="size-2 rounded-full bg-blue-600"></span>
+                    }
+                </div>
+                <p class="text-sm font-medium">
+                    {{ notif.title }}
+                </p>
+                <p class="text-gray-700 text-xs">
+                    {{ notif.message }}
+                </p>
+            </div>
+        </div>
+        }
+        }
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-3 border-t border-gray-200 flex justify-center bg-gray-50">
+        <button (click)="markAllAsRead()"
+            class="inline-flex items-center gap-x-1 hover:underline text-blue-600 hover:text-blue-800 text-[13px] font-medium transition-colors">
+            <svg lucideCheckCheck class="size-4" />
+            Marcar todas como leídas
+        </button>
+    </div>
+
+</section>

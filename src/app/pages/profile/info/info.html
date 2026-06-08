@@ -1,0 +1,144 @@
+<section class="divide-y divide-gray-200 w-full">
+
+    <!-- Foto de Perfil -->
+    <div class="flex items-center gap-x-5 pb-5">
+
+        <div
+            class="size-20 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center border border-gray-200 shrink-0">
+            @if (imagePreview) {
+            <img src="{{ imagePreview }}" alt="avatar preview" class="size-full object-cover">
+            } @else if (formData.photoUrl) {
+            <img src="{{ formData.photoUrl | publicUrl }}" alt="avatar" class="size-full object-cover">
+            } @else {
+            <span class="text-3xl font-semibold text-gray-500">
+                {{ (formData.names ? formData.names.substring(0, 1) : '') | titlecase }}
+            </span>
+            }
+        </div>
+
+        <input id="imageUpload" #fileInput type="file" accept="image/*" class="hidden"
+            (change)="onFileSelected($event)">
+
+        <div class="flex flex-col gap-y-2">
+            <button type="button" (click)="fileInput.click()" [disabled]="isSavingPhoto"
+                class="text-[13px] font-medium w-fit text-white bg-blue-500 rounded-lg px-3 py-2 hover:bg-blue-600 disabled:opacity-50 cursor-pointer">
+                {{ isSavingPhoto ? 'Subiendo...' : 'Subir Imagen' }}
+            </button>
+            <p class="text-xs text-gray-500">Admite archivos PNG, JPG o WebP.</p>
+        </div>
+
+    </div>
+
+    <!-- Nombres -->
+    <div class="py-5 flex flex-col gap-y-3">
+        <div class="flex items-center justify-between gap-x-2">
+            <div class="flex flex-col gap-y-1">
+                <p class="text-sm font-medium">Nombres</p>
+                <p class="text-sm text-gray-700">{{ user?.names }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apellidos -->
+    <div class="py-5 flex flex-col gap-y-3">
+        <div class="flex items-center justify-between gap-x-2">
+            <div class="flex flex-col gap-y-1">
+                <p class="text-sm font-medium">Apellidos</p>
+                <p class="text-sm text-gray-700">{{ user?.lastNames }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- DNI -->
+    <div class="py-5 flex flex-col gap-y-3">
+        <div class="flex items-center justify-between gap-x-2">
+            <div class="flex flex-col gap-y-1">
+                <p class="text-sm font-medium">DNI</p>
+                <p class="text-sm text-gray-700">{{ user?.dni }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Correo electrónico -->
+    <div class="py-5 flex flex-col gap-y-3">
+
+        <!-- Información actual -->
+        <div class="flex items-center justify-between gap-x-2">
+            <div class="flex flex-col gap-y-1">
+                <p class="text-sm font-medium">Correo electrónico</p>
+                @if (activeEditField !== 'email') {
+                <p class="text-sm text-gray-700">{{ user?.email }}</p>
+                }
+            </div>
+
+            <!-- Botones para editar / cancelar -->
+            @if (activeEditField !== 'email') {
+            <button type="button" (click)="startEdit('email')"
+                class="text-sm font-medium underline underline-offset-2 hover:text-blue-600 cursor-pointer">Editar</button>
+            } @else {
+            <button type="button" (click)="cancelEdit()"
+                class="text-sm font-medium underline underline-offset-2 hover:text-blue-600 cursor-pointer">Cancelar</button>
+            }
+
+        </div>
+
+        <!-- Formulario para editar correo -->
+        @if (activeEditField === 'email') {
+        <form #emailForm="ngForm" (ngSubmit)="saveField('email', emailForm)" class="flex flex-col gap-y-3 mt-2"
+            novalidate>
+            <input type="email" name="email" required email [(ngModel)]="formData.email" #emailModel="ngModel"
+                class="px-4 py-2 w-md max-w-full rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+                placeholder="Ej: example@gmail.com">
+            @if (emailModel.touched && emailModel.invalid) {
+            <p class="text-xs text-red-600 font-medium">Por favor, ingrese un correo válido.</p>
+            }
+            <button type="submit" [disabled]="emailForm.invalid || isSaving || !hasChanges"
+                class="text-[13px] w-fit font-medium text-white bg-blue-500 rounded-lg px-3 py-2 hover:bg-blue-600 disabled:opacity-50 cursor-pointer shadow-sm">
+                {{ isSaving ? 'Guardando...' : 'Guardar cambios' }}
+            </button>
+        </form>
+        }
+    </div>
+
+    <!-- Teléfono -->
+    <div class="py-5 flex flex-col gap-y-3">
+
+        <!-- Información actual -->
+        <div class="flex items-center justify-between gap-x-2">
+            <div class="flex flex-col gap-y-1">
+                <p class="text-sm font-medium">Teléfono</p>
+                @if (activeEditField !== 'phone') {
+                <p class="text-sm text-gray-700">{{ user?.phone || 'Sin registrar' }}</p>
+                }
+            </div>
+
+            <!-- Botones para editar / cancelar -->
+            @if (activeEditField !== 'phone') {
+            <button type="button" (click)="startEdit('phone')"
+                class="text-sm font-medium underline underline-offset-2 hover:text-blue-600 cursor-pointer">Editar</button>
+            } @else {
+            <button type="button" (click)="cancelEdit()"
+                class="text-sm font-medium underline underline-offset-2 hover:text-blue-600 cursor-pointer">Cancelar</button>
+            }
+
+        </div>
+
+        <!-- Formulario para editar teléfono -->
+        @if (activeEditField === 'phone') {
+        <form #phoneForm="ngForm" (ngSubmit)="saveField('phone', phoneForm)" class="flex flex-col gap-y-3 mt-2"
+            novalidate>
+            <input type="text" name="phone" [(ngModel)]="formData.phone" #phoneModel="ngModel" [pattern]="phonePattern"
+                class="px-4 py-2 w-md max-w-full rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+                placeholder="Ej: 938310254">
+            @if (phoneModel.touched && phoneModel.invalid) {
+            <p class="text-xs text-red-600 font-medium">El teléfono debe tener entre 7 y 15 dígitos numéricos.</p>
+            }
+            <button type="submit" [disabled]="phoneForm.invalid || isSaving || !hasChanges"
+                class="text-[13px] w-fit font-medium text-white bg-blue-500 rounded-lg px-3 py-2 hover:bg-blue-600 disabled:opacity-50 cursor-pointer shadow-sm">
+                {{ isSaving ? 'Guardando...' : 'Guardar cambios' }}
+            </button>
+        </form>
+        }
+    </div>
+
+</section>
