@@ -17,27 +17,30 @@
       </div>
       <div class="flex items-center gap-x-2">
         <svg lucideCalendar1 class="size-4 text-gray-500" />
-        <span class="text-sm text-gray-700">Fecha de registro:</span>
-        <span class="text-sm">{{ parent.user?.createdAt | date:'longDate':'':'es' }}</span>
+        <span class="text-sm text-gray-700 text-nowrap">Fecha de registro:</span>
+        <span class="text-sm line-clamp-1">{{ parent.user?.createdAt | date:'longDate':'':'es' }}</span>
       </div>
       <div class="flex items-center gap-x-2">
         <svg lucideCalendarCheck class="size-4 text-gray-500" />
-        <span class="text-sm text-gray-700">Fecha de actualización:</span>
-        <span class="text-sm">{{ (parent.user?.updatedAt | date:'longDate':'':'es') || 'No actualizado' }}</span>
+        <span class="text-sm text-gray-700 text-nowrap">Fecha de actualización:</span>
+        <span class="text-sm line-clamp-1">{{ (parent.user?.updatedAt | date:'longDate':'':'es') || 'No actualizado'
+          }}</span>
       </div>
 
       @if (parent.user?.status === 'SUSPENDED') {
-        <p class="flex items-center justify-center gap-x-2 text-sm px-3 py-2 font-medium rounded-lg bg-red-100 text-red-600 mt-5">
-          <svg lucideTrash2 class="size-4" />
-          El usuario ha sido suspendido.
-        </p>
+      <p
+        class="flex items-center justify-center gap-x-2 text-sm px-3 py-2 font-medium rounded-lg bg-red-100 text-red-600 mt-5">
+        <svg lucideTrash2 class="size-4" />
+        El usuario ha sido suspendido.
+      </p>
       } @else {
-        @if (parent.user?.status === 'INACTIVE') {
-          <p class="flex items-center justify-center gap-x-2 text-sm px-3 py-2 font-medium rounded-lg bg-amber-100 text-amber-600 mt-5">
-            <svg lucideXCircle class="size-4" />
-            El usuario se encuentra inactivo.
-          </p>
-        }
+      @if (parent.user?.status === 'INACTIVE') {
+      <p
+        class="flex items-center justify-center gap-x-2 text-sm px-3 py-2 font-medium rounded-lg bg-amber-100 text-amber-600 mt-5">
+        <svg lucideXCircle class="size-4" />
+        El usuario se encuentra inactivo.
+      </p>
+      }
       }
     </div>
   </article>
@@ -53,20 +56,23 @@
       <div class="flex flex-col gap-y-2 md:col-span-2">
         <label class="text-sm font-medium">Foto de perfil</label>
         <div class="flex items-center gap-x-4">
-          <div class="size-24 rounded-full border-4 border-white bg-gray-200 flex items-center justify-center overflow-hidden">
+          <div
+            class="size-24 rounded-full border-4 border-white bg-gray-200 flex items-center justify-center overflow-hidden">
             @if (imagePreview) {
-              <img src="{{ imagePreview }}" alt="avatar" class="size-full object-cover">
+            <img src="{{ imagePreview }}" alt="avatar" class="size-full object-cover">
             } @else if (parent.user?.photoUrl) {
-              <img src="{{ parent.user?.photoUrl | publicUrl }}" alt="avatar" class="size-full object-cover">
+            <img src="{{ parent.user?.photoUrl | publicUrl }}" alt="avatar" class="size-full object-cover">
             } @else {
-              <span class="text-3xl font-semibold text-gray-500">
-                {{ parent.user?.names?.charAt(0) }}{{ parent.user?.lastNames?.charAt(0) }}
-              </span>
+            <span class="text-3xl font-semibold text-gray-500">
+              {{ parent.user?.names?.charAt(0) }}{{ parent.user?.lastNames?.charAt(0) }}
+            </span>
             }
           </div>
           <div class="space-y-2">
             <input #fileInput type="file" accept="image/*" (change)="onFileChange($event)" hidden />
-            <button type="button" (click)="isEditable && fileInput.click()" [disabled]="!isEditable" class="text-[13px] px-2.5 py-1.5 font-medium text-white bg-blue-600 hover:bg-blue-600-dark rounded-lg disabled:bg-gray-200 disabled:text-gray-500">Cambiar foto</button>
+            <button type="button" (click)="isEditable && fileInput.click()" [disabled]="!isEditable"
+              class="text-[13px] px-2.5 py-1.5 font-medium text-white bg-blue-600 hover:bg-blue-600-dark rounded-lg disabled:bg-gray-200 disabled:text-gray-500">Cambiar
+              foto</button>
             <p class="text-xs text-gray-700">La imagen debe ser cuadrada y no mayor a 1MB</p>
           </div>
         </div>
@@ -74,82 +80,59 @@
 
       <div class="flex flex-col gap-y-2">
         <label class="text-sm font-medium">Nombres</label>
-        <input
-          type="text"
-          placeholder="Ingrese su nombre completo"
+        <input type="text" placeholder="Ingrese su nombre completo"
           class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600"
-          [(ngModel)]="formData.names"
-          (ngModelChange)="checkChanges()"
-          (blur)="touch('names')"
+          [(ngModel)]="formData.names" (ngModelChange)="checkChanges()" (blur)="touch('names')"
           [disabled]="!isEditable">
         @if (touched.names && !validateNames(formData.names)) {
-          <div class="text-xs text-red-500">El nombre es obligatorio y debe tener al menos 2 caracteres.</div>
+        <div class="text-xs text-red-500">El nombre es obligatorio y debe tener al menos 2 caracteres.</div>
         }
       </div>
 
       <div class="flex flex-col gap-y-2">
         <label class="text-sm font-medium">Apellidos</label>
-        <input
-          type="text"
-          placeholder="Ingrese sus apellidos"
+        <input type="text" placeholder="Ingrese sus apellidos"
           class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600"
-          [(ngModel)]="formData.lastNames"
-          (ngModelChange)="checkChanges()"
-          (blur)="touch('lastNames')"
+          [(ngModel)]="formData.lastNames" (ngModelChange)="checkChanges()" (blur)="touch('lastNames')"
           [disabled]="!isEditable">
         @if (touched.lastNames && !validateLastNames(formData.lastNames)) {
-          <div class="text-xs text-red-500">El apellido es obligatorio y debe tener al menos 2 caracteres.</div>
+        <div class="text-xs text-red-500">El apellido es obligatorio y debe tener al menos 2 caracteres.</div>
         }
       </div>
 
       <div class="flex flex-col gap-y-2 md:col-span-2">
         <label class="text-sm font-medium">DNI</label>
-        <input
-          type="text"
-          placeholder="Ingrese su DNI"
+        <input type="text" placeholder="Ingrese su DNI"
           class="text-sm bg-gray-100 border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600"
-          disabled
-          [(ngModel)]="formData.dni">
+          disabled [(ngModel)]="formData.dni">
       </div>
 
       <div class="flex flex-col gap-y-2">
         <label class="text-sm font-medium">Correo</label>
-        <input
-          type="email"
-          placeholder="Ingrese su correo electrónico"
+        <input type="email" placeholder="Ingrese su correo electrónico"
           class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600"
-          [(ngModel)]="formData.email"
-          (ngModelChange)="checkChanges()"
-          (blur)="touch('email')"
+          [(ngModel)]="formData.email" (ngModelChange)="checkChanges()" (blur)="touch('email')"
           [disabled]="!isEditable">
         @if (touched.email && !validateEmail(formData.email)) {
-          <div class="text-xs text-red-500">Ingresa un correo válido.</div>
+        <div class="text-xs text-red-500">Ingresa un correo válido.</div>
         }
       </div>
 
       <div class="flex flex-col gap-y-2">
         <label class="text-sm font-medium">Teléfono</label>
-        <input
-          type="text"
-          placeholder="Ingrese su número de teléfono"
-          maxlength="9"
+        <input type="text" placeholder="Ingrese su número de teléfono" maxlength="9"
           class="text-sm border border-gray-200 rounded-md py-2 px-4 focus:outline-none focus:ring-[1.5px] focus:ring-blue-600"
-          [(ngModel)]="formData.phone"
-          (ngModelChange)="checkChanges()"
-          (keypress)="allowOnlyNumbers($event)"
-          (blur)="touch('phone')"
-          [disabled]="!isEditable">
+          [(ngModel)]="formData.phone" (ngModelChange)="checkChanges()" (keypress)="allowOnlyNumbers($event)"
+          (blur)="touch('phone')" [disabled]="!isEditable">
         @if (touched.phone && formData.phone && !validatePhone(formData.phone)) {
-          <div class="text-xs text-red-500">El teléfono debe tener exactamente 9 dígitos numéricos.</div>
+        <div class="text-xs text-red-500">El teléfono debe tener exactamente 9 dígitos numéricos.</div>
         }
       </div>
 
       <div class="md:col-span-2">
-        <button
-          type="button"
+        <button type="button"
           class="text-sm px-4 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:bg-black disabled:cursor-not-allowed"
-          [disabled]="!hasChanges || !isFormValid || !isEditable"
-          (click)="saveChanges()">
+          [disabled]="!hasChanges || !isFormValid || !isEditable" (click)="saveChanges()">
           Guardar cambios
         </button>
       </div>

@@ -1,4 +1,4 @@
-<div class="bg-white rounded-2xl border border-gray-200 p-2 flex flex-col h-[400px]">
+<div class="bg-white rounded-2xl border border-gray-200 p-2 pb-5 flex flex-col h-[400px]">
     <!-- Header -->
     <div class="flex gap-x-3 p-3">
         <svg lucideHistory class="size-6 text-gray-500 mt-0.5" />
@@ -9,7 +9,7 @@
     </div>
 
     <!-- Content / Timeline -->
-    <div class="flex-1 overflow-y-auto pr-1 relative custom-scrollbar p-1">
+    <div class="flex-1 overflow-y-auto pr-1 relative custom-scrollbar px-3 pt-3">
         <ng-container *ngIf="isLoading; else activityTemplate">
             <!-- Loading Skeleton -->
             <div class="space-y-6 pl-4 border-l border-gray-100">

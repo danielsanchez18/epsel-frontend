@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import { BillingService } from '@core/services/billings/billing.service';
 import { SupplyService } from '@core/services/supplies/supply.service';
 import { PaymentService } from '@core/services/payments/payment.service';
+import { SupplyWorkOrdersService } from '@services/supply-work-orders/supply-work-orders.service';
 import { AuthService } from '@core/services/auth/auth.service';
 import { BillingResponseDTO } from '@interfaces/billings/billing.interface';
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
@@ -26,6 +27,7 @@ export class ComponentDashboardCobranzaList implements OnInit {
   private billingService = inject(BillingService);
   private supplyService = inject(SupplyService);
   private paymentService = inject(PaymentService);
+  private supplyWorkOrdersService = inject(SupplyWorkOrdersService);
   private authService = inject(AuthService);
 
   billings: BillingResponseDTO[] = [];
@@ -47,7 +49,7 @@ export class ComponentDashboardCobranzaList implements OnInit {
 
     let billingNumber: string | undefined;
     let customerName: string | undefined;
-    let status: string | undefined;
+    let status: string | string[] | undefined;
     let overdue: boolean | undefined;
 
     if (this.searchQuery) {
@@ -59,11 +61,13 @@ export class ComponentDashboardCobranzaList implements OnInit {
     }
 
     if (this.selectedStatus === 'OVERDUE') {
-      overdue = true;
+      status = 'OVERDUE';
     } else if (this.selectedStatus === 'PENDING') {
       status = 'PENDING';
     } else if (this.selectedStatus === 'PARTIALLY_PAID') {
       status = 'PARTIALLY_PAID';
+    } else if (this.selectedStatus === 'ALL_PENDING') {
+      status = ['PENDING', 'PARTIALLY_PAID', 'OVERDUE'];
     }
 
     this.billingService
@@ -80,13 +84,7 @@ export class ComponentDashboardCobranzaList implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.success && res.data) {
-            let content = res.data.content ?? [];
-            if (this.selectedStatus === 'ALL_PENDING') {
-              content = content.filter(
-                (b) => b.status !== 'PAID' && b.status !== 'CANCELLED',
-              );
-            }
-            this.billings = content;
+            this.billings = res.data.content ?? [];
             this.totalPages = res.data.totalPages ?? 0;
             this.totalElements = res.data.totalElements ?? 0;
             this.currentPage = page;
@@ -126,7 +124,8 @@ export class ComponentDashboardCobranzaList implements OnInit {
     const pendingAmount =
       Number(bill.totalAmount) - (Number(bill.amountPaid) || 0);
     const userId =
-      this.authService.getUser()?.userId || '3fa85f64-5717-4562-b3fc-2c963f66afa6';
+      this.authService.getUser()?.userId ||
+      '3fa85f64-5717-4562-b3fc-2c963f66afa6';
 
     Swal.fire({
       title: 'Registrar Pago',
@@ -259,56 +258,125 @@ export class ComponentDashboardCobranzaList implements OnInit {
   }
 
   suspendSupply(bill: BillingResponseDTO): void {
-    Swal.fire({
-      title: 'Suspender Suministro',
-      text: `¿Está seguro que desea suspender el suministro ${bill.supplyNumber} del cliente ${bill.customerName}?`,
-      input: 'text',
-      inputPlaceholder: 'Ingrese el motivo de la suspensión (obligatorio)...',
-      showCancelButton: true,
-      confirmButtonText: 'Confirmar Suspensión',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#dc2626',
-      preConfirm: (reason) => {
-        if (!reason || reason.trim() === '') {
-          Swal.showValidationMessage(
-            'Debe ingresar un motivo para proceder con la suspensión.',
-          );
-          return false;
-        }
-        return reason;
-      },
-    }).then((result) => {
-      if (result.isConfirmed && result.value) {
-        this.supplyService
-          .suspend(bill.supplyId, { reason: result.value })
-          .subscribe({
-            next: (res) => {
-              if (res.success) {
-                Swal.fire({
-                  title: 'Suministro Suspendido',
-                  text: `El suministro ${bill.supplyNumber} ha sido suspendido con éxito.`,
-                  icon: 'success',
-                  confirmButtonColor: '#2563eb',
-                });
-                this.loadData(this.currentPage);
-              } else {
-                Swal.fire({
-                  title: 'Error',
-                  text: res.message || 'No se pudo suspender el suministro.',
-                  icon: 'error',
-                  confirmButtonColor: '#2563eb',
-                });
+    this.supplyService.getById(bill.supplyId).subscribe({
+      next: (supplyRes) => {
+        if (supplyRes.success && supplyRes.data) {
+          const supply = supplyRes.data;
+          const isSuspended = supply.status === 'SUSPENDED';
+
+          if (isSuspended) {
+            Swal.fire({
+              title: 'Generar Orden de Corte',
+              text: `El suministro ${bill.supplyNumber} ya se encuentra suspendido. ¿Desea generar una orden de CORTE DEFINITIVO?`,
+              input: 'text',
+              inputPlaceholder: 'Ingrese el motivo del corte (obligatorio)...',
+              showCancelButton: true,
+              confirmButtonText: 'Generar Orden',
+              cancelButtonText: 'Cancelar',
+              confirmButtonColor: '#dc2626',
+              preConfirm: (reason) => {
+                if (!reason || reason.trim() === '') {
+                  Swal.showValidationMessage(
+                    'Debe ingresar un motivo para generar la orden de corte.',
+                  );
+                  return false;
+                }
+                return reason;
+              },
+            }).then((result) => {
+              if (result.isConfirmed && result.value) {
+                this.supplyWorkOrdersService
+                  .create({
+                    supplyId: bill.supplyId,
+                    type: 'CUT_OFF',
+                    reason: result.value,
+                    scheduledDate: new Date().toISOString().split('T')[0]
+                  })
+                  .subscribe({
+                    next: (res) => {
+                      if (res.success) {
+                        Swal.fire({
+                          title: 'Orden Generada',
+                          text: `La orden de corte para el suministro ${bill.supplyNumber} ha sido generada con éxito.`,
+                          icon: 'success',
+                          confirmButtonColor: '#2563eb',
+                        });
+                        this.loadData(this.currentPage);
+                      } else {
+                        Swal.fire({
+                          title: 'Error',
+                          text: res.message || 'No se pudo generar la orden de corte.',
+                          icon: 'error',
+                          confirmButtonColor: '#2563eb',
+                        });
+                      }
+                    },
+                    error: () => {
+                      Swal.fire({
+                        title: 'Error',
+                        text: 'Ocurrió un error al generar la orden de corte en el servidor.',
+                        icon: 'error',
+                        confirmButtonColor: '#2563eb',
+                      });
+                    },
+                  });
               }
-            },
-            error: () => {
-              Swal.fire({
-                title: 'Error',
-                text: 'Ocurrió un error al suspender el suministro en el servidor.',
-                icon: 'error',
-                confirmButtonColor: '#2563eb',
-              });
-            },
-          });
+            });
+          } else {
+            Swal.fire({
+              title: 'Suspender Suministro',
+              text: `¿Está seguro que desea suspender el suministro ${bill.supplyNumber} del cliente ${bill.customerName}?`,
+              input: 'text',
+              inputPlaceholder: 'Ingrese el motivo de la suspensión (obligatorio)...',
+              showCancelButton: true,
+              confirmButtonText: 'Suspender',
+              cancelButtonText: 'Cancelar',
+              confirmButtonColor: '#dc2626',
+              preConfirm: (reason) => {
+                if (!reason || reason.trim() === '') {
+                  Swal.showValidationMessage(
+                    'Debe ingresar un motivo para suspender el suministro.',
+                  );
+                  return false;
+                }
+                return reason;
+              },
+            }).then((result) => {
+              if (result.isConfirmed && result.value) {
+                this.supplyService
+                  .suspend(bill.supplyId, { reason: result.value })
+                  .subscribe({
+                    next: (res) => {
+                      if (res.success) {
+                        Swal.fire({
+                          title: 'Suministro Suspendido',
+                          text: `El suministro ${bill.supplyNumber} ha sido suspendido con éxito.`,
+                          icon: 'success',
+                          confirmButtonColor: '#2563eb',
+                        });
+                        this.loadData(this.currentPage);
+                      } else {
+                        Swal.fire({
+                          title: 'Error',
+                          text: res.message || 'No se pudo suspender el suministro.',
+                          icon: 'error',
+                          confirmButtonColor: '#2563eb',
+                        });
+                      }
+                    },
+                    error: () => {
+                      Swal.fire({
+                        title: 'Error',
+                        text: 'Ocurrió un error al suspender el suministro en el servidor.',
+                        icon: 'error',
+                        confirmButtonColor: '#2563eb',
+                      });
+                    },
+                  });
+              }
+            });
+          }
+        }
       }
     });
   }

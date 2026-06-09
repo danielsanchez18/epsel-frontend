@@ -7,45 +7,41 @@
   </div>
 
   <div class="flex flex-col gap-3">
-    
+
     <!-- Registrar Pago -->
-    <button *ngIf="billing && billing.status !== 'PAID' && billing.status !== 'CANCELLED'" 
-      (click)="onPay()"
+    <button *ngIf="billing && billing.status !== 'PAID' && billing.status !== 'CANCELLED'" (click)="onPay()"
       class="flex items-center justify-center gap-x-2 w-full px-4 py-2.5 rounded-lg border border-transparent bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors cursor-pointer">
       <svg lucideCreditCard class="size-4"></svg>
       Registrar Pago
     </button>
 
-    <!-- Imprimir Factura -->
-    <button (click)="onPrintBill()"
-      class="flex items-center justify-center gap-x-2 w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium text-sm transition-colors cursor-pointer">
-      <svg lucidePrinter class="size-4"></svg>
-      Imprimir Factura
-    </button>
-
     <!-- Generar Aviso de Cobranza -->
-    <button (click)="onGenerateAviso()"
+    <!-- <button (click)="onGenerateAviso()"
       class="flex items-center justify-center gap-x-2 w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium text-sm transition-colors cursor-pointer">
       <svg lucideFileDown class="size-4"></svg>
       Generar Aviso de Cobranza
-    </button>
+    </button> -->
 
     <!-- Si hay orden de suspensión activa -->
-    <div *ngIf="activeSuspensionOrder" class="w-full">
-      <div class="flex items-center gap-x-2 p-3 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg text-xs font-medium">
+    <div *ngIf="activeWorkOrder" class="w-full">
+      <div
+        class="flex items-center gap-x-2 p-3 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg text-xs font-medium">
         <svg class="size-4 animate-pulse text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span>Orden de suspensión activa en estado <strong>{{ translateStatus(activeSuspensionOrder.status) }}</strong>.</span>
+        <span>Orden de suspensión o corte activa en estado <strong>{{ translateStatus(activeWorkOrder.status)
+            }}</strong>.</span>
       </div>
     </div>
 
-    <!-- Crear orden de suspensión -->
-    <button *ngIf="!activeSuspensionOrder && billing && (billing.status === 'OVERDUE' || getDaysOverdue(billing.dueDate, billing.status) > 0)"
+    <!-- Crear orden de suspensión / corte -->
+    <button
+      *ngIf="!activeWorkOrder && billing && (billing.status === 'OVERDUE' || getDaysOverdue(billing.dueDate, billing.status) > 0)"
       (click)="onSuspendSupply()"
       class="flex items-center justify-center gap-x-2 w-full px-4 py-2.5 rounded-lg border border-transparent bg-red-600 hover:bg-red-700 text-white font-medium text-sm transition-colors cursor-pointer">
       <svg lucideScissors class="size-4"></svg>
-      Crear orden de suspensión
+      {{ supply?.status === 'SUSPENDED' ? 'Generar orden de corte' : 'Suspender suministro' }}
     </button>
 
   </div>

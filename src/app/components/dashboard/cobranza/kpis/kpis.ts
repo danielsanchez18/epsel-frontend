@@ -37,7 +37,7 @@ export class ComponentDashboardCobranzaKpis implements OnInit {
   }
 
   loadKPIs(): void {
-    this.billingService.search(0, 1000).subscribe({
+    this.billingService.search(0, 10000, undefined, undefined, ['PENDING', 'PARTIALLY_PAID', 'OVERDUE']).subscribe({
       next: (res) => {
         if (res.success && res.data && res.data.content) {
           this.calculate(res.data.content);

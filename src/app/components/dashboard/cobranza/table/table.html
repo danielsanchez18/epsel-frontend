@@ -70,20 +70,20 @@
         <!-- Acciones -->
         <td class="py-4 px-4 text-right">
           <div class="flex items-center justify-end gap-x-1.5">
-            <a [routerLink]="['/dashboard/cobranza', bill.id]" title="Ver detalle"
+            <a [routerLink]="['/dashboard/cobranza', bill.id]" title="Ver detalle" (click)="$event.stopPropagation()"
               class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
               <svg lucideEye class="size-4"></svg>
             </a>
-            <button (click)="onPay(bill)" title="Registrar pago"
+            <button (click)="onPay(bill); $event.stopPropagation()" title="Registrar pago"
               class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
               <svg lucideCreditCard class="size-4"></svg>
             </button>
-            <button (click)="onGenerateAviso(bill)" title="Generar aviso de cobranza"
+            <!-- <button (click)="onGenerateAviso(bill); $event.stopPropagation()" title="Generar aviso de cobranza"
               class="flex items-center gap-x-1 font-medium text-xs border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-lg p-2 transition-colors cursor-pointer">
               <svg lucidePrinter class="size-4"></svg>
-            </button>
+            </button> -->
             <button *ngIf="bill.status === 'OVERDUE' || getDaysOverdue(bill.dueDate, bill.status) > 0"
-              (click)="onSuspendSupply(bill)" title="Suspender suministro"
+              (click)="onSuspendSupply(bill); $event.stopPropagation()" title="Suspender suministro"
               class="flex items-center gap-x-1 font-medium text-xs border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg p-2 transition-colors cursor-pointer">
               <svg lucideScissors class="size-4"></svg>
             </button>

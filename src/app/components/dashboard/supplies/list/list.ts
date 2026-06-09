@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
@@ -7,6 +7,7 @@ import { ComponentSharedFilters } from '@components/shared/filters/filters';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
 import { ComponentSharedExport, ExportOptions } from '@components/shared/export/export';
 import { ComponentDashboardSuppliesEmpty } from '@components/dashboard/supplies/empty/empty';
+import { ComponentSharedImport } from '@components/shared/import/import';
 
 import { SupplyService } from '@core/services/supplies/supply.service';
 import {
@@ -29,10 +30,13 @@ import { ExportService } from '@core/services/utils/export.service';
     ComponentSharedPaginator,
     ComponentDashboardSuppliesTable,
     ComponentDashboardSuppliesEmpty,
+    ComponentSharedImport,
   ],
   templateUrl: './list.html',
 })
 export class ComponentDashboardSuppliesList implements OnInit {
+  @ViewChild('importComponent') importComponent!: ComponentSharedImport;
+
   private supplyService = inject(SupplyService);
   private zoneService = inject(ServiceZoneService);
   private exportService = inject(ExportService);
@@ -46,6 +50,8 @@ export class ComponentDashboardSuppliesList implements OnInit {
   pageSize = 10;
   searchQuery = '';
   isLoading = false;
+  isImportLoading = false;
+  importPreviewData: any = null;
 
   filterForm: FormGroup;
   activeFiltersCount = 0;
@@ -187,5 +193,59 @@ export class ComponentDashboardSuppliesList implements OnInit {
     } else {
       this.exportService.exportToExcel(exportData, filename);
     }
+  }
+
+  handleFileSelect(file: File) {
+    this.isImportLoading = true;
+    this.supplyService.previewImport(file).subscribe({
+      next: (res: any) => {
+        this.importPreviewData = res.data;
+        this.isImportLoading = false;
+      },
+      error: (err) => {
+        console.error('Error en previsualización de importación', err);
+        this.isImportLoading = false;
+      }
+    });
+  }
+
+  handleImportConfirm(validData: any[]) {
+    this.isImportLoading = true;
+    this.supplyService.createBulk(validData).subscribe({
+      next: () => {
+        this.isImportLoading = false;
+        this.importPreviewData = null;
+        if (this.importComponent) {
+          this.importComponent.closeModal();
+        }
+        this.loadSupplies(0);
+      },
+      error: (err) => {
+        console.error('Error importando registros', err);
+        this.isImportLoading = false;
+      }
+    });
+  }
+
+  handleDownloadTemplate() {
+    const data = [
+      {
+        'Documento Cliente (DNI/RUC)': '73324545',
+        'Código Catastral': 'CAT-001-A',
+        'Número de Medidor': 'MED-12345678',
+        'Referencia Interna': 'Piso 1, Tienda',
+        'Fecha de Instalación (YYYY-MM-DD)': '2020-01-15',
+        'Última Lectura': '1250'
+      },
+      {
+        'Documento Cliente (DNI/RUC)': '42112121',
+        'Código Catastral': 'CAT-002-B',
+        'Número de Medidor': 'MED-87654321',
+        'Referencia Interna': 'Dpto 201',
+        'Fecha de Instalación (YYYY-MM-DD)': '2021-03-20',
+        'Última Lectura': '450'
+      }
+    ];
+    this.exportService.exportToCsv(data, 'suministros_plantilla');
   }
 }

@@ -47,7 +47,7 @@ export class BillingService {
     size: number = 10,
     billingNumber?: string,
     customerName?: string,
-    status?: string,
+    status?: string | string[],
     startDate?: string,
     endDate?: string,
     overdue?: boolean,
@@ -58,7 +58,15 @@ export class BillingService {
 
     if (billingNumber) params = params.set('billingNumber', billingNumber);
     if (customerName) params = params.set('customerName', customerName);
-    if (status) params = params.set('status', status);
+    
+    if (status) {
+      if (Array.isArray(status)) {
+        status.forEach(s => params = params.append('status', s));
+      } else {
+        params = params.set('status', status);
+      }
+    }
+    
     if (startDate) params = params.set('startDate', startDate);
     if (endDate) params = params.set('endDate', endDate);
     if (overdue !== undefined) params = params.set('overdue', overdue.toString());
