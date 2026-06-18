@@ -1,11 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
 import { ComponentSharedSearchBox } from '@components/shared/search-box/search-box';
 import { ComponentSharedPaginator } from '@components/shared/paginator/paginator';
+import { ComponentSharedFilters } from '@components/shared/filters/filters';
 import { SupplyWorkOrdersService } from '@services/supply-work-orders/supply-work-orders.service';
 import {
   SupplyWorkOrderResponseDTO,
@@ -20,10 +21,12 @@ import { ComponentDashboardWorkOrdersEmpty } from '../empty/empty';
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     ComponentDashboardWorkOrdersTable,
     ComponentSharedSearchBox,
     ComponentSharedPaginator,
     ComponentDashboardWorkOrdersEmpty,
+    ComponentSharedFilters,
   ],
   templateUrl: './list.html',
 })
@@ -40,9 +43,14 @@ export class ComponentDashboardWorkOrdersList implements OnInit {
   searchQuery = ''; // bound to supplyId / supplyNumber search
   isLoading = false;
 
-  // Selected filters
-  selectedType: WorkOrderType | '' = '';
-  selectedStatus: WorkOrderStatus | '' = '';
+  filterForm = new FormGroup({
+    type: new FormControl<WorkOrderType | ''>(''),
+    status: new FormControl<WorkOrderStatus | ''>(''),
+    startDate: new FormControl(''),
+    endDate: new FormControl(''),
+  });
+
+  activeFiltersCount = 0;
 
   types: { value: WorkOrderType; label: string }[] = [
     { value: 'INSTALLATION', label: 'Instalación' },
@@ -66,10 +74,40 @@ export class ComponentDashboardWorkOrdersList implements OnInit {
     this.loadWorkOrders();
   }
 
+  applyFilters(): void {
+    this.countActiveFilters();
+    this.currentPage = 0;
+    this.loadWorkOrders(0);
+  }
+
+  clearFilters(): void {
+    this.filterForm.reset({
+      type: '',
+      status: '',
+      startDate: '',
+      endDate: '',
+    });
+    this.applyFilters();
+  }
+
+  private countActiveFilters(): void {
+    let count = 0;
+    const values = this.filterForm.value;
+    if (values.type) count++;
+    if (values.status) count++;
+    if (values.startDate) count++;
+    if (values.endDate) count++;
+    this.activeFiltersCount = count;
+  }
+
   loadWorkOrders(page: number = 0): void {
     this.isLoading = true;
-    const typeFilter = this.selectedType ? this.selectedType : undefined;
-    const statusFilter = this.selectedStatus ? this.selectedStatus : undefined;
+    const formValues = this.filterForm.value;
+    
+    const typeFilter = formValues.type ? formValues.type as WorkOrderType : undefined;
+    const statusFilter = formValues.status ? formValues.status as WorkOrderStatus : undefined;
+    const startDateFilter = formValues.startDate ? formValues.startDate : undefined;
+    const endDateFilter = formValues.endDate ? formValues.endDate : undefined;
     const searchFilter = this.searchQuery.trim()
       ? this.searchQuery.trim()
       : undefined;
@@ -82,6 +120,8 @@ export class ComponentDashboardWorkOrdersList implements OnInit {
         searchFilter,
         typeFilter,
         statusFilter,
+        startDateFilter,
+        endDateFilter,
       )
       .subscribe({
         next: (res: any) => {
@@ -107,11 +147,6 @@ export class ComponentDashboardWorkOrdersList implements OnInit {
 
   onSearchQuery(query: string): void {
     this.searchQuery = query;
-    this.currentPage = 0;
-    this.loadWorkOrders(0);
-  }
-
-  onFilterChange(): void {
     this.currentPage = 0;
     this.loadWorkOrders(0);
   }

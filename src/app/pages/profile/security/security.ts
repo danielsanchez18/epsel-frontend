@@ -65,4 +65,70 @@ export class PageProfileSecurity implements OnInit {
       });
     }
   }
+  async changePassword(): Promise<void> {
+    if (!this.user) return;
+
+    const result = await Swal.fire({
+      title: 'Cambiar contraseña',
+      html: `
+        <input type="password" id="currentPassword" class="swal2-input" placeholder="Contraseña actual" style="width: 80%; max-width: 300px; display: flex; margin: 1em auto;">
+        <input type="password" id="newPassword" class="swal2-input" placeholder="Nueva contraseña" style="width: 80%; max-width: 300px; display: flex; margin: 1em auto;">
+        <input type="password" id="confirmPassword" class="swal2-input" placeholder="Confirmar contraseña" style="width: 80%; max-width: 300px; display: flex; margin: 1em auto;">
+      `,
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Actualizar',
+      cancelButtonText: 'Cancelar',
+      preConfirm: () => {
+        const currentPassword = (
+          document.getElementById('currentPassword') as HTMLInputElement
+        ).value;
+        const newPassword = (
+          document.getElementById('newPassword') as HTMLInputElement
+        ).value;
+        const confirmPassword = (
+          document.getElementById('confirmPassword') as HTMLInputElement
+        ).value;
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+          Swal.showValidationMessage('Todos los campos son obligatorios');
+          return false;
+        }
+
+        if (newPassword !== confirmPassword) {
+          Swal.showValidationMessage('Las contraseñas no coinciden');
+          return false;
+        }
+
+        const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        if (!passwordRegex.test(newPassword)) {
+          Swal.showValidationMessage(
+            'La nueva contraseña debe tener al menos 8 caracteres, incluir letras, números y caracteres especiales',
+          );
+          return false;
+        }
+
+        return { currentPassword, newPassword };
+      },
+    });
+
+    if (result.isConfirmed) {
+      this.userService.changePassword(result.value!).subscribe({
+        next: () => {
+          Swal.fire(
+            'Contraseña actualizada',
+            'Tu contraseña ha sido cambiada exitosamente.',
+            'success',
+          );
+        },
+        error: (err) => {
+          Swal.fire(
+            'Error',
+            err.error?.message || 'No se pudo cambiar la contraseña',
+            'error',
+          );
+        },
+      });
+    }
+  }
 }

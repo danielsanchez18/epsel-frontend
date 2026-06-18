@@ -11,6 +11,7 @@ import {
   PaymentMethod,
   PaymentStatus,
   CancelPaymentDTO,
+  PaymentKpiDTO,
 } from '@interfaces/payments/payment.interface';
 
 @Injectable({
@@ -22,6 +23,20 @@ export class PaymentService {
 
   create(dto: CreatePaymentDTO): Observable<ApiResponse<PaymentResponseDTO>> {
     return this.http.post<ApiResponse<PaymentResponseDTO>>(this.baseUrl, dto);
+  }
+
+  getKpis(
+    startDate?: string,
+    endDate?: string,
+  ): Observable<ApiResponse<PaymentKpiDTO>> {
+    let params = new HttpParams();
+
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+
+    return this.http.get<ApiResponse<PaymentKpiDTO>>(`${this.baseUrl}/kpis`, {
+      params,
+    });
   }
 
   getById(id: string): Observable<ApiResponse<PaymentResponseDTO>> {

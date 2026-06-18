@@ -1,3 +1,13 @@
+<div class="flex justify-end mb-4">
+  <select
+    [(ngModel)]="selectedPeriod"
+    (change)="onPeriodChange()"
+    class="text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 cursor-pointer"
+  >
+    <option *ngFor="let p of periods" [value]="p.value">{{ p.label }}</option>
+  </select>
+</div>
+
 <ng-container *ngIf="isLoading; else kpisTemplate">
   <section class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
     <div *ngFor="let item of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"

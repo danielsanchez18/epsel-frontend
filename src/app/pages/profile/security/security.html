@@ -19,15 +19,14 @@
         <p class="text-xs text-gray-500 mt-1">El rol asignado determina tus permisos y accesos dentro del sistema.</p>
     </div>
 
-    <!-- Cambiar contraseña (sin funcionalidad aún) -->
+    <!-- Cambiar contraseña -->
     <div class="py-5 flex items-center justify-between gap-x-2">
         <div class="flex flex-col gap-y-1">
-            <p class="text-sm font-medium">Cambiar contraseña</p>
-            <p class="text-sm text-gray-700">Se enviará un correo electrónico con las instrucciones para restablecer tu
-                contraseña.</p>
+            <p class="text-sm font-medium">Contraseña</p>
+            <p class="text-sm text-gray-700">************</p>
         </div>
-        <button disabled
-            class="text-sm font-medium underline underline-offset-2 text-gray-400 cursor-not-allowed">Cambiar</button>
+        <button (click)="changePassword()"
+            class="text-sm font-medium underline underline-offset-2 text-blue-600 hover:text-blue-700 cursor-pointer">Cambiar</button>
     </div>
 
     <!-- Suspender cuenta -->

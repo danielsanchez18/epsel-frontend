@@ -11,34 +11,48 @@
     />
 
     <!-- Filters Section -->
-    <div class="flex flex-wrap items-center gap-2">
-      <!-- Tipo Filter -->
-      <div class="flex items-center gap-x-1.5">
-        <label for="typeFilter" class="text-xs font-medium text-gray-500">Tipo:</label>
-        <select
-          id="typeFilter"
-          [(ngModel)]="selectedType"
-          (change)="onFilterChange()"
-          class="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 focus:border-blue-500 focus:outline-none transition-colors"
-        >
-          <option value="">Todos los tipos</option>
-          <option *ngFor="let t of types" [value]="t.value">{{ t.label }}</option>
-        </select>
-      </div>
+    <div class="flex items-center gap-x-1">
+      <component-shared-filters [activeFiltersCount]="activeFiltersCount" offcanvasId="work-orders-filter-offcanvas">
+        <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="flex flex-col gap-y-5">
+          <!-- Tipo -->
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-gray-800">Tipo</label>
+            <select formControlName="type" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700">
+              <option value="">Todos los tipos</option>
+              <option *ngFor="let t of types" [value]="t.value">{{ t.label }}</option>
+            </select>
+          </div>
 
-      <!-- Estado Filter -->
-      <div class="flex items-center gap-x-1.5">
-        <label for="statusFilter" class="text-xs font-medium text-gray-500">Estado:</label>
-        <select
-          id="statusFilter"
-          [(ngModel)]="selectedStatus"
-          (change)="onFilterChange()"
-          class="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 focus:border-blue-500 focus:outline-none transition-colors"
-        >
-          <option value="">Todos los estados</option>
-          <option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</option>
-        </select>
-      </div>
+          <!-- Estado -->
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-gray-800">Estado</label>
+            <select formControlName="status" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700">
+              <option value="">Todos los estados</option>
+              <option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</option>
+            </select>
+          </div>
+
+          <!-- Fechas -->
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-gray-800">Fecha Creación Desde</label>
+            <input type="datetime-local" formControlName="startDate" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-gray-800">Fecha Creación Hasta</label>
+            <input type="datetime-local" formControlName="endDate" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="pt-4 border-t border-gray-100 flex items-center gap-x-3">
+            <button type="button" (click)="clearFilters()" class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+              Limpiar
+            </button>
+            <button type="submit" data-hs-overlay="#work-orders-filter-offcanvas" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+              Aplicar
+            </button>
+          </div>
+        </form>
+      </component-shared-filters>
     </div>
 
   </div>
@@ -59,8 +73,8 @@
   <!-- Empty State -->
   <component-dashboard-work-orders-empty
     *ngIf="workOrders.length === 0 && !isLoading"
-    [title]="searchQuery || selectedType || selectedStatus ? 'No se encontraron resultados' : 'No hay órdenes de trabajo registradas'"
-    [message]="searchQuery || selectedType || selectedStatus ? 'Intenta ajustando los términos de búsqueda o filtros aplicados.' : 'Las órdenes de trabajo aparecerán aquí una vez que sean registradas en el sistema.'"
+    [title]="searchQuery || filterForm.value.type || filterForm.value.status || filterForm.value.startDate || filterForm.value.endDate ? 'No se encontraron resultados' : 'No hay órdenes de trabajo registradas'"
+    [message]="searchQuery || filterForm.value.type || filterForm.value.status || filterForm.value.startDate || filterForm.value.endDate ? 'Intenta ajustando los términos de búsqueda o filtros aplicados.' : 'Las órdenes de trabajo aparecerán aquí una vez que sean registradas en el sistema.'"
   />
 
   <!-- Loader overlay when fetching -->

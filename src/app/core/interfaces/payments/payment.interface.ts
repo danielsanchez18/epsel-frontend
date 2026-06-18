@@ -34,3 +34,11 @@ export interface PaymentResponseDTO {
 export interface CancelPaymentDTO {
   reason: string;
 }
+
+export interface PaymentKpiDTO {
+  totalToday: number;
+  totalPeriod: number;
+  totalCash: number;
+  totalYape: number;
+  totalTransfer: number;
+}

@@ -18,73 +18,54 @@
 
       <!-- Correo electrónico -->
       <div class="flex flex-col gap-y-2">
-        <label
-          for="email"
-          class="block text-sm font-medium"
-        >
+        <label for="email" class="block text-sm font-medium">
           Correo electrónico
         </label>
         <div class="relative">
-          <input
-            type="email"
-            id="email"
-            name="email"
-            formControlName="email"
-            placeholder="Ingresa tu correo electrónico"
-            required
+          <input type="email" id="email" name="email" formControlName="email"
+            placeholder="Ingresa tu correo electrónico" required
             class="w-full px-4 pl-12 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <svg lucideAtSign class="absolute text-gray-500 size-4 top-1/2 -translate-y-1/2 left-4" />
+          <svg lucideAtSign class="absolute text-gray-500 size-4 top-1/2 -translate-y-1/2 left-4" />
         </div>
         @if (form.controls.email.touched && form.controls.email.invalid) {
-          <p class="text-xs text-red-600">Ingresa un correo electronico valido.</p>
+        <p class="text-xs text-red-600">Ingresa un correo electronico valido.</p>
         }
       </div>
 
       <!-- Contraseña -->
       <div class="flex flex-col gap-y-2">
-        <label
-          for="password"
-          class="block text-sm font-medium"
-        >
+        <label for="password" class="block text-sm font-medium">
           Contraseña
         </label>
         <div class="relative">
-          <input
-            type="password"
-            id="password"
-            name="password"
-            formControlName="password"
-            placeholder="Ingresa tu contraseña"
-            required
+          <input type="password" id="password" name="password" formControlName="password"
+            placeholder="Ingresa tu contraseña" required
             class="w-full px-4 pl-12 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <svg lucideLock class="absolute text-gray-500 size-4 top-1/2 -translate-y-1/2 left-4" />
+          <svg lucideLock class="absolute text-gray-500 size-4 top-1/2 -translate-y-1/2 left-4" />
         </div>
         @if (form.controls.password.touched && form.controls.password.invalid) {
-          <p class="text-xs text-red-600">La contraseña debe tener al menos 6 caracteres.</p>
+        <p class="text-xs text-red-600">La contraseña debe tener al menos 6 caracteres.</p>
         }
       </div>
 
       <!-- Olvidé mi contraseña -->
-      <div class="text-right">
+      <!-- <div class="text-right">
         <a
           href="/recuperar-clave"
           class="text-sm text-blue-600 font-semibold hover:underline"
         >
           ¿Olvidaste tu contraseña?
         </a>
-      </div>
+      </div> -->
 
       @if (errorMessage) {
-        <p class="text-sm text-red-600 text-center p-2 rounded-lg w-full bg-red-100">{{ errorMessage }}</p>
+      <p class="text-sm text-red-600 text-center p-2 rounded-lg w-full bg-red-100">{{ errorMessage }}</p>
       }
 
 
       <!-- Botón de inicio de sesión -->
-      <button
-        type="submit"
-        [disabled]="isSubmitting"
-        class="w-full py-2.5 text-center bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
+      <button type="submit" [disabled]="isSubmitting"
+        class="w-full py-2.5 text-center bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
         {{ isSubmitting ? 'Ingresando...' : 'Iniciar sesión' }}
       </button>
 

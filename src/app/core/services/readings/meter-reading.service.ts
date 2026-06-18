@@ -87,7 +87,11 @@ export class MeterReadingService {
     );
   }
 
-  getKpis(): Observable<ApiResponse<any>> {
-    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/kpis`);
+  getKpis(startDate?: string, endDate?: string): Observable<ApiResponse<any>> {
+    let params = new HttpParams();
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    
+    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/kpis`, { params });
   }
 }

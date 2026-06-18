@@ -22,6 +22,19 @@
   </button>
 </div>
 } @else {
+<div class="flex items-center justify-between mb-4">
+  <h2 class="text-base font-semibold text-gray-800">Métricas de Predios</h2>
+  <div class="flex items-center gap-x-2">
+    <label class="text-sm text-gray-600">Periodo:</label>
+    <select [value]="selectedPeriod" (change)="onPeriodChange($event)"
+      class="bg-white border border-gray-200 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 outline-none">
+      <option *ngFor="let period of periods" [value]="period.startDate + '|' + period.endDate">
+        {{ period.label }}
+      </option>
+    </select>
+  </div>
+</div>
+
 <section class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
   <article class="w-full bg-white py-5 space-y-2 px-5 rounded-xl border border-gray-200">

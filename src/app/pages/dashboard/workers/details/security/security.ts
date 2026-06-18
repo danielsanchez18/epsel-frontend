@@ -150,4 +150,28 @@ export class PageDashboardWorkersDetailsSecurity implements OnInit, DoCheck {
     }
   }
 
+  async resetPassword(): Promise<void> {
+    if (!this.isEditable) {
+      void Swal.fire('No editable', 'No se pueden editar datos de un trabajador inactivo o eliminado.', 'info');
+      return;
+    }
+    const result = await Swal.fire({
+      title: '¿Reestablecer contraseña?',
+      text: 'Se reestablecerá la contraseña usando el número de documento (DNI) del usuario.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, reestablecer',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
+      this.userService.resetPassword(this.parent.user!.id!).subscribe({
+        next: () => {
+          void Swal.fire('Contraseña reestablecida', 'La contraseña ha sido cambiada al DNI del usuario.', 'success');
+        },
+        error: (err) => void Swal.fire('Error', err.error?.message || 'No se pudo reestablecer la contraseña', 'error')
+      });
+    }
+  }
+
 }

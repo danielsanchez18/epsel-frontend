@@ -51,7 +51,9 @@ export class ComponentDashboardApplicationsList implements OnInit {
   constructor() {
     this.filterForm = this.fb.group({
       status: [''],
-      zoneName: ['']
+      zoneName: [''],
+      startDate: [''],
+      endDate: ['']
     });
   }
 
@@ -64,9 +66,11 @@ export class ComponentDashboardApplicationsList implements OnInit {
 
     const statusFilter = this.filterForm.value.status || undefined;
     const zoneNameFilter = this.filterForm.value.zoneName || undefined;
+    const startDate = this.filterForm.value.startDate || undefined;
+    const endDate = this.filterForm.value.endDate || undefined;
 
     this.requestService
-      .findAll(page, this.pageSize, this.sort, this.searchQuery || undefined, statusFilter as InstallationRequestStatus, zoneNameFilter)
+      .findAll(page, this.pageSize, this.sort, this.searchQuery || undefined, statusFilter as InstallationRequestStatus, zoneNameFilter, startDate, endDate)
       .subscribe({
         next: (res: any) => {
           this.requests = res.data.content;
@@ -108,7 +112,9 @@ export class ComponentDashboardApplicationsList implements OnInit {
   clearFilters(): void {
     this.filterForm.reset({
       status: '',
-      zoneName: ''
+      zoneName: '',
+      startDate: '',
+      endDate: ''
     });
     this.activeFiltersCount = 0;
     this.currentPage = 0;
@@ -124,8 +130,10 @@ export class ComponentDashboardApplicationsList implements OnInit {
       // Export all records
       const statusFilter = this.filterForm.value.status || undefined;
       const zoneNameFilter = this.filterForm.value.zoneName || undefined;
+      const startDate = this.filterForm.value.startDate || undefined;
+      const endDate = this.filterForm.value.endDate || undefined;
       
-      this.requestService.findAll(0, 10000, this.sort, this.searchQuery || undefined, statusFilter as InstallationRequestStatus, zoneNameFilter)
+      this.requestService.findAll(0, 10000, this.sort, this.searchQuery || undefined, statusFilter as InstallationRequestStatus, zoneNameFilter, startDate, endDate)
         .subscribe({
           next: (res: any) => {
             this.doExport(res.data.content, options.format, filename);

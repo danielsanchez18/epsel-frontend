@@ -25,3 +25,11 @@ export interface BillingResponseDTO {
   status: BillingStatus;
   printed: boolean;
 }
+
+export interface BillingKpiDTO {
+  pendingCount: number;
+  overdueCount: number;
+  paidCount: number;
+  totalCollected: number;
+  totalPending: number;
+}

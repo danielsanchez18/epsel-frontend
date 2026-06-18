@@ -2,23 +2,20 @@
 
   <div class="flex items-center justify-between gap-2">
 
-    <component-shared-search-box
-      class="w-full md:max-w-md"
-      placeholder="Buscar lecturas por código de suministro..."
-      [searchQuery]="searchQuery"
-      (searchQueryChange)="onSearchQuery($event)"
-    />
+    <component-shared-search-box class="w-full md:max-w-md" placeholder="Buscar lecturas por código de suministro..."
+      [searchQuery]="searchQuery" (searchQueryChange)="onSearchQuery($event)" />
 
     <div class="flex items-center gap-x-1">
       <component-shared-export (onExport)="handleExport($event)" />
       <component-shared-filters [activeFiltersCount]="activeFiltersCount" offcanvasId="readings-filter-offcanvas">
-        
+
         <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="flex flex-col gap-y-5">
-          
+
           <!-- Estado -->
           <div class="space-y-2">
             <label class="text-sm font-medium text-gray-800">Estado</label>
-            <select formControlName="status" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700">
+            <select formControlName="status"
+              class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700">
               <option value="">Todos los estados</option>
               <option value="PENDING">Pendiente</option>
               <option value="READ">Leída</option>
@@ -30,7 +27,8 @@
           <!-- Zona de Servicio -->
           <div class="space-y-2">
             <label class="text-sm font-medium text-gray-800">Zona</label>
-            <select formControlName="zoneId" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700">
+            <select formControlName="zoneId"
+              class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700">
               <option value="">Todas las zonas</option>
               <option *ngFor="let zone of zones" [value]="zone.id">{{ zone.name }}</option>
             </select>
@@ -39,12 +37,14 @@
           <!-- Rango de Fechas -->
           <div class="space-y-2">
             <label class="text-sm font-medium text-gray-800">Fecha de Lectura (Desde)</label>
-            <input type="date" formControlName="startDate" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
+            <input type="datetime-local" formControlName="startDate"
+              class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
           </div>
 
           <div class="space-y-2">
             <label class="text-sm font-medium text-gray-800">Fecha de Lectura (Hasta)</label>
-            <input type="date" formControlName="endDate" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
+            <input type="datetime-local" formControlName="endDate"
+              class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
           </div>
 
           <!-- Botones de Acción -->
@@ -67,22 +67,18 @@
   </div>
 
   <div *ngIf="isLoading" class="flex justify-center py-10">
-    <div class="animate-spin inline-block size-6 border-2 border-current border-t-transparent text-blue-600 rounded-full" role="status" aria-label="loading"></div>
+    <div
+      class="animate-spin inline-block size-6 border-2 border-current border-t-transparent text-blue-600 rounded-full"
+      role="status" aria-label="loading"></div>
   </div>
 
-  <component-dashboard-readings-table
-    *ngIf="!isLoading && readings.length > 0"
-    [items]="readings"
-  />
+  <component-dashboard-readings-table *ngIf="!isLoading && readings.length > 0" [items]="readings" />
 
-  <component-dashboard-readings-empty *ngIf="!isLoading && readings.length === 0" />
+  <component-dashboard-readings-empty *ngIf="!isLoading && readings.length === 0"
+    [title]="searchQuery || activeFiltersCount > 0 ? 'No se encontraron resultados' : 'No hay lecturas registradas'"
+    [message]="searchQuery || activeFiltersCount > 0 ? 'Intenta ajustando los términos de búsqueda o los filtros aplicados' : 'Registra una nueva lectura de medidor para comenzar el proceso de facturación'" />
 
-  <component-shared-paginator
-    *ngIf="totalPages > 1"
-    [page]="currentPage"
-    [totalPages]="totalPages"
-    [totalElements]="totalElements"
-    (pageChange)="onPageChange($event)"
-  />
+  <component-shared-paginator *ngIf="totalPages > 1" [page]="currentPage" [totalPages]="totalPages"
+    [totalElements]="totalElements" (pageChange)="onPageChange($event)" />
 
 </section>

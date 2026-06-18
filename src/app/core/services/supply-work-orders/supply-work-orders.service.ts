@@ -45,6 +45,8 @@ export class SupplyWorkOrdersService {
     supplyId?: string,
     type?: WorkOrderType,
     status?: WorkOrderStatus,
+    startDate?: string,
+    endDate?: string,
   ): Observable<
     ApiResponse<PaginatedResponse<SupplyWorkOrderResponseDTO>['data']>
   > {
@@ -56,6 +58,8 @@ export class SupplyWorkOrdersService {
     if (supplyId) params = params.set('supplyId', supplyId);
     if (type) params = params.set('type', type);
     if (status) params = params.set('status', status);
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
 
     return this.http.get<
       ApiResponse<PaginatedResponse<SupplyWorkOrderResponseDTO>['data']>

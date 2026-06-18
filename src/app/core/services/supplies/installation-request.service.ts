@@ -63,6 +63,8 @@ export class InstallationRequestService {
     search?: string,
     status?: InstallationRequestStatus,
     zoneName?: string,
+    startDate?: string,
+    endDate?: string,
   ): Observable<ApiResponse<PaginatedResponse<InstallationRequestResponse>>> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -72,6 +74,8 @@ export class InstallationRequestService {
     if (search) params = params.set('search', search);
     if (status) params = params.set('status', status);
     if (zoneName) params = params.set('zoneName', zoneName);
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
 
     return this.http.get<
       ApiResponse<PaginatedResponse<InstallationRequestResponse>>
@@ -97,7 +101,11 @@ export class InstallationRequestService {
     return this.http.post<ApiResponse<void>>(`${this.baseUrl}/bulk`, dtos);
   }
 
-  getKpis(): Observable<ApiResponse<any>> {
-    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/kpis`);
+  getKpis(startDate?: string, endDate?: string): Observable<ApiResponse<any>> {
+    let params = new HttpParams();
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    
+    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/kpis`, { params });
   }
 }

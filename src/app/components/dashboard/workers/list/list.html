@@ -2,31 +2,23 @@
 
   <div class="flex items-center justify-between gap-2">
 
-    <component-shared-search-box
-      class="w-full md:max-w-md"
-      placeholder="Buscar personal por nombre o DNI"
-      [searchQuery]="searchQuery"
-      (searchQueryChange)="onSearchQuery($event)"
-    />
+    <component-shared-search-box class="w-full md:max-w-md" placeholder="Buscar personal por nombre o DNI"
+      [searchQuery]="searchQuery" (searchQueryChange)="onSearchQuery($event)" />
 
     <div class="flex items-center gap-x-1">
-      <component-shared-import 
-        #importComponent
-        [isLoading]="isImportLoading"
-        [previewData]="importPreviewData"
-        (onFileSelect)="handleFileSelect($event)"
-        (onConfirm)="handleImportConfirm($event)"
-        (onDownloadTemplate)="handleDownloadTemplate()"
-      />
+      <component-shared-import #importComponent [isLoading]="isImportLoading" [previewData]="importPreviewData"
+        (onFileSelect)="handleFileSelect($event)" (onConfirm)="handleImportConfirm($event)"
+        (onDownloadTemplate)="handleDownloadTemplate()" />
       <component-shared-export (onExport)="handleExport($event)" />
       <component-shared-filters [activeFiltersCount]="activeFiltersCount" offcanvasId="workers-filter-offcanvas">
-        
+
         <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="flex flex-col gap-y-5">
-          
+
           <!-- Estado -->
           <div class="space-y-2">
             <label class="text-sm font-medium text-gray-800">Estado</label>
-            <select formControlName="status" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700">
+            <select formControlName="status"
+              class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700">
               <option value="">Todos los estados</option>
               <option value="ACTIVE">Activo</option>
               <option value="INACTIVE">Inactivo</option>
@@ -37,7 +29,8 @@
           <!-- Rol -->
           <div class="space-y-2">
             <label class="text-sm font-medium text-gray-800">Rol</label>
-            <select formControlName="role" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700">
+            <select formControlName="role"
+              class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700">
               <option value="">Todos los roles</option>
               <option value="ADMIN">Administrador</option>
               <option value="LECTURER">Lector</option>
@@ -51,11 +44,13 @@
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="text-xs text-gray-500 mb-1 block">Desde</label>
-                <input type="date" formControlName="startDate" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
+                <input type="datetime-local" formControlName="startDate"
+                  class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
               </div>
               <div>
                 <label class="text-xs text-gray-500 mb-1 block">Hasta</label>
-                <input type="date" formControlName="endDate" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
+                <input type="datetime-local" formControlName="endDate"
+                  class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
               </div>
             </div>
           </div>
@@ -79,24 +74,13 @@
 
   </div>
 
-  <component-dashboard-workers-table
-    *ngIf="users.length > 0"
-    [users]="users"
-    [isLoading]="isLoading"
-  />
+  <component-dashboard-workers-table *ngIf="users.length > 0" [users]="users" [isLoading]="isLoading" />
 
-  <component-dashboard-workers-empty
-    *ngIf="users.length === 0"
+  <component-dashboard-workers-empty *ngIf="users.length === 0"
     [title]="searchQuery ? 'No se encontraron resultados' : 'No tienes personal registrado'"
-    [message]="searchQuery ? 'Intenta ajustando los términos de búsqueda' : 'Registra un nuevo personal para empezar a gestionar tu sistema'"
-  />
+    [message]="searchQuery ? 'Intenta ajustando los términos de búsqueda' : 'Registra un nuevo personal para empezar a gestionar tu sistema'" />
 
-  <component-shared-paginator
-    *ngIf="totalPages > 1"
-    [page]="currentPage"
-    [totalPages]="totalPages"
-    [totalElements]="totalElements"
-    (pageChange)="onPageChange($event)"
-  />
+  <component-shared-paginator *ngIf="totalPages > 1" [page]="currentPage" [totalPages]="totalPages"
+    [totalElements]="totalElements" (pageChange)="onPageChange($event)" />
 
 </section>

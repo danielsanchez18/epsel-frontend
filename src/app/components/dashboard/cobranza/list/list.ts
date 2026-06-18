@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
 import { BillingService } from '@core/services/billings/billing.service';
@@ -12,18 +12,25 @@ import { ComponentSharedPaginator } from '@components/shared/paginator/paginator
 import { ComponentDashboardCobranzaTable } from '../table/table';
 import { ComponentDashboardCobranzaEmpty } from '../empty/empty';
 
+import { ComponentSharedFilters } from '@components/shared/filters/filters';
+import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
+
 @Component({
   selector: 'component-dashboard-cobranza-list',
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     ComponentSharedSearchBox,
     ComponentSharedPaginator,
+    ComponentSharedFilters,
     ComponentDashboardCobranzaTable,
     ComponentDashboardCobranzaEmpty,
   ],
   templateUrl: './list.html',
 })
 export class ComponentDashboardCobranzaList implements OnInit {
+  @Output() filtersChanged = new EventEmitter<{startDate?: string, endDate?: string}>();
+
   private billingService = inject(BillingService);
   private supplyService = inject(SupplyService);
   private paymentService = inject(PaymentService);
@@ -40,8 +47,34 @@ export class ComponentDashboardCobranzaList implements OnInit {
   totalPages = 0;
   totalElements = 0;
 
+  filterForm = new FormGroup({
+    status: new FormControl('ALL_PENDING'),
+    startDate: new FormControl(''),
+    endDate: new FormControl(''),
+  });
+  activeFiltersCount = 0;
+
   ngOnInit(): void {
+    this.updateActiveFiltersCount();
     this.loadData();
+  }
+
+  updateActiveFiltersCount(): void {
+    let count = 0;
+    const values = this.filterForm.value;
+    if (values.status && values.status !== 'ALL_PENDING') count++;
+    if (values.startDate) count++;
+    if (values.endDate) count++;
+    this.activeFiltersCount = count;
+  }
+
+  applyFilters(): void {
+    this.updateActiveFiltersCount();
+    this.filtersChanged.emit({
+      startDate: this.filterForm.value.startDate || undefined,
+      endDate: this.filterForm.value.endDate || undefined,
+    });
+    this.loadData(0);
   }
 
   loadData(page: number = 0): void {
@@ -60,15 +93,21 @@ export class ComponentDashboardCobranzaList implements OnInit {
       }
     }
 
-    if (this.selectedStatus === 'OVERDUE') {
+    const formValues = this.filterForm.value;
+    let selectedStatus = formValues.status || 'ALL_PENDING';
+
+    if (selectedStatus === 'OVERDUE') {
       status = 'OVERDUE';
-    } else if (this.selectedStatus === 'PENDING') {
+    } else if (selectedStatus === 'PENDING') {
       status = 'PENDING';
-    } else if (this.selectedStatus === 'PARTIALLY_PAID') {
+    } else if (selectedStatus === 'PARTIALLY_PAID') {
       status = 'PARTIALLY_PAID';
-    } else if (this.selectedStatus === 'ALL_PENDING') {
+    } else if (selectedStatus === 'ALL_PENDING') {
       status = ['PENDING', 'PARTIALLY_PAID', 'OVERDUE'];
     }
+
+    let startDate = formValues.startDate || undefined;
+    let endDate = formValues.endDate || undefined;
 
     this.billingService
       .search(
@@ -77,8 +116,8 @@ export class ComponentDashboardCobranzaList implements OnInit {
         billingNumber,
         customerName,
         status,
-        undefined,
-        undefined,
+        startDate,
+        endDate,
         overdue,
       )
       .subscribe({
@@ -108,11 +147,6 @@ export class ComponentDashboardCobranzaList implements OnInit {
 
   onSearchQuery(query: string): void {
     this.searchQuery = query;
-    this.loadData(0);
-  }
-
-  onStatusFilter(status: string): void {
-    this.selectedStatus = status;
     this.loadData(0);
   }
 

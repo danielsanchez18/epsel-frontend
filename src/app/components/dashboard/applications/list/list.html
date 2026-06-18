@@ -41,6 +41,17 @@
             <input type="text" formControlName="zoneName" placeholder="Ej. Zona Norte" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
           </div>
 
+          <!-- Rango de Fechas -->
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-gray-800">Fecha de Solicitud (Desde)</label>
+            <input type="datetime-local" formControlName="startDate" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-gray-800">Fecha de Solicitud (Hasta)</label>
+            <input type="datetime-local" formControlName="endDate" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
+          </div>
+
           <!-- Botones de Acción -->
           <div class="flex items-center gap-x-2 pt-4 border-t border-gray-100 mt-2">
             <button type="button" (click)="clearFilters()" data-hs-overlay="#applications-filter-offcanvas"
@@ -67,8 +78,8 @@
 
   <component-dashboard-applications-empty
     *ngIf="requests.length === 0 && !isLoading"
-    [title]="searchQuery ? 'No se encontraron resultados' : 'No tienes solicitudes registradas'"
-    [message]="searchQuery ? 'Intenta ajustando los términos de búsqueda' : 'Registra una nueva solicitud para empezar a gestionar tu sistema'"
+    [title]="searchQuery || activeFiltersCount > 0 ? 'No se encontraron resultados' : 'No tienes solicitudes registradas'"
+    [message]="searchQuery || activeFiltersCount > 0 ? 'Intenta ajustando los términos de búsqueda o los filtros aplicados' : 'Registra una nueva solicitud de instalación para empezar a gestionar tu sistema'"
   />
 
   <component-shared-paginator

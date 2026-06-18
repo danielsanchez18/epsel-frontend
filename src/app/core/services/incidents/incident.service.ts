@@ -11,7 +11,8 @@ import {
   ResolveIncidentDTO,
   IncidentStatus,
   IncidentPriority,
-  IncidentType
+  IncidentType,
+  IncidentKpiDTO
 } from '@interfaces/incidents/incident.interface';
 
 @Injectable({
@@ -20,6 +21,20 @@ import {
 export class IncidentService {
   private http = inject(HttpClient);
   private baseUrl = `${API_URL}/incidents`;
+
+  getKpis(
+    startDate?: string,
+    endDate?: string,
+  ): Observable<ApiResponse<IncidentKpiDTO>> {
+    let params = new HttpParams();
+
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+
+    return this.http.get<ApiResponse<IncidentKpiDTO>>(`${this.baseUrl}/kpis`, {
+      params,
+    });
+  }
 
   create(dto: CreateIncidentDTO): Observable<ApiResponse<IncidentResponseDTO>> {
     return this.http.post<ApiResponse<IncidentResponseDTO>>(this.baseUrl, dto);

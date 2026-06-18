@@ -10,10 +10,13 @@ import {
 import { PaymentService } from '@core/services/payments/payment.service';
 import { PaymentResponseDTO } from '@interfaces/payments/payment.interface';
 
+import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'component-dashboard-payments-kpis',
   imports: [
     CommonModule,
+    FormsModule,
     LucideCalendar,
     LucideCreditCard,
     LucideSmartphone,
@@ -31,15 +34,53 @@ export class ComponentDashboardPaymentsKpis implements OnInit {
   totalYape = 0;
   totalTransfer = 0;
 
+  selectedPeriod = '';
+  periods: { label: string; value: string }[] = [];
+
   ngOnInit(): void {
+    this.generatePeriods();
+    this.loadKPIs();
+  }
+
+  generatePeriods(): void {
+    const today = new Date();
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const year = d.getFullYear();
+      const month = d.getMonth() + 1;
+      const monthName = d.toLocaleString('es-PE', { month: 'long' });
+      const label = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} ${year}`;
+      const value = `${year}-${month.toString().padStart(2, '0')}`;
+      this.periods.push({ label, value });
+    }
+    this.selectedPeriod = this.periods[0].value;
+  }
+
+  onPeriodChange(): void {
     this.loadKPIs();
   }
 
   loadKPIs(): void {
-    this.paymentService.search(0, 1000, 'createdAt,desc').subscribe({
+    let startDate: string | undefined;
+    let endDate: string | undefined;
+
+    if (this.selectedPeriod) {
+      const [year, month] = this.selectedPeriod.split('-');
+      const start = new Date(Number(year), Number(month) - 1, 1);
+      const end = new Date(Number(year), Number(month), 0, 23, 59, 59);
+
+      startDate = start.toISOString();
+      endDate = end.toISOString();
+    }
+
+    this.paymentService.getKpis(startDate, endDate).subscribe({
       next: (res) => {
-        if (res.success && res.data && res.data.content) {
-          this.calculate(res.data.content);
+        if (res.success && res.data) {
+          this.totalToday = res.data.totalToday;
+          this.totalMonth = res.data.totalPeriod;
+          this.totalCash = res.data.totalCash;
+          this.totalYape = res.data.totalYape;
+          this.totalTransfer = res.data.totalTransfer;
         } else {
           this.resetKPIs();
         }
@@ -56,48 +97,5 @@ export class ComponentDashboardPaymentsKpis implements OnInit {
     this.totalCash = 0;
     this.totalYape = 0;
     this.totalTransfer = 0;
-  }
-
-  private calculate(list: PaymentResponseDTO[]): void {
-    const todayStr = new Date().toISOString().split('T')[0];
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-
-    // Filter COMPLETED status payments (since PENDING or CANCELLED may not represent actual revenue)
-    const completedPayments = list.filter((p) => p.status === 'COMPLETED');
-
-    this.totalToday = completedPayments
-      .filter((p) => {
-        if (!p.paymentDate) return false;
-        return p.paymentDate.startsWith(todayStr);
-      })
-      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
-
-    this.totalMonth = completedPayments
-      .filter((p) => {
-        if (!p.paymentDate) return false;
-        const d = new Date(p.paymentDate);
-        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-      })
-      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
-
-    this.totalCash = completedPayments
-      .filter((p) => p.paymentMethod === 'CASH')
-      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
-
-    this.totalYape = completedPayments
-      .filter((p) => p.paymentMethod === 'YAPE')
-      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
-
-    // Transferencias: BANK_TRANSFER + PLIN + CARD
-    this.totalTransfer = completedPayments
-      .filter(
-        (p) =>
-          p.paymentMethod === 'BANK_TRANSFER' ||
-          p.paymentMethod === 'PLIN' ||
-          p.paymentMethod === 'CARD',
-      )
-      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
   }
 }

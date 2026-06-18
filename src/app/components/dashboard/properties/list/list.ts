@@ -46,7 +46,9 @@ export class ComponentDashboardPropertiesList implements OnInit {
 
   constructor() {
     this.filterForm = this.fb.group({
-      type: ['']
+      type: [''],
+      startDate: [''],
+      endDate: ['']
     });
   }
 
@@ -58,9 +60,11 @@ export class ComponentDashboardPropertiesList implements OnInit {
     this.isLoading = true;
 
     const typeFilter = this.filterForm.value.type || undefined;
+    const startDate = this.filterForm.value.startDate || undefined;
+    const endDate = this.filterForm.value.endDate || undefined;
 
     this.propertyService
-      .getAll(page, this.pageSize, this.sort, this.searchQuery || undefined, typeFilter)
+      .getAll(page, this.pageSize, this.sort, this.searchQuery || undefined, typeFilter, undefined, startDate, endDate)
       .subscribe({
         next: (res: any) => {
           this.properties = res.data.content;
@@ -102,7 +106,9 @@ export class ComponentDashboardPropertiesList implements OnInit {
 
   clearFilters(): void {
     this.filterForm.reset({
-      type: ''
+      type: '',
+      startDate: '',
+      endDate: ''
     });
     this.activeFiltersCount = 0;
     this.currentPage = 0;
@@ -117,8 +123,10 @@ export class ComponentDashboardPropertiesList implements OnInit {
     } else {
       // Export all records
       const typeFilter = this.filterForm.value.type || undefined;
+      const startDate = this.filterForm.value.startDate || undefined;
+      const endDate = this.filterForm.value.endDate || undefined;
       
-      this.propertyService.getAll(0, 10000, this.sort, this.searchQuery || undefined, typeFilter)
+      this.propertyService.getAll(0, 10000, this.sort, this.searchQuery || undefined, typeFilter, undefined, startDate, endDate)
         .subscribe({
           next: (res: any) => {
             this.doExport(res.data.content, options.format, filename);

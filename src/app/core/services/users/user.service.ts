@@ -96,4 +96,12 @@ export class UserService {
     return this.http.post<ApiResponse<void>>(`${this.apiUrl}/bulk`, dtos);
   }
 
+  resetPassword(id: string): Observable<ApiResponse<void>> {
+    return this.http.patch<ApiResponse<void>>(`${this.apiUrl}/${id}/reset-password`, null);
+  }
+
+  changePassword(data: { currentPassword: string; newPassword: string }): Observable<ApiResponse<void>> {
+    return this.http.patch<ApiResponse<void>>(`${this.apiUrl}/profile/change-password`, data);
+  }
+
 }

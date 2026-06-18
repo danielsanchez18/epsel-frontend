@@ -1,3 +1,20 @@
+<div class="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-3">
+  <div>
+    <h2 class="text-base font-semibold text-gray-800">Resumen de Morosidad</h2>
+  </div>
+  <div class="flex items-center gap-2">
+    <select
+      [(ngModel)]="selectedPeriod"
+      (ngModelChange)="onPeriodChange()"
+      class="block w-full sm:w-48 py-2 px-3 border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-white text-gray-700 font-medium shadow-xs"
+    >
+      <option *ngFor="let period of periods" [value]="period.value">
+        {{ period.label }}
+      </option>
+    </select>
+  </div>
+</div>
+
 <section class="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
 
   <!-- Facturas Pendientes -->

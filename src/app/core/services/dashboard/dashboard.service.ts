@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { API_URL } from '@core/utils/api';
@@ -13,7 +13,16 @@ export class DashboardService {
   private http = inject(HttpClient);
   private baseUrl = `${API_URL}/dashboard`;
 
-  getDashboard(): Observable<ApiResponse<DashboardResponse>> {
-    return this.http.get<ApiResponse<DashboardResponse>>(this.baseUrl);
+  getDashboard(
+    month?: number,
+    year?: number,
+  ): Observable<ApiResponse<DashboardResponse>> {
+    let params = new HttpParams();
+    if (month) params = params.set('month', month.toString());
+    if (year) params = params.set('year', year.toString());
+
+    return this.http.get<ApiResponse<DashboardResponse>>(this.baseUrl, {
+      params,
+    });
   }
 }

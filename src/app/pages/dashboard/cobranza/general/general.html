@@ -6,7 +6,7 @@
     <p class="text-sm text-gray-700">Administra las cuentas pendientes de cobro, gestiona clientes morosos y genera avisos de cobranza o suspensión de servicio.</p>
   </div>
 
-  <component-dashboard-cobranza-kpis />
-  <component-dashboard-cobranza-list />
+  <component-dashboard-cobranza-kpis #kpis />
+  <component-dashboard-cobranza-list (filtersChanged)="kpis.loadKPIs($event.startDate, $event.endDate)" />
 
 </main>

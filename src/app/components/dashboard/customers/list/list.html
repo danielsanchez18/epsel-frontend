@@ -28,9 +28,19 @@
             <label class="text-sm font-medium text-gray-800">Tipo de Cliente</label>
             <select formControlName="type" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700">
               <option value="">Todos los tipos</option>
-              <option value="NATURAL">Persona Natural</option>
-              <option value="JURIDICA">Persona Jurídica</option>
+              <option value="PERSON">Persona Natural</option>
+              <option value="COMPANY">Persona Jurídica</option>
             </select>
+          </div>
+
+          <!-- Fechas -->
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-gray-800">Fecha Creación Desde</label>
+            <input type="datetime-local" formControlName="startDate" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-gray-800">Fecha Creación Hasta</label>
+            <input type="datetime-local" formControlName="endDate" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700" />
           </div>
 
           <!-- Botones de Acción -->
@@ -60,8 +70,8 @@
 
   <component-dashboard-customers-empty
     *ngIf="customers.length === 0 && !isLoading"
-    [title]="searchQuery ? 'No se encontraron resultados' : 'No tienes clientes registrados'"
-    [message]="searchQuery ? 'Intenta ajustando los términos de búsqueda' : 'Registra un nuevo cliente para empezar a gestionar tu sistema'"
+    [title]="searchQuery || activeFiltersCount > 0 ? 'No se encontraron resultados' : 'No tienes clientes registrados'"
+    [message]="searchQuery || activeFiltersCount > 0 ? 'Intenta ajustando los términos de búsqueda o los filtros aplicados' : 'Registra un nuevo cliente para empezar a gestionar tu sistema'"
   />
 
   <component-shared-paginator

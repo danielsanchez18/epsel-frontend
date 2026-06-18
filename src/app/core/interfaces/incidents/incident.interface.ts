@@ -47,3 +47,10 @@ export interface IncidentResponseDTO {
   resolvedDate?: string;
   resolution?: string;
 }
+
+export interface IncidentKpiDTO {
+  total: number;
+  open: number;
+  inProgress: number;
+  resolved: number;
+}

@@ -1,12 +1,13 @@
-import { Routes } from "@angular/router";
+import { Routes } from '@angular/router';
 
 export const AUTH_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () => import('@pages/auth/login/login').then(m => m.PageAuthLogin)
+    loadComponent: () =>
+      import('@pages/auth/login/login').then((m) => m.PageAuthLogin),
   },
-  {
-    path: 'recuperar-clave',
-    loadComponent: () => import('@pages/auth/forgot-password/forgot-password').then(m => m.PageAuthForgotPassword)
-  }
-]
+  // {
+  //   path: 'recuperar-clave',
+  //   loadComponent: () => import('@pages/auth/forgot-password/forgot-password').then(m => m.PageAuthForgotPassword)
+  // }
+];

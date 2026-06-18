@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { API_URL } from '@core/utils/api';
 import { ApiResponse } from '@core/interfaces/shared/api-response.interface';
 import { PaginatedResponse } from '@core/interfaces/shared/paginated-response.interface';
-import { BillingResponseDTO } from '@interfaces/billings/billing.interface';
+import { BillingResponseDTO, BillingKpiDTO } from '@interfaces/billings/billing.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +13,20 @@ import { BillingResponseDTO } from '@interfaces/billings/billing.interface';
 export class BillingService {
   private http = inject(HttpClient);
   private baseUrl = `${API_URL}/billings`;
+
+  getKpis(
+    startDate?: string,
+    endDate?: string,
+  ): Observable<ApiResponse<BillingKpiDTO>> {
+    let params = new HttpParams();
+
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+
+    return this.http.get<ApiResponse<BillingKpiDTO>>(`${this.baseUrl}/kpis`, {
+      params,
+    });
+  }
 
   generate(readingId: string): Observable<ApiResponse<BillingResponseDTO>> {
     return this.http.post<ApiResponse<BillingResponseDTO>>(

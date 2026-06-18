@@ -47,6 +47,8 @@ export class PropertyService {
     search?: string,
     type?: string,
     customerId?: string,
+    startDate?: string,
+    endDate?: string,
   ): Observable<ApiResponse<PaginatedResponse<PropertyResponse>['data']>> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -56,6 +58,8 @@ export class PropertyService {
     if (search) params = params.set('search', search);
     if (type) params = params.set('type', type);
     if (customerId) params = params.set('customerId', customerId);
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
     return this.http.get<
       ApiResponse<PaginatedResponse<PropertyResponse>['data']>
     >(this.baseUrl, { params });
@@ -65,8 +69,12 @@ export class PropertyService {
     return this.http.delete<ApiResponse<void>>(`${this.baseUrl}/${id}`);
   }
 
-  getKpis(): Observable<ApiResponse<any>> {
-    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/kpis`);
+  getKpis(startDate?: string, endDate?: string): Observable<ApiResponse<any>> {
+    let params = new HttpParams();
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    
+    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/kpis`, { params });
   }
 
   previewImport(file: File): Observable<ApiResponse<ImportPreviewResponse<CreatePropertyRequest>>> {

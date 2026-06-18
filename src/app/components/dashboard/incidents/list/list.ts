@@ -46,12 +46,6 @@ export class ComponentDashboardIncidentsList implements OnInit {
   filterForm: FormGroup;
   activeFiltersCount = 0;
 
-  // KPI counts
-  kpiTotal = 0;
-  kpiOpen = 0;
-  kpiInProgress = 0;
-  kpiResolved = 0;
-
   constructor() {
     this.filterForm = this.fb.group({
       status: [''],
@@ -64,21 +58,6 @@ export class ComponentDashboardIncidentsList implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
-    this.loadKpis();
-  }
-
-  loadKpis(): void {
-    this.incidentService.search(0, 1000).subscribe({
-      next: (res) => {
-        if (res.success && res.data) {
-          const all = res.data.content ?? [];
-          this.kpiTotal = all.length;
-          this.kpiOpen = all.filter(i => i.status === 'OPEN').length;
-          this.kpiInProgress = all.filter(i => i.status === 'IN_PROGRESS').length;
-          this.kpiResolved = all.filter(i => i.status === 'RESOLVED').length;
-        }
-      }
-    });
   }
 
   loadData(page: number = 0): void {

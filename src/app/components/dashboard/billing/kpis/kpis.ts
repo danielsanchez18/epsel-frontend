@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   LucideClock,
   LucideBadgeAlert,
@@ -7,12 +8,12 @@ import {
   LucideBadgeDollarSign,
 } from '@lucide/angular';
 import { BillingService } from '@core/services/billings/billing.service';
-import { BillingResponseDTO } from '@interfaces/billings/billing.interface';
 
 @Component({
   selector: 'component-dashboard-billing-kpis',
   imports: [
     CommonModule,
+    FormsModule,
     LucideClock,
     LucideBadgeAlert,
     LucideBadgeCheck,
@@ -29,15 +30,53 @@ export class ComponentDashboardBillingKpis implements OnInit {
   totalCollected = 0;
   totalPending = 0;
 
+  selectedPeriod = '';
+  periods: { label: string; value: string }[] = [];
+
   ngOnInit(): void {
+    this.generatePeriods();
+    this.loadKPIs();
+  }
+
+  generatePeriods(): void {
+    const today = new Date();
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const year = d.getFullYear();
+      const month = d.getMonth() + 1;
+      const monthName = d.toLocaleString('es-PE', { month: 'long' });
+      const label = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} ${year}`;
+      const value = `${year}-${month.toString().padStart(2, '0')}`;
+      this.periods.push({ label, value });
+    }
+    this.selectedPeriod = this.periods[0].value;
+  }
+
+  onPeriodChange(): void {
     this.loadKPIs();
   }
 
   loadKPIs(): void {
-    this.billingService.search(0, 1000).subscribe({
+    let startDate: string | undefined;
+    let endDate: string | undefined;
+
+    if (this.selectedPeriod) {
+      const [year, month] = this.selectedPeriod.split('-');
+      const start = new Date(Number(year), Number(month) - 1, 1);
+      const end = new Date(Number(year), Number(month), 0, 23, 59, 59);
+
+      startDate = start.toISOString();
+      endDate = end.toISOString();
+    }
+
+    this.billingService.getKpis(startDate, endDate).subscribe({
       next: (res) => {
-        if (res.success && res.data && res.data.content) {
-          this.calculate(res.data.content);
+        if (res.success && res.data) {
+          this.pendingCount = res.data.pendingCount;
+          this.overdueCount = res.data.overdueCount;
+          this.paidCount = res.data.paidCount;
+          this.totalCollected = res.data.totalCollected;
+          this.totalPending = res.data.totalPending;
         } else {
           this.resetKPIs();
         }
@@ -54,25 +93,5 @@ export class ComponentDashboardBillingKpis implements OnInit {
     this.paidCount = 0;
     this.totalCollected = 0;
     this.totalPending = 0;
-  }
-
-  private calculate(list: BillingResponseDTO[]): void {
-    this.pendingCount = list.filter((b) => b.status === 'PENDING').length;
-    this.overdueCount = list.filter((b) => b.status === 'OVERDUE').length;
-    this.paidCount = list.filter((b) => b.status === 'PAID').length;
-
-    this.totalCollected = list
-      .filter((b) => b.status === 'PAID')
-      .reduce(
-        (sum, b) => sum + (Number(b.amountPaid) || Number(b.totalAmount)),
-        0,
-      );
-
-    this.totalPending = list
-      .filter((b) => b.status === 'PENDING' || b.status === 'OVERDUE')
-      .reduce(
-        (sum, b) => sum + (Number(b.totalAmount) - (Number(b.amountPaid) || 0)),
-        0,
-      );
   }
 }

@@ -46,7 +46,9 @@ export class ComponentDashboardCustomersList implements OnInit {
 
   constructor() {
     this.filterForm = this.fb.group({
-      type: ['']
+      type: [''],
+      startDate: [''],
+      endDate: ['']
     });
   }
 
@@ -58,9 +60,11 @@ export class ComponentDashboardCustomersList implements OnInit {
     this.isLoading = true;
 
     const typeFilter = this.filterForm.value.type || undefined;
+    const startDate = this.filterForm.value.startDate || undefined;
+    const endDate = this.filterForm.value.endDate || undefined;
 
     this.customerService
-      .search(page, this.pageSize, this.sort, this.searchQuery || undefined, typeFilter as CustomerType)
+      .search(page, this.pageSize, this.sort, this.searchQuery || undefined, typeFilter as CustomerType, startDate, endDate)
       .subscribe({
         next: (res: any) => {
           this.customers = res.data.content;
@@ -102,7 +106,9 @@ export class ComponentDashboardCustomersList implements OnInit {
 
   clearFilters(): void {
     this.filterForm.reset({
-      type: ''
+      type: '',
+      startDate: '',
+      endDate: ''
     });
     this.activeFiltersCount = 0;
     this.currentPage = 0;
@@ -117,8 +123,10 @@ export class ComponentDashboardCustomersList implements OnInit {
     } else {
       // Export all records
       const typeFilter = this.filterForm.value.type || undefined;
+      const startDate = this.filterForm.value.startDate || undefined;
+      const endDate = this.filterForm.value.endDate || undefined;
       
-      this.customerService.search(0, 10000, this.sort, this.searchQuery || undefined, typeFilter as CustomerType)
+      this.customerService.search(0, 10000, this.sort, this.searchQuery || undefined, typeFilter as CustomerType, startDate, endDate)
         .subscribe({
           next: (res: any) => {
             this.doExport(res.data.content, options.format, filename);
@@ -133,7 +141,7 @@ export class ComponentDashboardCustomersList implements OnInit {
   private doExport(data: any[], format: 'CSV' | 'EXCEL', filename: string): void {
     // Transform data for export to make it cleaner
     const exportData = data.map(c => ({
-      'Tipo de Cliente': c.type === 'NATURAL' ? 'Persona Natural' : 'Persona Jurídica',
+      'Tipo de Cliente': c.type === 'PERSON' ? 'Persona Natural' : 'Persona Jurídica',
       'Documento': c.documentNumber || '',
       'Nombre': c.name || '',
       'Razón Social': c.businessName || '',

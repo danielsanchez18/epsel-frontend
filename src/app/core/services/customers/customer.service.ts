@@ -45,6 +45,8 @@ export class CustomerService {
     sort: string,
     search?: string,
     type?: CustomerType,
+    startDate?: string,
+    endDate?: string,
   ): Observable<ApiResponse<PaginatedResponse<CustomerResponse>['data']>> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -56,6 +58,12 @@ export class CustomerService {
     }
     if (type) {
       params = params.set('type', type);
+    }
+    if (startDate) {
+      params = params.set('startDate', startDate);
+    }
+    if (endDate) {
+      params = params.set('endDate', endDate);
     }
 
     return this.http.get<
